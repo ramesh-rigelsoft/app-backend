@@ -167,7 +167,7 @@ public class UserController {
 		Map<String, Object> data2 = new HashMap<>();
 		String secret = null;
 		LoginActivity loginActivity = loginInfoService.findLoginActivityByUsername(login.getUsername());
-		System.out.println((jwtTokenUtil.isTokenExpired(loginActivity.getToken())) + "------------" + loginActivity);
+//		System.out.println((jwtTokenUtil.isTokenExpired(loginActivity.getToken())) + "------------" + loginActivity);
 		if (loginActivity == null || (loginActivity != null
 				&& jwtTokenUtil.isTokenExpired(loginActivity != null ? loginActivity.getToken() : null))) {
 			ThirdPartyResponse thirdPartyResponse = RAUtility.loginPost(login.toString());
@@ -328,7 +328,7 @@ public class UserController {
 
 				String safeFileName = fileName.contains("_") ? fileName.split("_")[1] : fileName;
 
-				Path downloadPath = Paths.get(userHome, "Downloads", safeFileName);
+				Path downloadPath = Paths.get(userHome, "Downloads",Constaints.DOWNLOAD_FOLDER_NAME, safeFileName);
 
 				Files.copy(file.toPath(), downloadPath, StandardCopyOption.REPLACE_EXISTING);
 

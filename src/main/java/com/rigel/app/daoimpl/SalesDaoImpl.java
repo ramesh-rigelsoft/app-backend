@@ -124,8 +124,7 @@ public class SalesDaoImpl implements ISalesDao {
 			query.setParameter(entry.getKey(), entry.getValue());
 		}
 		if (!criteria.isIsdownload()) {
-			int startIndex = Math.max(criteria.getStartIndex() - 1, 0);
-			query.setFirstResult(startIndex);
+		    query.setFirstResult(criteria.getStartIndex());
 			query.setMaxResults(criteria.getMaxRecords());
 		}
 		return query.getResultList();

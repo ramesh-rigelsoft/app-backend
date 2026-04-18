@@ -139,9 +139,8 @@ public class ItemsDaoImpl implements IItemsDao {
 		}
 
 		if (!criteria.isIsdownload()) {
-			// pagination safe handling
-			int startIndex = Math.max(criteria.getStartIndex() - 1, 0);
-			query.setFirstResult(startIndex);
+			System.out.println("ddddd---"+criteria.getStartIndex());
+			query.setFirstResult(criteria.getStartIndex());
 			query.setMaxResults(criteria.getMaxRecords());
 		}
 		return query.getResultList();

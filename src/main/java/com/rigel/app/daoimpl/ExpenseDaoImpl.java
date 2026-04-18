@@ -76,7 +76,8 @@ public class ExpenseDaoImpl implements IExpenseDao {
 	    if (creteria.getMonth() != 0) {
 	        query.setParameter("month", creteria.getMonth());
 	    }
-
+	    query.setFirstResult(creteria.getStartIndex());
+	    query.setMaxResults(creteria.getMaxRecords());
 	    return query.getResultList();
 	}
 

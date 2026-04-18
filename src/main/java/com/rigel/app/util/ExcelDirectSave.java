@@ -142,7 +142,7 @@ public class ExcelDirectSave {
 
             // ✅ Folder Path (Downloads/RigelEMISM)
             String userHome = System.getProperty("user.home");
-            Path folder = Paths.get(userHome, "Downloads", "RigelEMISM");
+            Path folder = Paths.get(userHome, "Downloads", Constaints.DOWNLOAD_FOLDER_NAME);
 
             // ✅ Create if not exists
             if (!Files.exists(folder)) {

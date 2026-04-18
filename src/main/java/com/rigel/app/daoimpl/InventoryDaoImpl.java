@@ -225,7 +225,10 @@ public class InventoryDaoImpl implements IInventoryDao {
 	    if (criteria.getDescription() != null && !criteria.getDescription().isEmpty()) {
 	        query.setParameter("description", "%" + criteria.getDescription().toLowerCase() + "%");
 	    }
-
+	  System.out.println("start-"+criteria.getStartIndex());
+	  System.out.println("max-"+criteria.getMaxRecords());
+	    query.setFirstResult(criteria.getStartIndex());
+	    query.setMaxResults(criteria.getMaxRecords());	    
 	    return query.getResultList();
 	}
 
