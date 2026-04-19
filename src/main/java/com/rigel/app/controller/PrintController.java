@@ -13,9 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.rigel.app.exception.BadGatewayRequest;
-import com.rigel.app.model.dto.SalesRequest;
-import com.rigel.app.model.dto.SalesResponse;
-import com.rigel.app.service.IBuyerInfoService;
+import com.rigel.app.model.dto.GenerateBillRequest;
+import com.rigel.app.service.IPrintService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -25,26 +24,26 @@ import jakarta.validation.Valid;
 public class PrintController {
 
 	@Autowired
-	IBuyerInfoService buyerInfoService;
+	private IPrintService printService;
 
 	@PostMapping("bill")
-	public ResponseEntity<Map<String, Object>> save(@RequestBody(required = true) @Valid SalesRequest salesRequest,
+	public ResponseEntity<Map<String, Object>> save(@RequestBody(required = true) @Valid GenerateBillRequest billRequest,
 			BindingResult result, HttpServletRequest request) {
 		Map<String, Object> response = new HashMap<>();
 		Map<String, Object> data = new HashMap<>();
 
-		if (salesRequest == null) {
+		if (billRequest == null) {
 			throw new BadGatewayRequest("Invalid Request");
 		} else if (result.hasFieldErrors()) {
 			throw new BadGatewayRequest(result.getFieldError().getDefaultMessage());
 		} else {
-			SalesResponse salesResponse = buyerInfoService.saveBuyerInfo(salesRequest);
-			data.put("buyer", salesResponse);
+			printService.billPrint(billRequest.getInvoiceNumber(), billRequest.getOwnerId(), billRequest.getUsername());
 			response.put("data", data);
 			response.put("status", "CREATED");
 			response.put("code", "201");
-			response.put("message", "Your records has been created successfully.");
+			response.put("message", "Your bill has been created successfully.");
 			return new ResponseEntity<>(response, HttpStatus.CREATED);
 		}
 	}
 }
+

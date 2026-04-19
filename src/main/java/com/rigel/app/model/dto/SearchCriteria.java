@@ -31,6 +31,7 @@ public class SearchCriteria {
 	private String startDate;
 	private String endDate;
 	
+	private String invoiceNumber;
     private Set<String> itemCodes;
     private String itemCode;
     private String category;

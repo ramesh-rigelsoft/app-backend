@@ -77,10 +77,13 @@ public class SalesDaoImpl implements ISalesDao {
 		StringBuilder jpql = new StringBuilder("SELECT i FROM SalesInfo i INNER JOIN FETCH i.buyerInfo WHERE 1=1 ");
 
 		Map<String, Object> params = new HashMap<>();
-
-		// ownerId (mandatory)
 		jpql.append(" AND i.ownerId = :ownerId ");
 		params.put("ownerId", criteria.getUserId());
+		
+		if (criteria.getInvoiceNumber() != null && !criteria.getInvoiceNumber().isEmpty()) {
+		    jpql.append(" AND i.buyerInfo.invoiceNumber = :invoiceNumber ");
+		    params.put("invoiceNumber", criteria.getInvoiceNumber());
+		}
 
 		// optional searchKeyword (itemCode / model / brand search)
 		if (criteria.getSearchKeyword() != null && !criteria.getSearchKeyword().isEmpty()) {
