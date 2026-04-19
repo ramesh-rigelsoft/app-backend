@@ -105,11 +105,12 @@ public class InventoryDaoImpl implements IInventoryDao {
 	public List<Inventory> searchInventory(SearchCriteria criteria) {
 
 	    StringBuilder jpql = new StringBuilder("SELECT i FROM Inventory i WHERE ");
-
-	    if (criteria.getUserId() != 0) {
-	        jpql.append("i.ownerId = :ownerId ");
+        jpql.append("i.ownerId = :ownerId ");
+        
+        if (criteria.getItemCode() != null) {
+	        jpql.append(" AND i.itemCode = :itemCode ");
 	    }
-
+        
 	    if (criteria.getCategory() != null) {
 	        jpql.append(" AND i.category = :category ");
 	    }
@@ -169,11 +170,10 @@ public class InventoryDaoImpl implements IInventoryDao {
 //	    jpql.append(" ORDER BY i.createdAt DESC ");
 
 	    TypedQuery<Inventory> query = entityManager.createQuery(jpql.toString(), Inventory.class);
-	   
-	    if (criteria.getUserId() != 0) {
-	    	query.setParameter("ownerId",criteria.getUserId());
-	    }
-	    
+    	query.setParameter("ownerId",criteria.getUserId());
+    	if (criteria.getItemCode() != null) {
+ 	       query.setParameter("itemCode", criteria.getItemCode());
+ 	    }
 	    if (criteria.getCategory() != null) {
 	        query.setParameter("category", criteria.getCategory());
 	    }
