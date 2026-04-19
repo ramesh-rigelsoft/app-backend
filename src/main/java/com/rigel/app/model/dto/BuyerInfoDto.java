@@ -12,7 +12,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Set;
 
 
-@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

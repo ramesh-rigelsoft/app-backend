@@ -2,6 +2,7 @@ package com.rigel.app.daoimpl;
 
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -66,11 +67,17 @@ public class InventoryDaoImpl implements IInventoryDao {
 
 	@Override
 	public int deleteInventory(String itemCode,int ownerId) {
-	    String hql = "DELETE FROM Inventory i WHERE i.itemCode = :itemCode AND ownerId = :ownerId ";
-	    return entityManager.createQuery(hql)
-	            .setParameter("itemCode", itemCode)
-	            .setParameter("ownerId", ownerId)
-		        .executeUpdate();
+	    String hql = "update Inventory SET quantity = :quantity WHERE ownerId = :ownerId AND itemCode = :itemCode";
+	      try {
+		    return entityManager.createQuery(hql)
+		            .setParameter("quantity", 0)
+		            .setParameter("ownerId", ownerId)
+		            .setParameter("itemCode", itemCode)
+		            .executeUpdate();
+	      }catch(Exception e){
+	    	 e.printStackTrace();
+		    return 0;
+	     }
 	}
 	
 	@Override
@@ -107,9 +114,9 @@ public class InventoryDaoImpl implements IInventoryDao {
 	    StringBuilder jpql = new StringBuilder("SELECT i FROM Inventory i WHERE ");
         jpql.append("i.ownerId = :ownerId ");
         
-        if (criteria.getItemCode() != null) {
-	        jpql.append(" AND i.itemCode = :itemCode ");
-	    }
+        if (criteria.getItemCodes() != null && !criteria.getItemCodes().isEmpty()) {
+            jpql.append(" AND i.itemCode IN :itemCodes ");
+        }
         
 	    if (criteria.getCategory() != null) {
 	        jpql.append(" AND i.category = :category ");
@@ -171,9 +178,10 @@ public class InventoryDaoImpl implements IInventoryDao {
 
 	    TypedQuery<Inventory> query = entityManager.createQuery(jpql.toString(), Inventory.class);
     	query.setParameter("ownerId",criteria.getUserId());
-    	if (criteria.getItemCode() != null) {
- 	       query.setParameter("itemCode", criteria.getItemCode());
- 	    }
+    	
+    	if (criteria.getItemCodes() != null && !criteria.getItemCodes().isEmpty()) {
+    	    query.setParameter("itemCodes", criteria.getItemCodes());
+    	}
 	    if (criteria.getCategory() != null) {
 	        query.setParameter("category", criteria.getCategory());
 	    }

@@ -67,6 +67,8 @@ public class SalesInfoDto {
     private String itemGen;
     
 	private String gstRate;
+	
+    private Double soldPrice;
     
     private int ownerId;
 

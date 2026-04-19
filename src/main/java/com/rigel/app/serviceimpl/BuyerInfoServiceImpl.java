@@ -2,12 +2,13 @@ package com.rigel.app.serviceimpl;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.context.annotation.Lazy;
@@ -21,10 +22,12 @@ import com.rigel.app.model.BuyerInfo;
 import com.rigel.app.model.Inventory;
 import com.rigel.app.model.SalesInfo;
 import com.rigel.app.model.dto.RequestInfo;
+import com.rigel.app.model.dto.SalesInfoDto;
 import com.rigel.app.model.dto.SalesRequest;
 import com.rigel.app.model.dto.SalesResponse;
 import com.rigel.app.model.dto.SearchCriteria;
 import com.rigel.app.service.IBuyerInfoService;
+import com.rigel.app.validate.SalesInfoValidator;
 
 @Lazy 
 @Service
@@ -45,9 +48,19 @@ public class BuyerInfoServiceImpl implements IBuyerInfoService {
 	
 	@Autowired
 	FyIdGeneratorService generatorService;
+	
+	@Autowired
+	SalesInfoValidator salesInfoValidator;
 
 	@Override
 	public SalesResponse saveBuyerInfo(SalesRequest salesRequest) {
+		
+		List<SalesInfoDto> sales = objectMapper.convertValue(
+		        salesRequest.getBuyerInfoDto().getSalesInfo(),
+		        new TypeReference<List<SalesInfoDto>>() {}
+		);
+
+		salesInfoValidator.validate(sales,salesRequest.getUserId());
 		
         BuyerInfo buyer = objectMapper.convertValue(salesRequest.getBuyerInfoDto(),BuyerInfo.class);
 	    buyer.setCreatedAt(LocalDateTime.now());

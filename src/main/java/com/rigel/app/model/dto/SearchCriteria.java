@@ -1,5 +1,6 @@
 package com.rigel.app.model.dto;
 
+import java.util.List;
 import java.util.Set;
 
 import jakarta.validation.constraints.NotBlank;
@@ -30,6 +31,7 @@ public class SearchCriteria {
 	private String startDate;
 	private String endDate;
 	
+    private Set<String> itemCodes;
     private String itemCode;
     private String category;
 	private String categoryType;
