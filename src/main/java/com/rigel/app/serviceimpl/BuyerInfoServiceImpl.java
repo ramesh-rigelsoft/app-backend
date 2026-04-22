@@ -21,6 +21,7 @@ import com.rigel.app.dao.ISalesDao;
 import com.rigel.app.model.BuyerInfo;
 import com.rigel.app.model.Inventory;
 import com.rigel.app.model.SalesInfo;
+import com.rigel.app.model.dto.BuyerInfoDto;
 import com.rigel.app.model.dto.RequestInfo;
 import com.rigel.app.model.dto.SalesInfoDto;
 import com.rigel.app.model.dto.SalesRequest;
@@ -63,9 +64,10 @@ public class BuyerInfoServiceImpl implements IBuyerInfoService {
 		salesInfoValidator.validate(sales,salesRequest.getUserId());
 		
         BuyerInfo buyer = objectMapper.convertValue(salesRequest.getBuyerInfoDto(),BuyerInfo.class);
+        String invoiceNumber=generatorService.generateFyId(salesRequest.getUserId(), "INV");
 	    buyer.setCreatedAt(LocalDateTime.now());
 	    buyer.setStatus(1);
-	    buyer.setInvoiceNumber(generatorService.generateFyId(salesRequest.getUserId(), "INV"));
+	    buyer.setInvoiceNumber(invoiceNumber);
 	    buyer.setCountryCode("91");
 	    buyer.setOwnerId(salesRequest.getUserId());
 	    
@@ -99,8 +101,15 @@ public class BuyerInfoServiceImpl implements IBuyerInfoService {
 		  		}
 	    	}
 	    });
-	    salesDao.saveSalesInfo(list); // 🔥 ONLY THIS
-	    return null;
+	    List<SalesInfo> savedSales=salesDao.saveSalesInfo(list);
+	    Set<SalesInfoDto> salesInfo = savedSales.stream()
+	            .map(s -> objectMapper.convertValue(s, SalesInfoDto.class))
+	            .collect(java.util.stream.Collectors.toSet());      
+	       
+	    BuyerInfoDto buyerInfoDto=salesRequest.getBuyerInfoDto();
+	    buyerInfoDto.setInvoiceNumber(invoiceNumber);
+	    buyerInfoDto.setSalesInfo(salesInfo);
+	   return SalesResponse.builder().buyerInfoDto(Arrays.asList(buyerInfoDto)).build();
 	}
 	
 	@Override

@@ -61,6 +61,7 @@ public class Inventory implements Serializable {
 	@Column(length = 36, updatable = false, nullable = false)
 	private String id;
 
+    @Column(unique = true, nullable = false)
     private String itemCode;
     
     private String category;

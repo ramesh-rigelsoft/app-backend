@@ -10,7 +10,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-
+import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -32,6 +32,7 @@ public class Items implements Serializable {
 	@Column(length = 36, updatable = false, nullable = false)
 	private String id;
     
+    @Column(unique = true, nullable = false)
     private String itemCode;
     
     private String category;
@@ -62,8 +63,6 @@ public class Items implements Serializable {
     private String operatingSystem;
     private String screenSize;
     private String itemGen;
-    
-	@Column(name = "gst_rate")
     private String gstRate;
 	
 	@Column(name = "created_at")

@@ -33,13 +33,17 @@ public class PrintService implements IPrintService {
 
 	@Override
 	public boolean billPrint(String invoiceNumber,int ownerId,String username) {
-		SearchCriteria searchCriteria = SearchCriteria.builder().isdownload(false).invoiceNumber(invoiceNumber).userId(ownerId).build();
+		SearchCriteria searchCriteria = SearchCriteria.builder().startIndex(0).maxRecords(100).isdownload(false).invoiceNumber(invoiceNumber).userId(ownerId).build();
+		System.out.println("searchCriteria---"+searchCriteria.toString());
 		List<SalesInfo> item=salesService.searchSalesInfo(searchCriteria);
+		System.out.println("item-------------"+item.toString());
 		BuyerInfo buyer=item.get(0).getBuyerInfo();
-		buyer.setInvoiceNumber("ITM225100003");
 		String userObject=loginInfoService.findLoginActivityByUsername(username).getUserObject();
+		System.out.println("userObject-------------"+userObject);
+		
 		try {
 			User user = mapper.readValue(userObject, User.class);
+			
 			SalesSlipPDF.createSlip("bill_"+buyer.getInvoiceNumber(),user,buyer,item);
 			return true;
 		} catch (JsonMappingException e) {

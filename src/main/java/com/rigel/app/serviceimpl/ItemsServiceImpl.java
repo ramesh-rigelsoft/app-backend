@@ -33,6 +33,10 @@ public class ItemsServiceImpl implements IItemsService {
 		String itemGen=AppUtill.replaceAllSpace(items.getItemGen());
 		String screenSize=AppUtill.replaceAllSpace(items.getScreenSize());
 		String operatingSystem=AppUtill.replaceAllSpace(items.getOperatingSystem());
+		String gstRate=AppUtill.replaceAllSpace(items.getGstRate());
+		System.out.println("gst--"+gstRate);
+		System.out.println("desc--"+desc);
+		
 		items.setCreatedAt(LocalDateTime.now());
 		items.setDescription(desc);
 		items.setBrand(brand);
@@ -42,6 +46,7 @@ public class ItemsServiceImpl implements IItemsService {
 		items.setScreenSize(screenSize);
 		items.setOperatingSystem(operatingSystem);
 		items.setCreatedAt(LocalDateTime.now());
+		items.setGstRate(gstRate);
 		return itemsDao.saveItems(items);
 	}
 

@@ -50,4 +50,6 @@ public class ItemsDTO {
     private int ownerId;
     
 	private String gstRate;
+	    
+	private String description;
 }
