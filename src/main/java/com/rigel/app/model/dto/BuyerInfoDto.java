@@ -24,6 +24,9 @@ public class BuyerInfoDto {
 
 	    @JsonProperty("invoiceNumber")
 	    private String invoiceNumber;
+	    
+	    @JsonProperty("paymentModes")
+	    private String paymentModes;
 
 	    @JsonProperty("buyerName")
 	    private String buyerName;
