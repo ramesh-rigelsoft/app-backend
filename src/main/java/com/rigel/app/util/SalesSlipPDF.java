@@ -140,25 +140,22 @@ public class SalesSlipPDF {
             header.addCell(slipCell);
 
             document.add(header);
-            
-            Table gstTable = new Table(2).useAllAvailableWidth();
-
-//            Table gstTable = new Table(UnitValue.createPercentArray(2)).useAllAvailableWidth();
-           
-            gstTable.addCell(new Cell().add(new Paragraph("GSTN Number: " + user.getGstNumber())
-                    .setFont(bold).setFontSize(6))
-                    .setBorder(Border.NO_BORDER)
-                    .setTextAlignment(TextAlignment.RIGHT));
-            document.add(gstTable);
-            
+            if(gstApplicable){
+	            Table gstTable = new Table(2).useAllAvailableWidth();
+	            gstTable.addCell(new Cell().add(new Paragraph("GSTN Number: " + user.getGstNumber())
+	                    .setFont(bold).setFontSize(6))
+	                    .setBorder(Border.NO_BORDER)
+	                    .setTextAlignment(TextAlignment.RIGHT));
+	            document.add(gstTable);
+            }
             
             
             addLine(document);
 
             /* ----------- INVOICE INFO ----------- */
             Table invoiceTable = new Table(UnitValue.createPercentArray(2)).useAllAvailableWidth();
-            invoiceTable.addCell(new Cell().add(new Paragraph("Invoice Number: " + buyer.getInvoiceNumber()).setFont(bold).setFontSize(7)).setBorder(Border.NO_BORDER));
-            invoiceTable.addCell(new Cell().add(new Paragraph("Invoice Date : " + LocalDate.now()).setFont(bold).setFontSize(7)).setBorder(Border.NO_BORDER));
+            invoiceTable.addCell(new Cell().add(new Paragraph("Invoice Number: " + buyer.getInvoiceNumber()).setFont(bold).setFontSize(6)).setBorder(Border.NO_BORDER));
+            invoiceTable.addCell(new Cell().add(new Paragraph("Invoice Date : " + LocalDate.now()).setFont(bold).setFontSize(6)).setBorder(Border.NO_BORDER));
             document.add(invoiceTable);
 
             addLine(document);
