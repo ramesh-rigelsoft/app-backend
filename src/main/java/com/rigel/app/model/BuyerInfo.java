@@ -54,6 +54,9 @@ public class BuyerInfo implements Serializable{
 	@NotNull
 	private String invoiceNumber;
 	
+	@NotNull
+	private String custumberId;
+	
 	private String paymentModes;
 	
 //	@Pattern(regexp="^[a-zA-Z ]+$", message="Enter valid Name")

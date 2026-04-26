@@ -19,6 +19,7 @@ import com.rigel.app.model.dto.SearchCriteria;
 import com.rigel.app.querybuilder.ItemsQueryBuilder;
 import com.rigel.app.service.IInventoryService;
 import com.rigel.app.serviceimpl.FyIdGeneratorService;
+import com.rigel.app.util.Constaints;
 import com.rigel.app.util.DateUtility;
 
 import jakarta.persistence.EntityManager;
@@ -42,7 +43,7 @@ public class ItemsDaoImpl implements IItemsDao {
 
 		Inventory Inventory = mapper.convertValue(items, Inventory.class);
 		
-		if (Inventory.getCategory().equals("Repair Installation")) {
+		if (Inventory.getCategory().equalsIgnoreCase(Constaints.SHOP_OWNER_CATEGORY)) {
 			Inventory.setQuantity(1);
 		}
 
@@ -50,11 +51,10 @@ public class ItemsDaoImpl implements IItemsDao {
 		if (existingInventory != null) {
 			items.setItemCode(existingInventory.getItemCode());
 		}
-		if (Inventory.getCategory().equals("Repair Installation")) {
+		if (Inventory.getCategory().equalsIgnoreCase(Constaints.SHOP_OWNER_CATEGORY)) {
 			items.setQuantity(1);
 		}
-
-		return entityManager.merge(items);
+		return existingInventory!=null?entityManager.merge(items):items;
 	}
 
 	@Override

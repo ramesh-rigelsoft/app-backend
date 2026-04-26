@@ -145,10 +145,10 @@ public class SalesSlipPDF {
             if(buyer.getGstNumber()==null) {
                 
             Table customerTable = new Table(UnitValue.createPercentArray(2)).useAllAvailableWidth();
-            customerTable.addCell(new Cell().add(new Paragraph("Customer : " + buyer.getBuyerName()).setFont(normal).setFontSize(6)).setBorder(Border.NO_BORDER));
-            customerTable.addCell(new Cell().add(new Paragraph("Phone : " + buyer.getMobileNumber()).setFont(normal).setFontSize(6)).setBorder(Border.NO_BORDER));
-            customerTable.addCell(new Cell().add(new Paragraph("Address : " + buyer.getBuyerAddress()).setFont(normal).setFontSize(6)).setBorder(Border.NO_BORDER));
-            customerTable.addCell(new Cell().add(new Paragraph("Email'Id : "+ buyer.getEmailId())).setFont(normal).setFontSize(6).setBorder(Border.NO_BORDER));
+            customerTable.addCell(new Cell().add(new Paragraph("Customer : " + (buyer.getBuyerName()!=null?buyer.getBuyerName():buyer.getCustumberId())).setFont(normal).setFontSize(6)).setBorder(Border.NO_BORDER));
+            customerTable.addCell(new Cell().add(new Paragraph("Phone : " + (buyer.getMobileNumber()!=null?buyer.getMobileNumber():"N/A")).setFont(normal).setFontSize(6)).setBorder(Border.NO_BORDER));
+            customerTable.addCell(new Cell().add(new Paragraph("Address : " + (buyer.getBuyerAddress()!=null?buyer.getBuyerAddress():"N/A")).setFont(normal).setFontSize(6)).setBorder(Border.NO_BORDER));
+            customerTable.addCell(new Cell().add(new Paragraph("Email'Id : "+ (buyer.getEmailId()!=null?buyer.getEmailId():"N/A"))).setFont(normal).setFontSize(6).setBorder(Border.NO_BORDER));
             document.add(customerTable);
             addLine(document);
             
@@ -222,7 +222,7 @@ public class SalesSlipPDF {
             
             for (int i = 0; i < sales.size(); i++) {
                 SalesInfo s = sales.get(i);
-                BigDecimal sellingPrice = BigDecimal.valueOf(s.getSellingPrice());
+                BigDecimal soldPrice = BigDecimal.valueOf(s.getSoldPrice());
                 BigDecimal gstRate = BigDecimal.valueOf(Integer.valueOf(s.getGstRate()));
              // 1 + GST/100
                 BigDecimal divisor = BigDecimal.ONE.add(
@@ -230,14 +230,14 @@ public class SalesSlipPDF {
                 );
 
                 // Base price
-                BigDecimal basePrice = sellingPrice.divide(divisor, 2, RoundingMode.HALF_UP);
+                BigDecimal basePrice = soldPrice.divide(divisor, 2, RoundingMode.HALF_UP);
 
                 // GST amount
-                BigDecimal gstAmount = sellingPrice.subtract(basePrice);
+                BigDecimal gstAmount = soldPrice.subtract(basePrice);
                 
                 
                 
-                System.out.println(s.getSellingPrice()+""+basePrice+"----"+gstAmount);
+                System.out.println(s.getSoldPrice()+""+basePrice+"----"+gstAmount);
                 
                 BigDecimal qty = BigDecimal.valueOf(s.getQuantity());
 
@@ -259,7 +259,7 @@ public class SalesSlipPDF {
             /* ---------------- PRICE SUMMARY ---------------- */
              double gst = sales.stream()
                     .mapToDouble(s -> {
-                        double rate = s.getSellingPrice() /(1 + Integer.valueOf(s.getGstRate()) / 100.0);
+                        double rate = s.getSoldPrice() /(1 + Integer.valueOf(s.getGstRate()) / 100.0);
                         double gstAmt=rate*(Integer.valueOf(s.getGstRate()) / 100.0);
 //                        System.out.println(s.getSellingPrice()+" rate--"+rate+",gst--"+gstAmt);
                         return gstAmt*s.getQuantity();
@@ -268,7 +268,7 @@ public class SalesSlipPDF {
             
           double subTotal = sales.stream()
                       .mapToDouble(s -> {
-                          double rate = s.getSellingPrice() /(1 + Integer.valueOf(s.getGstRate()) / 100.0);
+                          double rate = s.getSoldPrice() /(1 + Integer.valueOf(s.getGstRate()) / 100.0);
                           double gstAmt=rate*(Integer.valueOf(s.getGstRate()) / 100.0);
                           System.out.println(" rate--"+rate);
                           return rate*s.getQuantity();
@@ -466,180 +466,3 @@ public class SalesSlipPDF {
                 .setTextAlignment(TextAlignment.RIGHT);
     }
 }
-//package com.rigel.app.util;
-//
-//import com.itextpdf.kernel.colors.ColorConstants;
-//import com.itextpdf.kernel.font.PdfFont;
-//import com.itextpdf.kernel.font.PdfFontFactory;
-//import com.itextpdf.kernel.geom.PageSize;
-//import com.itextpdf.kernel.pdf.PdfDocument;
-//import com.itextpdf.kernel.pdf.PdfWriter;
-//import com.itextpdf.layout.Document;
-//import com.itextpdf.layout.borders.Border;
-//import com.itextpdf.layout.element.*;
-//import com.itextpdf.layout.properties.*;
-//import com.itextpdf.barcodes.Barcode128;
-//import com.itextpdf.kernel.pdf.canvas.draw.SolidLine;
-//
-//import com.rigel.app.model.*;
-//
-//import java.io.FileOutputStream;
-//import java.math.BigDecimal;
-//import java.math.RoundingMode;
-//import java.time.LocalDate;
-//import java.util.List;
-//
-//public class SalesSlipPDF {
-//
-//    // ✅ Cached fonts (performance optimized)
-//    private static PdfFont BOLD;
-//    private static PdfFont NORMAL;
-//
-//    static {
-//        try {
-//            BOLD = PdfFontFactory.createFont("Helvetica-Bold");
-//            NORMAL = PdfFontFactory.createFont("Helvetica");
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
-//
-//    public static void createSlip(String fileName, User user, BuyerInfo buyer, List<SalesInfo> sales) {
-//
-//        // ✅ Prevent null crash
-//        if (buyer == null || sales == null) {
-//            throw new RuntimeException("Invalid data for PDF");
-//        }
-//
-//        // ✅ try-with-resources (NO MEMORY / FILE LEAK)
-//        try (FileOutputStream fos = new FileOutputStream(fileName + ".pdf")) {
-//
-//            PdfWriter writer = new PdfWriter(fos);
-//            PdfDocument pdf = new PdfDocument(writer);
-//            Document document = new Document(pdf, new PageSize(288, 576));
-//            document.setMargins(5, 5, 5, 5);
-//
-//            /* ================= HEADER ================= */
-//            Table header = new Table(UnitValue.createPercentArray(new float[]{2, 5}))
-//                    .useAllAvailableWidth();
-//
-//            String companyName = user != null && user.getCompanyName() != null
-//                    ? user.getCompanyName()
-//                    : "RAHUL MOBILE GALLERY";
-//
-//            header.addCell(new Cell()
-//                    .add(new Paragraph(companyName).setFont(BOLD).setFontSize(9))
-//                    .setTextAlignment(TextAlignment.CENTER)
-//                    .setBorder(Border.NO_BORDER));
-//
-//            Barcode128 barcode = new Barcode128(pdf);
-//            barcode.setCode(buyer.getInvoiceNumber() == null ? "NA" : buyer.getInvoiceNumber());
-//
-//            Image barcodeImage = new Image(barcode.createFormXObject(null, null, pdf))
-//                    .setAutoScale(true);
-//
-//            header.addCell(new Cell()
-//                    .add(new Paragraph("E BILL").setFont(BOLD).setFontSize(7))
-//                    .add(barcodeImage)
-//                    .setBorder(Border.NO_BORDER)
-//                    .setTextAlignment(TextAlignment.CENTER));
-//
-//            document.add(header);
-//            addLine(document);
-//
-//            /* ================= INVOICE ================= */
-//            document.add(new Paragraph("Invoice No: " + safe(buyer.getInvoiceNumber()))
-//                    .setFont(BOLD).setFontSize(7));
-//
-//            document.add(new Paragraph("Date: " + LocalDate.now())
-//                    .setFont(NORMAL).setFontSize(6));
-//
-//            addLine(document);
-//
-//            /* ================= CUSTOMER ================= */
-//            document.add(new Paragraph("Customer: " + safe(buyer.getBuyerName()))
-//                    .setFont(NORMAL).setFontSize(6));
-//
-//            document.add(new Paragraph("Phone: " + safe(buyer.getMobileNumber()))
-//                    .setFont(NORMAL).setFontSize(6));
-//
-//            addLine(document);
-//
-//            /* ================= ITEMS ================= */
-//            Table table = new Table(UnitValue.createPercentArray(new float[]{1, 4, 1, 2}))
-//                    .useAllAvailableWidth();
-//
-//            table.addHeaderCell(headerCell("SR"));
-//            table.addHeaderCell(headerCell("ITEM"));
-//            table.addHeaderCell(headerCell("QTY"));
-//            table.addHeaderCell(headerCell("AMOUNT"));
-//
-//            BigDecimal total = BigDecimal.ZERO;
-//
-//            for (int i = 0; i < sales.size(); i++) {
-//                SalesInfo s = sales.get(i);
-//
-//                BigDecimal price = BigDecimal.valueOf(
-//                        s.getSellingPrice() == null ? 0 : s.getSellingPrice()
-//                );
-//
-//                BigDecimal qty = BigDecimal.valueOf(
-//                        s.getQuantity() == null ? 0 : s.getQuantity()
-//                );
-//
-//                BigDecimal amt = price.multiply(qty);
-//                total = total.add(amt);
-//
-//                table.addCell(cell(String.valueOf(i + 1)));
-//                table.addCell(cell(safe(s.getDescription())));
-//                table.addCell(cell(String.valueOf(qty)));
-//                table.addCell(cell(amt.toString()));
-//            }
-//
-//            document.add(table);
-//            addLine(document);
-//
-//            /* ================= TOTAL ================= */
-//            document.add(new Paragraph("Total: " + total)
-//                    .setFont(BOLD).setFontSize(8)
-//                    .setTextAlignment(TextAlignment.RIGHT));
-//
-//            addLine(document);
-//
-//            /* ================= FOOTER ================= */
-//            document.add(new Paragraph("***** THANK YOU VISIT AGAIN *****")
-//                    .setFont(BOLD)
-//                    .setFontSize(7)
-//                    .setTextAlignment(TextAlignment.CENTER));
-//
-//            document.close();
-//
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            throw new RuntimeException("PDF generation failed");
-//        }
-//    }
-//
-//    /* ================= HELPERS ================= */
-//
-//    private static void addLine(Document doc) {
-//        doc.add(new LineSeparator(new SolidLine()));
-//    }
-//
-//    private static Cell cell(String text) {
-//        return new Cell()
-//                .add(new Paragraph(text).setFont(NORMAL).setFontSize(6))
-//                .setBorder(Border.NO_BORDER);
-//    }
-//
-//    private static Cell headerCell(String text) {
-//        return new Cell()
-//                .add(new Paragraph(text).setFont(BOLD).setFontSize(6))
-//                .setBackgroundColor(ColorConstants.LIGHT_GRAY)
-//                .setTextAlignment(TextAlignment.CENTER);
-//    }
-//
-//    private static String safe(String val) {
-//        return val == null ? "" : val;
-//    }
-//}

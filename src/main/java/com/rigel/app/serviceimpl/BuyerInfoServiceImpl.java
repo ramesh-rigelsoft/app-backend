@@ -65,11 +65,13 @@ public class BuyerInfoServiceImpl implements IBuyerInfoService {
 		
         BuyerInfo buyer = objectMapper.convertValue(salesRequest.getBuyerInfoDto(),BuyerInfo.class);
         String invoiceNumber=invoiceService.generateFyId(salesRequest.getUserId(), "INV","");
+        String customberId=invoiceService.generateCustId(salesRequest.getUserId(), "CUST_ID","");
 	    buyer.setCreatedAt(LocalDateTime.now());
 	    buyer.setStatus(1);
 	    buyer.setInvoiceNumber(invoiceNumber);
 	    buyer.setCountryCode("91");
 	    buyer.setOwnerId(salesRequest.getUserId());
+	    buyer.setCustumberId(customberId);
 	    
 	    List<SalesInfo> salesSet = salesRequest
 	            .getBuyerInfoDto().getSalesInfo()

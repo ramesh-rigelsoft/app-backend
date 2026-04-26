@@ -18,6 +18,7 @@ import com.rigel.app.model.Inventory;
 import com.rigel.app.model.dto.SearchCriteria;
 import com.rigel.app.service.IInventoryService;
 import com.rigel.app.util.AppUtill;
+import com.rigel.app.util.Constaints;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
@@ -63,8 +64,12 @@ public class InventoryService implements IInventoryService {
 
 			if (!results.isEmpty()) {
 				Inventory existing = results.get(0);
-				existing.setQuantity(existing.getQuantity() + inventory.getQuantity());
-				return em.merge(existing);
+				if(!inventory.getCategory().equalsIgnoreCase(Constaints.SHOP_OWNER_CATEGORY)) {
+				   existing.setQuantity(existing.getQuantity() + inventory.getQuantity());
+				   return em.merge(existing);
+				}else {
+				   return null;
+				}
 			}
 
 			String itemCode = fyIdGeneratorService.generateFyId(inventory.getOwnerId(), "ITM", "");
@@ -74,6 +79,7 @@ public class InventoryService implements IInventoryService {
 			return inventory;
 
 		} catch (Exception e) {
+			e.printStackTrace();
 			throw new RuntimeException("Error saving inventory", e);
 		}
 	}

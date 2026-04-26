@@ -57,7 +57,8 @@ public class ItemsController {
 			Items items=mapper.convertValue(itemDto, Items.class);
 			items.setImage(image);
 			Items itemsDetails = itemsService.saveItems(items);
-			barcodeService.barcodeGenerate(itemsDetails.getItemCode(), itemsDetails.getQuantity());
+			
+//			barcodeService.barcodeGenerate(itemsDetails.getItemCode(), itemsDetails.getQuantity());
 			data.put("items", itemsDetails);
 			response.put("data", data);
 			response.put("status", "CREATED");

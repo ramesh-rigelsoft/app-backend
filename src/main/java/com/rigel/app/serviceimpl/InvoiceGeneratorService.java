@@ -50,6 +50,27 @@ public class InvoiceGeneratorService {
 
 		return seqCode + fyMonth + fyYear + userId + String.format("%08d", next);
 	}
+	
+	@Transactional
+	public String generateCustId(int userId, String seqCode, String seqName) {
+
+		String fy = getFinancialYear(); // e.g. 04-2024
+		String[] parts = fy.split("-");
+		int fyMonth = Integer.parseInt(parts[0]);
+		String fyYear = parts[1];
+
+		// Try to fetch with lock
+		FySequence seq = repository.findForUpdate(fyYear, fyMonth, userId, seqCode)
+				.orElseGet(() -> createOrUpdateSequence(userId, seqCode, seqName, fyYear, fyMonth));
+
+		// increment
+		int next = seq.getLastNumber() + 1;
+		seq.setLastNumber(next);
+
+		repository.save(seq);
+
+		return userId + String.format("%08d", next)+fyYear+fyMonth;
+	}
 
 	private FySequence createOrUpdateSequence(int userId, String seqCode, String seqName, String fyYear, int fyMonth) {
 
