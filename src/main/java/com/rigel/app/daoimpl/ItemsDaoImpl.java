@@ -32,12 +32,6 @@ public class ItemsDaoImpl implements IItemsDao {
 	private EntityManager entityManager;
 
 	@Autowired
-	private ItemsQueryBuilder itemsQueryBuilder;
-
-	@Autowired
-	FyIdGeneratorService fyIdGeneratorService;
-
-	@Autowired
 	IInventoryService inventoryService;
 
 	@Autowired
@@ -46,25 +40,18 @@ public class ItemsDaoImpl implements IItemsDao {
 	@Override
 	public Items saveItems(Items items) {
 
-		String existingItemCode = items.getItemCode();
-		if (items.getItemCode() == null) {
-			items.setItemCode(fyIdGeneratorService.generateFyId(items.getOwnerId(), "ITM"));
-		}
-		System.out.println("item--" + items);
 		Inventory Inventory = mapper.convertValue(items, Inventory.class);
-		System.out.println("Inventory--" + Inventory);
-
+		
 		if (Inventory.getCategory().equals("Repair Installation")) {
-			Inventory.setQuantity(50);
+			Inventory.setQuantity(1);
 		}
 
-		Inventory existingInventory = inventoryService.saveInventory(Inventory, existingItemCode, items.getOwnerId(),
-				entityManager);
+		Inventory existingInventory =inventoryService.saveInventory(Inventory,entityManager);
 		if (existingInventory != null) {
 			items.setItemCode(existingInventory.getItemCode());
 		}
 		if (Inventory.getCategory().equals("Repair Installation")) {
-			items.setQuantity(50);
+			items.setQuantity(1);
 		}
 
 		return entityManager.merge(items);
@@ -139,7 +126,6 @@ public class ItemsDaoImpl implements IItemsDao {
 		}
 
 		if (!criteria.isIsdownload()) {
-			System.out.println("ddddd---"+criteria.getStartIndex());
 			query.setFirstResult(criteria.getStartIndex());
 			query.setMaxResults(criteria.getMaxRecords());
 		}

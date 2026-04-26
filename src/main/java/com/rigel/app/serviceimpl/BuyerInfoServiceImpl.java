@@ -48,7 +48,7 @@ public class BuyerInfoServiceImpl implements IBuyerInfoService {
 	ObjectMapper objectMapper;
 	
 	@Autowired
-	FyIdGeneratorService generatorService;
+	InvoiceGeneratorService invoiceService;
 	
 	@Autowired
 	SalesInfoValidator salesInfoValidator;
@@ -64,7 +64,7 @@ public class BuyerInfoServiceImpl implements IBuyerInfoService {
 		salesInfoValidator.validate(sales,salesRequest.getUserId());
 		
         BuyerInfo buyer = objectMapper.convertValue(salesRequest.getBuyerInfoDto(),BuyerInfo.class);
-        String invoiceNumber=generatorService.generateFyId(salesRequest.getUserId(), "INV");
+        String invoiceNumber=invoiceService.generateFyId(salesRequest.getUserId(), "INV","");
 	    buyer.setCreatedAt(LocalDateTime.now());
 	    buyer.setStatus(1);
 	    buyer.setInvoiceNumber(invoiceNumber);

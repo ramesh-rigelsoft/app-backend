@@ -16,15 +16,15 @@ import jakarta.persistence.LockModeType;
 public interface FySequenceRepository extends JpaRepository<FySequence, String> {
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("SELECT f FROM FySequence f WHERE f.fyYear = :fyYear AND f.fyMonth = :fyMonth  AND f.userId = :userId AND f.numberFormateName = :numberFormateName")
-    Optional<FySequence> findForUpdate(@Param("fyYear") String fyYear,@Param("fyMonth") int fyMonth,@Param("userId") int userId,@Param("numberFormateName") String numberFormateName);
+    @Query("SELECT f FROM FySequence f WHERE f.fyYear = :fyYear AND f.fyMonth = :fyMonth  AND f.userId = :userId AND f.seqCode = :seqCode")
+    Optional<FySequence> findForUpdate(@Param("fyYear") String fyYear,@Param("fyMonth") int fyMonth,@Param("userId") int userId,@Param("seqCode") String seqCode);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("SELECT f FROM FySequence f WHERE f.userId = :userId AND f.numberFormateName = :numberFormateName")
-    Optional<FySequence> findSequence(@Param("userId") int userId,@Param("numberFormateName") String numberFormateName);
+    @Query("SELECT f FROM FySequence f WHERE f.userId = :userId AND f.seqCode = :seqCode")
+    Optional<FySequence> findSequence(@Param("userId") int userId,@Param("seqCode") String seqCode);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("SELECT f FROM FySequence f WHERE f.fyMonth = :fyMonth AND f.userId = :userId AND f.numberFormateName = :numberFormateName")
-    Optional<FySequence> findSequenceByMonth(@Param("fyMonth") int fyMonth,@Param("userId") int userId,@Param("numberFormateName") String numberFormateName);
+    @Query("SELECT f FROM FySequence f WHERE f.fyMonth = :fyMonth AND f.userId = :userId AND f.seqCode = :seqCode")
+    Optional<FySequence> findSequenceByMonth(@Param("fyMonth") int fyMonth,@Param("userId") int userId,@Param("seqCode") String seqCode);
 
 }

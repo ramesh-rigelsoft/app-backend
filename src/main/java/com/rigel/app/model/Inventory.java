@@ -2,7 +2,6 @@ package com.rigel.app.model;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -10,43 +9,14 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import lombok.Builder.Default;
-
 @Entity
-@Table(
-    name = "INVENTORY")//,
-//    uniqueConstraints = @UniqueConstraint(
-//    		columnNames = {
-//    			    "item_code",
-//    			    "category",
-//    			    "category_type",
-//    			    "measure_type",
-//    			    "brand",
-//    			    "model_name",
-//    			    "item_condition",
-//    			    "ram",
-//    			    "ram_unit",
-//    			    "storage",
-//    			    "storage_type",
-//    			    "storage_unit",
-//    			    "initial_price",
-//    			    "selling_price",
-//    			    "item_color",
-//    			    "processor",
-//    			    "operating_system",
-//    			    "screen_size",
-//    			    "item_gen",
-//    			    "owner_id"
-//    			}
-//    )
-//)
+@Table(name = "INVENTORY")
 @Data
 @Builder
 @NoArgsConstructor
@@ -63,56 +33,36 @@ public class Inventory implements Serializable {
 
     @Column(unique = true, nullable = false)
     private String itemCode;
-    
     private String category;
-
     private String categoryType;
-
     private String measureType;
-
     private String brand;
-
     private String modelName;
-
     private String itemCondition;
-
     private String itemSource;
-
     private String ram;
-
     private String ramUnit;
-
     private String storage;
-
     private String storageType;
 
     private String storageUnit;
+    private Double initialPrice;
+    private Double sellingPrice;
+    private String itemColor;
+    private String processor;
+    private String operatingSystem;
+    private String screenSize;
+    private String itemGen;
+    private String gstRate;
+    private int ownerId;
+    private String description;
+    
+    @Column( name = "finger_print",unique = true,nullable = false,insertable = true,updatable = false)
+    private String fingerPrint;
 
     private Integer quantity;
-
-    private Double initialPrice;
-
-    private Double sellingPrice;
-
-    private String description;
-
-    private String itemColor;
-
     private String image;
-
-    private String processor;
-
-    private String operatingSystem;
-
-    private String screenSize;
-
-    private String itemGen;
-    
-    private String gstRate;
-	
-    private int ownerId;
-    
-	@Column(name = "created_at")
+    @Column(name = "created_at")
 	private LocalDateTime createdAt;
 
 }

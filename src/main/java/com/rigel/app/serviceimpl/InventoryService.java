@@ -1,5 +1,9 @@
 package com.rigel.app.serviceimpl;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,311 +21,166 @@ import com.rigel.app.util.AppUtill;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 
-@Lazy 
+@Lazy
 @Service
 @Transactional
 public class InventoryService implements IInventoryService {
 
-    @Autowired
-    private IInventoryDao iInventoryDao;
+	@Autowired
+	private IInventoryDao iInventoryDao;
 
-    @Override
-    public Inventory saveInventory(Inventory inventory, String existingItemCode, int ownerId, EntityManager entityManager) {
-        try {
-            // --- 1) Update by existingItemCode if provided ---
-            if (existingItemCode != null && !existingItemCode.trim().isEmpty()) {
-                TypedQuery<Inventory> queryByItemCode = entityManager.createQuery(
-                        "SELECT i FROM Inventory i WHERE i.ownerId = :ownerId AND i.itemCode = :itemCode", Inventory.class)
-                        .setParameter("ownerId", ownerId)
-                        .setParameter("itemCode", existingItemCode)
-                        .setMaxResults(1);
+	@Autowired
+	FyIdGeneratorService fyIdGeneratorService;
 
-                List<Inventory> results = queryByItemCode.getResultList();
-                if (!results.isEmpty()) {
-                    Inventory existing = results.get(0);
-                    existing.setQuantity(existing.getQuantity() + inventory.getQuantity());
-                    return entityManager.merge(existing);
-                } else {
-                    inventory.setOwnerId(ownerId);
-                    entityManager.persist(inventory);
-                    return inventory;
-                }
-            }
+	@Override
+	public Inventory saveInventory(Inventory inventory, EntityManager em) {
 
-            // --- 2) Dynamic null-safe matching on all fields ---
-            StringBuilder jpql = new StringBuilder("SELECT i FROM Inventory i WHERE i.ownerId = :ownerId");
-            Map<String, Object> params = new HashMap<>();
-            params.put("ownerId", ownerId);
+		try {
+			String fingerPrint = generateFingerprint(inventory);
+			CriteriaBuilder cb = em.getCriteriaBuilder();
+			CriteriaQuery<Inventory> cq = cb.createQuery(Inventory.class);
+			Root<Inventory> i = cq.from(Inventory.class);
 
-            // Optional fields
-            if (inventory.getCategory() != null) {
-                jpql.append(" AND i.category = :category");
-                params.put("category", inventory.getCategory());
-            }
-            if (inventory.getCategoryType() != null) {
-                jpql.append(" AND i.categoryType = :categoryType");
-                params.put("categoryType", inventory.getCategoryType());
-            }
-            if (inventory.getMeasureType() != null) {
-                jpql.append(" AND i.measureType = :measureType");
-                params.put("measureType", inventory.getMeasureType());
-            }
-            if (inventory.getBrand() != null) {
-                jpql.append(" AND i.brand = :brand");
-                params.put("brand", AppUtill.replaceAllSpace(inventory.getBrand()));
-            }
-            if (inventory.getModelName() != null) {
-                jpql.append(" AND i.modelName = :modelName");
-                params.put("modelName", AppUtill.replaceAllSpace(inventory.getModelName()));
-            }
-            if (inventory.getInitialPrice() != null) {
-                jpql.append(" AND i.initialPrice = :initialPrice");
-                params.put("initialPrice", inventory.getInitialPrice());
-            }
-            if (inventory.getSellingPrice() != null) {
-                jpql.append(" AND i.sellingPrice = :sellingPrice");
-                params.put("sellingPrice", inventory.getSellingPrice());
-            }
-            if (inventory.getItemCondition() != null) {
-                jpql.append(" AND i.itemCondition = :itemCondition");
-                params.put("itemCondition", inventory.getItemCondition());
-            }
-            // Null-safe fields
-            jpql.append(" AND ((i.ram = :ram) OR (i.ram IS NULL AND :ram IS NULL))");
-            params.put("ram", inventory.getRam());
+			List<Predicate> predicates = new ArrayList<>();
 
-            jpql.append(" AND ((i.ramUnit = :ramUnit) OR (i.ramUnit IS NULL AND :ramUnit IS NULL))");
-            params.put("ramUnit", inventory.getRamUnit());
+			// ownerId (mandatory)
+			predicates.add(cb.equal(i.get("ownerId"), inventory.getOwnerId()));
 
-            jpql.append(" AND ((i.storage = :storage) OR (i.storage IS NULL AND :storage IS NULL))");
-            params.put("storage", inventory.getStorage());
+			// --- ALL 23 FIELDS NULL SAFE ---
+			addIfNotNull(cb, predicates, i, "fingerPrint", fingerPrint);
 
-            jpql.append(" AND ((i.storageUnit = :storageUnit) OR (i.storageUnit IS NULL AND :storageUnit IS NULL))");
-            params.put("storageUnit", inventory.getStorageUnit());
+			cq.where(cb.and(predicates.toArray(new Predicate[0])));
 
-            jpql.append(" AND ((i.storageType = :storageType) OR (i.storageType IS NULL AND :storageType IS NULL))");
-            params.put("storageType", inventory.getStorageType());
+			TypedQuery<Inventory> query = em.createQuery(cq);
+			query.setMaxResults(1);
 
-            jpql.append(" AND ((i.description = :description) OR (i.description IS NULL AND :description IS NULL))");
-            params.put("description", AppUtill.replaceAllSpace(inventory.getDescription()));
+			List<Inventory> results = query.getResultList();
 
-            jpql.append(" AND ((i.itemColor = :itemColor) OR (i.itemColor IS NULL AND :itemColor IS NULL))");
-            params.put("itemColor", AppUtill.replaceAllSpace(inventory.getItemColor()));
+			if (!results.isEmpty()) {
+				Inventory existing = results.get(0);
+				existing.setQuantity(existing.getQuantity() + inventory.getQuantity());
+				return em.merge(existing);
+			}
 
-            jpql.append(" AND ((i.processor = :processor) OR (i.processor IS NULL AND :processor IS NULL))");
-            params.put("processor", inventory.getProcessor());
+			String itemCode = fyIdGeneratorService.generateFyId(inventory.getOwnerId(), "ITM", "");
+			inventory.setItemCode(itemCode);
+			inventory.setFingerPrint(fingerPrint);
+			em.persist(inventory);
+			return inventory;
 
-            jpql.append(" AND ((i.operatingSystem = :operatingSystem) OR (i.operatingSystem IS NULL AND :operatingSystem IS NULL))");
-            params.put("operatingSystem", AppUtill.replaceAllSpace(inventory.getOperatingSystem()));
+		} catch (Exception e) {
+			throw new RuntimeException("Error saving inventory", e);
+		}
+	}
 
-            jpql.append(" AND ((i.screenSize = :screenSize) OR (i.screenSize IS NULL AND :screenSize IS NULL))");
-            params.put("screenSize", AppUtill.replaceAllSpace(inventory.getScreenSize()));
+	private void addIfNotNull(CriteriaBuilder cb, List<Predicate> predicates, Root<Inventory> root, String field,
+			Object value) {
+		if (value != null) {
+			predicates.add(cb.equal(root.get(field), value));
+		}
 
-            jpql.append(" AND ((i.itemGen = :itemGen) OR (i.itemGen IS NULL AND :itemGen IS NULL))");
-            params.put("itemGen", AppUtill.replaceAllSpace(inventory.getItemGen()));
+//		if (value != null) {
+//		    predicates.add(cb.equal(root.get(field), value));
+//		} else {
+//		    predicates.add(cb.isNull(root.get(field)));
+//		}
+	}
 
-            TypedQuery<Inventory> query = entityManager.createQuery(jpql.toString(), Inventory.class);
-            params.forEach(query::setParameter);
-            query.setMaxResults(1);
+	@Override
+	public Inventory updateInventory(Inventory inventory) {
+		return iInventoryDao.updateInventory(inventory);
+	}
 
-            List<Inventory> results = query.getResultList();
-            if (!results.isEmpty()) {
-                Inventory existing = results.get(0);
-                existing.setQuantity(existing.getQuantity() + inventory.getQuantity());
-                return entityManager.merge(existing);
-            } else {
-                inventory.setOwnerId(ownerId);
-                entityManager.persist(inventory);
-                return inventory;
-            }
+	@Override
+	public int deleteInventory(String itemCode, int ownerId) {
+		return iInventoryDao.deleteInventory(itemCode, ownerId);
+	}
 
-        } catch (Exception e) {
-            throw new RuntimeException("Error saving inventory: " + e.getMessage(), e);
-        }
-    }
+	@Override
+	public List<Inventory> searchInventory(SearchCriteria criteria) {
+		return iInventoryDao.searchInventory(criteria);
+	}
 
-    @Override
-    public Inventory updateInventory(Inventory inventory) {
-        return iInventoryDao.updateInventory(inventory);
-    }
+	@Override
+	public Inventory getInventryByItemCode(String itemCode, int qty, int ownerId, EntityManager entityManager) {
+		try {
+			TypedQuery<Inventory> query = entityManager
+					.createQuery("SELECT i FROM Inventory i WHERE i.ownerId = :ownerId AND i.itemCode = :itemCode",
+							Inventory.class)
+					.setParameter("ownerId", ownerId).setParameter("itemCode", itemCode).setMaxResults(1);
 
-    @Override
-    public int deleteInventory(String itemCode, int ownerId) {
-        return iInventoryDao.deleteInventory(itemCode, ownerId);
-    }
+			List<Inventory> results = query.getResultList();
+			if (results.isEmpty()) {
+				throw new RuntimeException("Inventory not found for itemCode: " + itemCode);
+			}
 
-    @Override
-    public List<Inventory> searchInventory(SearchCriteria criteria) {
-        return iInventoryDao.searchInventory(criteria);
-    }
+			Inventory inventory = results.get(0);
+			inventory.setQuantity(inventory.getQuantity() - qty);
+			return entityManager.merge(inventory);
 
-    @Override
-    public Inventory getInventryByItemCode(String itemCode, int qty, int ownerId, EntityManager entityManager) {
-        try {
-            TypedQuery<Inventory> query = entityManager.createQuery(
-                    "SELECT i FROM Inventory i WHERE i.ownerId = :ownerId AND i.itemCode = :itemCode", Inventory.class)
-                    .setParameter("ownerId", ownerId)
-                    .setParameter("itemCode", itemCode)
-                    .setMaxResults(1);
+		} catch (Exception e) {
+			throw new RuntimeException("Error fetching inventory for itemCode: " + itemCode, e);
+		}
+	}
 
-            List<Inventory> results = query.getResultList();
-            if (results.isEmpty()) {
-                throw new RuntimeException("Inventory not found for itemCode: " + itemCode);
-            }
+	public static String generateFingerprint(Inventory inv) {
+		StringBuilder sb = new StringBuilder();
 
-            Inventory inventory = results.get(0);
-            inventory.setQuantity(inventory.getQuantity() - qty);
-            return entityManager.merge(inventory);
+		append(sb, inv.getOwnerId());
 
-        } catch (Exception e) {
-            throw new RuntimeException("Error fetching inventory for itemCode: " + itemCode, e);
-        }
-    }
+		append(sb, inv.getCategory());
+		append(sb, inv.getCategoryType());
+		append(sb, inv.getMeasureType());
+		append(sb, inv.getBrand());
+		append(sb, inv.getModelName());
+		append(sb, inv.getItemCondition());
+		append(sb, inv.getRam());
+		append(sb, inv.getRamUnit());
+		append(sb, inv.getStorage());
+		append(sb, inv.getStorageType());
+		append(sb, inv.getStorageUnit());
+		append(sb, inv.getInitialPrice());
+		append(sb, inv.getSellingPrice());
+		append(sb, inv.getItemColor());
+		append(sb, inv.getProcessor());
+		append(sb, inv.getOperatingSystem());
+		append(sb, inv.getScreenSize());
+		append(sb, inv.getItemGen());
+		append(sb, inv.getGstRate());
+		append(sb, inv.getDescription());
+
+		return sha256(sb.toString());
+	}
+
+	private static void append(StringBuilder sb, Object value) {
+		if (sb.length() > 0) {
+			sb.append("|");
+		}
+		// IMPORTANT: whitespace preserve ho raha hai
+		sb.append(value == null ? "NULL" : value.toString().strip());
+	}
+
+	private static String sha256(String input) {
+		try {
+			MessageDigest digest = MessageDigest.getInstance("SHA-256");
+			byte[] hash = digest.digest(input.getBytes(StandardCharsets.UTF_8));
+
+			StringBuilder hex = new StringBuilder();
+			for (byte b : hash) {
+				String h = Integer.toHexString(0xff & b);
+				if (h.length() == 1)
+					hex.append('0');
+				hex.append(h);
+			}
+			return hex.toString();
+
+		} catch (NoSuchAlgorithmException e) {
+			throw new RuntimeException("Error generating fingerprint", e);
+		}
+	}
 }
-
-//package com.app.todoapp.serviceimpl;
-//
-//import java.util.List;
-//
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.stereotype.Service;
-//import org.springframework.transaction.annotation.Transactional;
-//
-//import com.app.todoapp.dao.IInventoryDao;
-//import com.app.todoapp.model.Inventory;
-//import com.app.todoapp.model.dto.SearchCriteria;
-//import com.app.todoapp.service.IInventoryService;
-//import com.app.todoapp.util.AppUtill;
-//
-//import jakarta.persistence.EntityManager;
-//import jakarta.persistence.TypedQuery;
-//
-//@Service
-//@Transactional
-//public class InventoryService implements IInventoryService {
-//
-//    @Autowired
-//    IInventoryDao iInventoryDao;
-//
-//    @Override
-//    public Inventory saveInventory(Inventory inventory, String existingItemCode,int ownerId, EntityManager entityManager) {
-//System.out.println("existingcode---"+existingItemCode);
-//        try {
-//            // 1) Update by existingItemCode if provided
-//            if (existingItemCode != null && !existingItemCode.trim().isEmpty()) {
-//                TypedQuery<Inventory> queryByItemcode = entityManager.createQuery(
-//                        "SELECT i FROM Inventory i WHERE i.ownerId=:ownerId AND i.itemCode = :itemcode", Inventory.class)
-//                		 .setParameter("ownerId", ownerId)
-//                         .setParameter("itemcode", existingItemCode)
-//                        .setMaxResults(1); // fetch only first match
-//
-//                List<Inventory> results = queryByItemcode.getResultList();
-//
-//                if (!results.isEmpty()) {
-//                    Inventory existing = results.get(0);
-//                    existing.setQuantity(existing.getQuantity() + inventory.getQuantity());
-//                    return entityManager.merge(existing); // managed entity auto-updates
-//                } else {
-//                    entityManager.persist(inventory);
-//                    entityManager.flush();
-//                    entityManager.clear(); // free memory
-//                    return inventory;
-//                }
-//            }
-//
-//            // 2) Null-safe matching on fields
-//            String jpql = "SELECT i FROM Inventory i " +
-//                    "WHERE i.ownerId = :ownerId " +
-//                    "AND i.category = :category " +
-//                    "AND i.categoryType = :categoryType " +
-//                    "AND i.measureType = :measureType " +
-//                    "AND i.brand = :brand " +
-//                    "AND i.modelName = :modelName " +
-//                    "AND i.initialPrice = :initialPrice " +
-//                    "AND i.sellingPrice = :sellingPrice " +
-//                    "AND i.itemCondition = :itemCondition " +
-//                    "AND ((i.ram = :ram) OR (i.ram IS NULL AND :ram IS NULL)) " +
-//                    "AND ((i.ramUnit = :ramUnit) OR (i.ramUnit IS NULL AND :ramUnit IS NULL)) " +
-//                    "AND ((i.storage = :storage) OR (i.storage IS NULL AND :storage IS NULL)) " +
-//                    "AND ((i.storageUnit = :storageUnit) OR (i.storageUnit IS NULL AND :storageUnit IS NULL)) " +
-//                    "AND ((i.storageType = :storageType) OR (i.storageType IS NULL AND :storageType IS NULL)) " +
-//                    "AND ((i.description = :description) OR (i.description IS NULL AND :description IS NULL)) " +
-//                    "AND ((i.itemColor = :itemColor) OR (i.itemColor IS NULL AND :itemColor IS NULL)) " +
-//                    "AND ((i.processor = :processor) OR (i.processor IS NULL AND :processor IS NULL)) " +
-//                    "AND ((i.operatingSystem = :operatingSystem) OR (i.operatingSystem IS NULL AND :operatingSystem IS NULL)) " +
-//                    "AND ((i.screenSize = :screenSize) OR (i.screenSize IS NULL AND :screenSize IS NULL)) " +
-//                    "AND ((i.itemGen = :itemGen) OR (i.itemGen IS NULL AND :itemGen IS NULL))";
-//
-//            TypedQuery<Inventory> query = entityManager.createQuery(jpql, Inventory.class)
-//            		.setParameter("ownerId", ownerId)
-//                    .setParameter("category", inventory.getCategory())
-//                    .setParameter("categoryType", inventory.getCategoryType())
-//                    .setParameter("measureType", inventory.getMeasureType())
-//                    .setParameter("brand",AppUtill.replaceAllSpace(inventory.getBrand()))
-//                    .setParameter("modelName", AppUtill.replaceAllSpace(inventory.getModelName()))
-//                    .setParameter("initialPrice", inventory.getInitialPrice())
-//                    .setParameter("sellingPrice", inventory.getSellingPrice())
-//                    .setParameter("itemCondition", inventory.getItemCondition())
-//                    .setParameter("ram", inventory.getRam())
-//                    .setParameter("ramUnit", inventory.getRamUnit())
-//                    .setParameter("storage", inventory.getStorage())
-//                    .setParameter("storageUnit", inventory.getStorageUnit())
-//                    .setParameter("storageType", inventory.getStorageType())
-//                    .setParameter("description", AppUtill.replaceAllSpace(inventory.getDescription()))
-//                    .setParameter("itemColor", AppUtill.replaceAllSpace(inventory.getItemColor()))
-//                    .setParameter("processor", inventory.getProcessor())
-//                    .setParameter("operatingSystem", AppUtill.replaceAllSpace(inventory.getOperatingSystem()))
-//                    .setParameter("screenSize", AppUtill.replaceAllSpace(inventory.getScreenSize()))
-//                    .setParameter("itemGen", AppUtill.replaceAllSpace(inventory.getItemGen()))
-//                    .setMaxResults(1); // fetch only one match
-//
-//            List<Inventory> results = query.getResultList();
-//            if (!results.isEmpty()) {
-//                Inventory existing = results.get(0);
-//                existing.setQuantity(existing.getQuantity() + inventory.getQuantity());
-//                return entityManager.merge(existing);
-//            } else {
-//                entityManager.persist(inventory);
-//                entityManager.flush();
-//                entityManager.clear(); // free memory
-//                return inventory;
-//            }
-//
-//        } catch (Exception e) {
-//            // log and throw
-//            throw new RuntimeException("Error saving inventory: " + e.getMessage(), e);
-//        }
-//    }
-//
-//    @Override
-//    public Inventory updateInventory(Inventory inventory) {
-//        return iInventoryDao.updateInventory(inventory);
-//    }
-//
-//    @Override
-//    public int deleteInventory(String itemCode,int ownerId) {
-//        return iInventoryDao.deleteInventory(itemCode,ownerId);
-//    }
-//
-//    @Override
-//    public List<Inventory> searchInventory(SearchCriteria criteria) {
-//        return iInventoryDao.searchInventory(criteria);
-//    }
-//
-//    @Override
-//    public Inventory getInventryByItemCode(String itemCode, int qty,int ownerId, EntityManager entityManager) {
-//        try {
-//            TypedQuery<Inventory> query = entityManager.createQuery(
-//                    "SELECT i FROM Inventory i WHERE i.ownerId = :ownerId AND i.itemCode = :itemcode", Inventory.class)
-//            	    .setParameter("ownerId", ownerId)
-//                    .setParameter("itemcode", itemCode)
-//                    .setMaxResults(1); // fetch only one
-//            Inventory result = query.getResultList().get(0);
-//            result.setQuantity(result.getQuantity() - qty);
-//            return entityManager.merge(result);
-//        } catch (Exception e) {
-//            throw new RuntimeException("Inventory not found for itemCode: " + itemCode, e);
-//        }
-//    }
-//}

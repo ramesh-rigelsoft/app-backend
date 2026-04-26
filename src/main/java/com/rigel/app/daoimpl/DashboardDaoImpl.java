@@ -36,7 +36,6 @@ public class DashboardDaoImpl implements IDashboardDao {
 
 	@Override
 	public Map<String, Object> viewDashboard(String cycle, int ownerId) {
-		System.out.println("dddddddddd--------"+cycle);
 		LocalDateTime start = null;
 		LocalDateTime end = null;
 		if(cycle.equals("Day")) {
@@ -87,9 +86,17 @@ public class DashboardDaoImpl implements IDashboardDao {
 			    .map(s -> BigDecimal.valueOf(s.getQuantity())
 			            .multiply(BigDecimal.valueOf(s.getSellingPrice())))
 			    .reduce(BigDecimal.ZERO, BigDecimal::add);
+		BigDecimal totalProfitValue = sales.stream()
+			    .map(s -> BigDecimal.valueOf(s.getQuantity())
+			        .multiply(
+			            BigDecimal.valueOf(s.getSellingPrice())
+			                .subtract(BigDecimal.valueOf(s.getInitialPrice()))
+			        )
+			    )
+			    .reduce(BigDecimal.ZERO, BigDecimal::add);
 //		Double totalExpense = expense.stream().mapToDouble(s -> s.getAmount()).sum();
 //		double totalSalesAmount = sales.stream().mapToDouble(s -> s.getQuantity() * s.getSellingPrice()).sum();
-		BigDecimal profite = totalSalesAmount.subtract(totalExpense);
+		BigDecimal profite = totalProfitValue.subtract(totalExpense);
 		long lowStockCount = inventory.stream().filter(i -> i.getQuantity() != null && i.getQuantity() < 10).count();
 
 		Map<String, Long> itemCount = sales.stream()
