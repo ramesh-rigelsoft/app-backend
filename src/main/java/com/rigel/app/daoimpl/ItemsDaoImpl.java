@@ -44,7 +44,7 @@ public class ItemsDaoImpl implements IItemsDao {
 		Inventory Inventory = mapper.convertValue(items, Inventory.class);
 		
 		if (Inventory.getCategory().equalsIgnoreCase(Constaints.SHOP_OWNER_CATEGORY)) {
-			Inventory.setQuantity(1);
+			Inventory.setQuantity(100);
 		}
 
 		Inventory existingInventory =inventoryService.saveInventory(Inventory,entityManager);
@@ -52,7 +52,7 @@ public class ItemsDaoImpl implements IItemsDao {
 			items.setItemCode(existingInventory.getItemCode());
 		}
 		if (Inventory.getCategory().equalsIgnoreCase(Constaints.SHOP_OWNER_CATEGORY)) {
-			items.setQuantity(1);
+			items.setQuantity(100);
 		}
 		return existingInventory!=null?entityManager.merge(items):items;
 	}

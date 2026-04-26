@@ -18,7 +18,7 @@ import com.rigel.app.util.ExcelDirectSave;
 
 @Lazy 
 @Service
-@CacheConfig(cacheNames = "userCache", keyGenerator = "TransferKeyGenerator")
+//@CacheConfig(cacheNames = "userCache", keyGenerator = "TransferKeyGenerator")
 public class SalesServiceImpl implements ISalesService {
 
 	@Autowired

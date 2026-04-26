@@ -28,6 +28,7 @@ import com.rigel.app.model.dto.SalesRequest;
 import com.rigel.app.model.dto.SalesResponse;
 import com.rigel.app.model.dto.SearchCriteria;
 import com.rigel.app.service.IBuyerInfoService;
+import com.rigel.app.util.Constaints;
 import com.rigel.app.validate.SalesInfoValidator;
 
 @Lazy 
@@ -94,7 +95,7 @@ public class BuyerInfoServiceImpl implements IBuyerInfoService {
 	    
 	    salesSet.stream().forEach(sal->{
 	    	Inventory icount=inventoryDao.findInventoryByCode(sal.getItemCode(),sal.getOwnerId());
-	    	if(!sal.getCategory().equals("Repair Installation")){
+	    	if(!sal.getCategory().equalsIgnoreCase(Constaints.SHOP_OWNER_CATEGORY)) {	
 		    	if(sal.getQuantity()<icount.getQuantity()) {
 		    		int count=icount.getQuantity()-sal.getQuantity();
 		    		inventoryDao.updateInventory(sal.getItemCode(), count,sal.getOwnerId());

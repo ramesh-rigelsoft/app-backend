@@ -63,15 +63,14 @@ public class InventoryService implements IInventoryService {
 			List<Inventory> results = query.getResultList();
 
 			if (!results.isEmpty()) {
-				Inventory existing = results.get(0);
 				if(!inventory.getCategory().equalsIgnoreCase(Constaints.SHOP_OWNER_CATEGORY)) {
+				   Inventory existing = results.get(0);
 				   existing.setQuantity(existing.getQuantity() + inventory.getQuantity());
 				   return em.merge(existing);
 				}else {
 				   return null;
 				}
 			}
-
 			String itemCode = fyIdGeneratorService.generateFyId(inventory.getOwnerId(), "ITM", "");
 			inventory.setItemCode(itemCode);
 			inventory.setFingerPrint(fingerPrint);
