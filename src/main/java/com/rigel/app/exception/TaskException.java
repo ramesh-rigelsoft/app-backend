@@ -18,7 +18,8 @@ public class TaskException {
 //          @ExceptionHandler(value = { IllegalArgumentException.class, IllegalStateException.class })
             @ExceptionHandler(BadGatewayRequest.class)
 		    public ResponseEntity<Map<String,Object>> addTaskException(BadGatewayRequest badGatewayRequest) {
-		        HashMap<String, Object> response=new  HashMap<>();		        
+            	badGatewayRequest.printStackTrace();
+            	HashMap<String, Object> response=new  HashMap<>();		        
 		    	response.put("data", "");
 				response.put("status", "BAD_GATEWAY");
 				response.put("code", "400");
@@ -28,7 +29,8 @@ public class TaskException {
             
             @ExceptionHandler(TaskTitleException.class)
 		    public ResponseEntity<Map<String,Object>> taskTitleException(TaskTitleException taskTitleException) {
-		        HashMap<String, Object> response=new  HashMap<>();		        
+            	taskTitleException.printStackTrace();
+            	HashMap<String, Object> response=new  HashMap<>();		        
 		    	response.put("data", "");
 				response.put("status", "BAD_GATEWAY");
 				response.put("code", "400");
@@ -48,7 +50,8 @@ public class TaskException {
             
             @ExceptionHandler(TaskTitleNotFound.class)
 		    public ResponseEntity<Map<String,Object>> taskTitleNotFound(TaskTitleNotFound taskTitleException) {
-		        HashMap<String, Object> response=new  HashMap<>();		        
+            	taskTitleException.printStackTrace();
+            	HashMap<String, Object> response=new  HashMap<>();		        
 		    	response.put("data", "");
 				response.put("status", "NOT_FOUND");
 				response.put("code", "404");
@@ -58,7 +61,8 @@ public class TaskException {
             
             @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
 		    public ResponseEntity<Map<String,Object>> nethodNotAllow(HttpRequestMethodNotSupportedException taskTitleException) {
-		        HashMap<String, Object> response=new  HashMap<>();		        
+            	taskTitleException.printStackTrace();
+            	HashMap<String, Object> response=new  HashMap<>();		        
 		    	response.put("data", "");
 				response.put("status", "METHOD_NOT_ALLOW");
 				response.put("code", "405");
@@ -68,6 +72,7 @@ public class TaskException {
             
             @ExceptionHandler(Exception.class)
 		    public ResponseEntity<Map<String,Object>> taskTitleNotFound(Exception exception) {
+            	exception.printStackTrace();
 		        Map<String, Object> response=new  HashMap<>();		        
 		    	response.put("data", "");
 				response.put("status", "INTERNAL_SERVER_ERROR");
@@ -79,13 +84,12 @@ public class TaskException {
             
             @ExceptionHandler(MethodArgumentNotValidException.class)
             public ResponseEntity<Map<String,Object>> methodArgumentNotValidException(MethodArgumentNotValidException methodArgumentNotValidException) {
-                HashMap<String, Object> response=new  HashMap<>();		        
+            	methodArgumentNotValidException.printStackTrace();
+            	HashMap<String, Object> response=new  HashMap<>();		        
             	response.put("data", "");
         		response.put("status", "NOT_ACCEPTABLE");
         		response.put("code", "202");
         		response.put("message",methodArgumentNotValidException.getMessage());
                 return new ResponseEntity<>(response,HttpStatus.NOT_ACCEPTABLE);
-            }
-        	
-            
+            }        
 }

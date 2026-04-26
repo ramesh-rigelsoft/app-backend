@@ -14,6 +14,7 @@ public class Constaints {
 	public static final String APP_LOGO = START_SERVER+"\\logoico.ico";
 	public static final String OWNSERVER_RESULT = "https://www.rigelautomation.com";
 
+	public static final String SHOP_OWNER_CATEGORY = "Repair Installation";
 	public static final String DOWNLOAD_FOLDER_NAME = "RigelEIMS";
 
 }

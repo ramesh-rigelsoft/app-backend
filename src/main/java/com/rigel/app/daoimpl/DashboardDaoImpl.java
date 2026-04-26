@@ -17,6 +17,7 @@ import com.rigel.app.model.Expense;
 import com.rigel.app.model.Inventory;
 import com.rigel.app.model.SalesInfo;
 import com.rigel.app.model.dto.ItemSalesCompare;
+import com.rigel.app.util.Constaints;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -58,10 +59,12 @@ public class DashboardDaoImpl implements IDashboardDao {
 				.createQuery("SELECT e FROM SalesInfo e " + "WHERE e.ownerId = :ownerId "
 						+ "AND e.createdAt BETWEEN :start AND :end", SalesInfo.class)
 				.setParameter("ownerId", ownerId).setParameter("start", start).setParameter("end", end).getResultList();
+//	    boolean sale=(salesValue!=null&&!salesValue.isEmpty())?salesValue.stream().filter(s->!s.getCategory().equalsIgnoreCase(Constaints.SHOP_OWNER_CATEGORY)).toList():salesValue;
 
 		List<Inventory> inventory = entityManager
 				.createQuery("SELECT e FROM Inventory e " + "WHERE e.ownerId = :ownerId ", Inventory.class)
 				.setParameter("ownerId", ownerId).getResultList();
+//		List<Inventory> inventory=(inventoryValue!=null&&!inventoryValue.isEmpty())?inventoryValue.stream().filter(s->!s.getCategory().equalsIgnoreCase(Constaints.SHOP_OWNER_CATEGORY)).toList():null;
 
 		List<Expense> expense = entityManager
 				.createQuery("SELECT e FROM Expense e " + "WHERE e.ownerId = :ownerId "
@@ -73,7 +76,13 @@ public class DashboardDaoImpl implements IDashboardDao {
 //		Double totalValues = inventory.stream().mapToDouble(s -> s.getQuantity() * s.getInitialPrice()).sum();
 		BigDecimal totalValues = inventory.stream()
 			    .map(s -> BigDecimal.valueOf(s.getQuantity())
-			            .multiply(BigDecimal.valueOf(s.getInitialPrice())))
+			            .multiply(
+	//			            		BigDecimal.valueOf(s.getInitialPrice())
+						            s.getCategory().equalsIgnoreCase(Constaints.SHOP_OWNER_CATEGORY)
+					                ? BigDecimal.ZERO
+					                : BigDecimal.valueOf(s.getInitialPrice())
+				            	   )
+			                     )
 			    .reduce(BigDecimal.ZERO, BigDecimal::add);
 		BigDecimal totalQuantity = inventory.stream()
 			    .map(s -> BigDecimal.valueOf(s.getQuantity()))
@@ -82,25 +91,36 @@ public class DashboardDaoImpl implements IDashboardDao {
 		BigDecimal totalExpense = expense.stream()
 			    .map(s -> BigDecimal.valueOf(s.getAmount()))
 			    .reduce(BigDecimal.ZERO, BigDecimal::add);
+//		BigDecimal totalSalesAmount = sales.stream()
+//			    .map(s -> BigDecimal.valueOf(s.getQuantity())
+//			            .multiply(BigDecimal.valueOf(s.getSellingPrice())))
+//			    .reduce(BigDecimal.ZERO, BigDecimal::add);
+		
 		BigDecimal totalSalesAmount = sales.stream()
 			    .map(s -> BigDecimal.valueOf(s.getQuantity())
-			            .multiply(BigDecimal.valueOf(s.getSellingPrice())))
+			        .multiply(BigDecimal.valueOf(s.getSoldPrice()))
+			    )
 			    .reduce(BigDecimal.ZERO, BigDecimal::add);
+		
 		BigDecimal totalProfitValue = sales.stream()
 			    .map(s -> BigDecimal.valueOf(s.getQuantity())
 			        .multiply(
-			            BigDecimal.valueOf(s.getSellingPrice())
-			                .subtract(BigDecimal.valueOf(s.getInitialPrice()))
-			        )
+			            BigDecimal.valueOf(s.getSoldPrice())
+			                .subtract(
+						            s.getCategory().equalsIgnoreCase(Constaints.SHOP_OWNER_CATEGORY)
+						                ? BigDecimal.ZERO
+						                : BigDecimal.valueOf(s.getInitialPrice())
+			                		)
+			           )
 			    )
 			    .reduce(BigDecimal.ZERO, BigDecimal::add);
+		//   shopOwnerCategory(s.getCategory(),s.getSellingPrice())
 //		Double totalExpense = expense.stream().mapToDouble(s -> s.getAmount()).sum();
 //		double totalSalesAmount = sales.stream().mapToDouble(s -> s.getQuantity() * s.getSellingPrice()).sum();
 		BigDecimal profite = totalProfitValue.subtract(totalExpense);
 		long lowStockCount = inventory.stream().filter(i -> i.getQuantity() != null && i.getQuantity() < 10).count();
 
-		Map<String, Long> itemCount = sales.stream()
-				.collect(Collectors.groupingBy(SalesInfo::getCategoryType, Collectors.counting()));
+//		Map<String, Long> itemCount = sales.stream().collect(Collectors.groupingBy(SalesInfo::getCategoryType, Collectors.counting()));
 		List<ItemSalesCompare> itemSalesCompare = getItemSalesCompare(cycle,start,end,inventory, sales);
 		salesInfo.put("totalValue", totalValues);
 		salesInfo.put("totalStock", totalQuantity);
@@ -111,6 +131,16 @@ public class DashboardDaoImpl implements IDashboardDao {
 		salesInfo.put("itemSalesCompare", itemSalesCompare);
 	
 		return salesInfo;
+	}
+	
+	private String shopOwnerCategory(String category,Double value) {
+		
+		if(category.equalsIgnoreCase(Constaints.SHOP_OWNER_CATEGORY)) {
+			return "1";
+		}else {
+			return String.valueOf(value);
+		}
+		
 	}
 	
 	 public static List<ItemSalesCompare> getItemSalesCompare(String cycle,LocalDateTime start1,LocalDateTime end1,List<Inventory> inventory, List<SalesInfo> sales) {
