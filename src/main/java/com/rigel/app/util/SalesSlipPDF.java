@@ -13,6 +13,10 @@ import com.itextpdf.layout.properties.HorizontalAlignment;
 import com.itextpdf.layout.properties.TextAlignment;
 import com.itextpdf.layout.properties.UnitValue;
 import com.rigel.app.model.*;
+import com.rigel.app.model.dto.GstRate;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.itextpdf.barcodes.Barcode128;
 import com.itextpdf.io.image.ImageDataFactory;
 import com.itextpdf.kernel.pdf.canvas.draw.SolidLine;
@@ -20,10 +24,12 @@ import com.itextpdf.kernel.pdf.canvas.draw.SolidLine;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -35,10 +41,14 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
+import org.springframework.stereotype.Service;
+
+//@Service
 public class SalesSlipPDF {
 
     public static void createSlip(String fileName, User user, BuyerInfo buyer, List<SalesInfo> sales) {
         try {
+        	boolean gstApplicable=user.getGstNumber()==null?false:true;
 //        	NumberFormat nf = NumberFormat.getNumberInstance(new Locale("en", "IN"));
 //        	 nf.setMinimumFractionDigits(2);
 //             nf.setMaximumFractionDigits(2);
@@ -130,7 +140,19 @@ public class SalesSlipPDF {
             header.addCell(slipCell);
 
             document.add(header);
+            
+            Table gstTable = new Table(2).useAllAvailableWidth();
 
+//            Table gstTable = new Table(UnitValue.createPercentArray(2)).useAllAvailableWidth();
+           
+            gstTable.addCell(new Cell().add(new Paragraph("GSTN Number: " + user.getGstNumber())
+                    .setFont(bold).setFontSize(6))
+                    .setBorder(Border.NO_BORDER)
+                    .setTextAlignment(TextAlignment.RIGHT));
+            document.add(gstTable);
+            
+            
+            
             addLine(document);
 
             /* ----------- INVOICE INFO ----------- */
@@ -207,23 +229,54 @@ public class SalesSlipPDF {
 
            
             /* ----------- ITEMS TABLE ----------- */
-            Table itemTable = new Table(UnitValue.createPercentArray(new float[]{1f, 4f, 1f, 2f, 1f, 2f}))
+            Table itemTable = null;
+            		if(gstApplicable) {
+            			itemTable=new Table(UnitValue.createPercentArray(new float[]{1f, 4f, 1f, 1f, 1f, 1f, 1f, 1f}))
                     .useAllAvailableWidth();
+            		}else {
+            			itemTable=new Table(UnitValue.createPercentArray(new float[]{1f, 5f, 1f, 2f, 2f}))
+                                .useAllAvailableWidth();            			
+            		}
 
             // Header Row with background color
             itemTable.addHeaderCell(new Cell().add(new Paragraph("SR").setFont(bold).setFontSize(6)).setBackgroundColor(ColorConstants.LIGHT_GRAY).setTextAlignment(TextAlignment.CENTER));
             itemTable.addHeaderCell(new Cell().add(new Paragraph("ITEM").setFont(bold).setFontSize(6)).setBackgroundColor(ColorConstants.LIGHT_GRAY).setTextAlignment(TextAlignment.CENTER));
             itemTable.addHeaderCell(new Cell().add(new Paragraph("QTY").setFont(bold).setFontSize(6)).setBackgroundColor(ColorConstants.LIGHT_GRAY).setTextAlignment(TextAlignment.CENTER));
             itemTable.addHeaderCell(new Cell().add(new Paragraph("PRICE").setFont(bold).setFontSize(6)).setBackgroundColor(ColorConstants.LIGHT_GRAY).setTextAlignment(TextAlignment.CENTER));
-            itemTable.addHeaderCell(new Cell().add(new Paragraph("GST").setFont(bold).setFontSize(6)).setBackgroundColor(ColorConstants.LIGHT_GRAY).setTextAlignment(TextAlignment.CENTER));
+           
+            if(gstApplicable) {
+         // Create header row
+            itemTable.addHeaderCell(new Cell().add(new Paragraph("CGST")
+                    .setFont(bold).setFontSize(6))
+                    .setBackgroundColor(ColorConstants.LIGHT_GRAY)
+                    .setTextAlignment(TextAlignment.CENTER));
+
+            itemTable.addHeaderCell(new Cell().add(new Paragraph("SGST")
+                    .setFont(bold).setFontSize(6))
+                    .setBackgroundColor(ColorConstants.LIGHT_GRAY)
+                    .setTextAlignment(TextAlignment.CENTER));
+
+            itemTable.addHeaderCell(new Cell().add(new Paragraph("IGST")
+                    .setFont(bold).setFontSize(6))
+                    .setBackgroundColor(ColorConstants.LIGHT_GRAY)
+                    .setTextAlignment(TextAlignment.CENTER));
+            }
+            
+//            itemTable.addHeaderCell(new Cell().add(new Paragraph(buyer.getState()!=null?(buyer.getState().equalsIgnoreCase(user.getState())?"SGST+CGST":"IGST"):"SGST+CGST").setFont(bold).setFontSize(6)).setBackgroundColor(ColorConstants.LIGHT_GRAY).setTextAlignment(TextAlignment.CENTER));
             itemTable.addHeaderCell(new Cell().add(new Paragraph("AMOUNT").setFont(bold).setFontSize(6)).setBackgroundColor(ColorConstants.LIGHT_GRAY).setTextAlignment(TextAlignment.CENTER));
 
             BigDecimal total = BigDecimal.ZERO;
-            
+            ObjectMapper mapper = new ObjectMapper();
+	          
             for (int i = 0; i < sales.size(); i++) {
                 SalesInfo s = sales.get(i);
+
+                
+	            // Jackson library use karke
+	            GstRate gstValue = mapper.readValue(s.getGstRate(), GstRate.class);
+   
                 BigDecimal soldPrice = BigDecimal.valueOf(s.getSoldPrice());
-                BigDecimal gstRate = BigDecimal.valueOf(Integer.valueOf(s.getGstRate()));
+                BigDecimal gstRate = BigDecimal.valueOf(Integer.valueOf(gstValue.getIgst()));
              // 1 + GST/100
                 BigDecimal divisor = BigDecimal.ONE.add(
                         gstRate.divide(BigDecimal.valueOf(100), 6, RoundingMode.HALF_UP)
@@ -233,59 +286,136 @@ public class SalesSlipPDF {
                 BigDecimal basePrice = soldPrice.divide(divisor, 2, RoundingMode.HALF_UP);
 
                 // GST amount
-                BigDecimal gstAmount = soldPrice.subtract(basePrice);
+//                BigDecimal gstAmount = soldPrice.subtract(basePrice);
                 
-                
-                
-                System.out.println(s.getSoldPrice()+""+basePrice+"----"+gstAmount);
                 
                 BigDecimal qty = BigDecimal.valueOf(s.getQuantity());
 
-                BigDecimal amt = basePrice.multiply(qty);
+                BigDecimal amt = gstApplicable?basePrice.multiply(qty):new BigDecimal(s.getSoldPrice()).multiply(qty);
 
                 total = total.add(amt);
+                StringBuilder itemDesc = new StringBuilder();
+
+                if (s.getSerialNumber() != null) {
+                    itemDesc.append("S/No-").append(s.getSerialNumber());
+                }
+                itemDesc.append(",").append(s.getBrand()).append("/").append(s.getModelName()).append(",");
+
+                if (s.getRam() != null) {
+                    itemDesc.append(s.getRam()).append("/");
+                }
+                if (s.getStorage() != null) {
+                    itemDesc.append(s.getStorage()).append(s.getStorageUnit()).append(",");
+                }
+                if (s.getItemColor() != null) {
+                    itemDesc.append(s.getItemColor()).append(",");
+                }
+                if (s.getItemGen() != null) {
+                    itemDesc.append(s.getItemGen()).append(",");
+                }
+                if (s.getProcessor() != null) {
+                    itemDesc.append(s.getProcessor()).append(",");
+                }
+                if (s.getScreenSize() != null) {
+                    itemDesc.append(s.getScreenSize()).append(",");
+                }
+                if (s.getDescription() != null) {
+                    itemDesc.append(s.getDescription());
+                }
+
+                String finalDesc = itemDesc.toString();
+
                                 
                 itemTable.addCell(new Cell().add(new Paragraph(String.valueOf(i + 1))).setFont(normal).setFontSize(6).setTextAlignment(TextAlignment.CENTER));
-                itemTable.addCell(new Cell().add(new Paragraph(s.getDescription())).setFont(normal).setFontSize(6));
+                itemTable.addCell(new Cell().add(new Paragraph(finalDesc)).setFont(normal).setFontSize(6));
                 itemTable.addCell(new Cell().add(new Paragraph(String.valueOf(s.getQuantity()))).setFont(normal).setFontSize(6).setTextAlignment(TextAlignment.CENTER));
-                itemTable.addCell(new Cell().add(new Paragraph(nf.format(basePrice).toString())).setFont(normal).setFontSize(6).setTextAlignment(TextAlignment.RIGHT));
-                itemTable.addCell(new Cell().add(new Paragraph("%")).setFont(normal).setFontSize(6).setTextAlignment(TextAlignment.CENTER));
-                itemTable.addCell(new Cell().add(new Paragraph(nf.format(amt).toString())).setFont(normal).setFontSize(6).setTextAlignment(TextAlignment.RIGHT));
+                itemTable.addCell(new Cell().add(new Paragraph(nf.format(gstApplicable?basePrice:new BigDecimal(s.getSoldPrice())).toString())).setFont(normal).setFontSize(6).setTextAlignment(TextAlignment.RIGHT));
+                
+                if(gstApplicable) {
+	                BigDecimal cgstValue = basePrice
+	            	        .multiply(new BigDecimal(gstValue.getCgst()))
+	            	        .divide(new BigDecimal("100"), 2, RoundingMode.HALF_UP);
+	                BigDecimal sgstValue = basePrice
+	            	        .multiply(new BigDecimal(gstValue.getSgst()))
+	            	        .divide(new BigDecimal("100"), 2, RoundingMode.HALF_UP);
+	                BigDecimal igstValue = basePrice
+	            	        .multiply(new BigDecimal(gstValue.getIgst()))
+	            	        .divide(new BigDecimal("100"), 2, RoundingMode.HALF_UP);
+	                // Create value row based on condition
+	                if (buyer.getState() == null) {
+	                	 itemTable.addCell(new Cell().add(new Paragraph(cgstValue+"").setFontSize(6).setTextAlignment(TextAlignment.CENTER)));
+	                     itemTable.addCell(new Cell().add(new Paragraph(sgstValue+"").setFontSize(6).setTextAlignment(TextAlignment.CENTER)));
+	                     itemTable.addCell(new Cell().add(new Paragraph("-").setFontSize(6).setTextAlignment(TextAlignment.CENTER)));
+	                } else if(buyer.getState().equalsIgnoreCase(user.getState())) {
+	            	    itemTable.addCell(new Cell().add(new Paragraph(cgstValue+"").setFontSize(6).setTextAlignment(TextAlignment.CENTER)));
+	                    itemTable.addCell(new Cell().add(new Paragraph(sgstValue+"").setFontSize(6).setTextAlignment(TextAlignment.CENTER)));
+	                    itemTable.addCell(new Cell().add(new Paragraph("-").setFontSize(6).setTextAlignment(TextAlignment.CENTER)));
+	                }else {
+	                    // Different state → IGST apply
+	                    itemTable.addCell(new Cell().add(new Paragraph("-").setFontSize(6).setTextAlignment(TextAlignment.CENTER)));
+	                    itemTable.addCell(new Cell().add(new Paragraph("-").setFontSize(6).setTextAlignment(TextAlignment.CENTER)));
+	                    itemTable.addCell(new Cell().add(new Paragraph(igstValue+"").setFontSize(6).setTextAlignment(TextAlignment.CENTER)));
+	                }
+	                
+	             }
+	             itemTable.addCell(new Cell().add(new Paragraph(nf.format(amt).toString())).setFont(normal).setFontSize(6).setTextAlignment(TextAlignment.RIGHT));
             }
             document.add(itemTable);
             
             addLine(document);
-
+            
             /* ---------------- PRICE SUMMARY ---------------- */
              double gst = sales.stream()
                     .mapToDouble(s -> {
-                        double rate = s.getSoldPrice() /(1 + Integer.valueOf(s.getGstRate()) / 100.0);
-                        double gstAmt=rate*(Integer.valueOf(s.getGstRate()) / 100.0);
-//                        System.out.println(s.getSellingPrice()+" rate--"+rate+",gst--"+gstAmt);
+                    	GstRate gstValue2=null;
+						try {
+							gstValue2 = mapper.readValue(s.getGstRate(), GstRate.class);
+						} catch (JsonMappingException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (JsonProcessingException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+                         
+                        double rate = s.getSoldPrice() /(1 + Integer.valueOf(gstValue2.getIgst()) / 100.0);
+                        double gstAmt=rate*(Integer.valueOf(gstValue2.getIgst()) / 100.0);
                         return gstAmt*s.getQuantity();
                     })
                     .sum();
             
           double subTotal = sales.stream()
                       .mapToDouble(s -> {
-                          double rate = s.getSoldPrice() /(1 + Integer.valueOf(s.getGstRate()) / 100.0);
-                          double gstAmt=rate*(Integer.valueOf(s.getGstRate()) / 100.0);
-                          System.out.println(" rate--"+rate);
+                    	  
+                    	GstRate gstValue2=null;
+	  						try {
+	  							gstValue2 = mapper.readValue(s.getGstRate(), GstRate.class);
+	  						} catch (JsonMappingException e) {
+	  							// TODO Auto-generated catch block
+	  							e.printStackTrace();
+	  						} catch (JsonProcessingException e) {
+	  							// TODO Auto-generated catch block
+	  							e.printStackTrace();
+	  						}
+  						
+                          double rate = gstApplicable?(s.getSoldPrice() /(1 + Integer.valueOf(gstValue2.getIgst()) / 100.0)):s.getSoldPrice();
                           return rate*s.getQuantity();
                       })
                       .sum();
             
             double discount = 0;
-            double grandTotal = subTotal + gst - discount;
+            double grandTotal = subTotal + (gstApplicable?gst:0.0) - discount;
 
             Table summary = new Table(2).useAllAvailableWidth();
 
             summary.addCell(cell("Subtotal", normal));
             summary.addCell(cell(nf.format(new BigDecimal(String.valueOf(subTotal))).toString(), normal));
 
-            summary.addCell(cell("GST 18%", normal));
-            summary.addCell(cell(nf.format(new BigDecimal(String.valueOf(gst))).toString(), normal));
-
+            if(gstApplicable) {
+	            summary.addCell(cell("GST", normal));
+	            summary.addCell(cell(nf.format(new BigDecimal(String.valueOf(gst))).toString(), normal));
+            }
+            
             summary.addCell(cell("Discount", normal));
             summary.addCell(cell(nf.format(new BigDecimal(String.valueOf(discount))).toString(), normal));
 
@@ -365,6 +495,8 @@ public class SalesSlipPDF {
                     .setTextAlignment(TextAlignment.CENTER);
             document.add(thanks);
            
+            
+           if(user.getShopType()!=null) {
             try {
                 // ---------------------------
                 // 1. Create AWT Banner (all brands except iPhone)
@@ -443,14 +575,137 @@ public class SalesSlipPDF {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+          }else {
+        	  try {
+        		    int width = 700;
+        		    int height = 120;
+
+        		    BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        		    Graphics2D g = img.createGraphics();
+
+        		    // Anti-aliasing
+        		    g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        		    g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+
+        		    // Background
+        		    g.setColor(Color.WHITE);
+        		    g.fillRect(0, 0, width, height);
+
+        		    // Top & Bottom Border
+        		    g.setColor(Color.GRAY);
+        		    g.setStroke(new BasicStroke(2));
+        		    g.drawLine(0, 5, width, 5);
+        		    g.drawLine(0, height - 5, width, height - 5);
+
+        		    int cols = 8;
+        		    int cellW = width / cols;
+
+        		    for (int i = 0; i < cols; i++) {
+
+        		        int x = i * cellW;
+
+        		        // Divider
+        		        g.setColor(Color.LIGHT_GRAY);
+        		        g.drawLine(x, 10, x, height - 10);
+
+        		        switch (i) {
+
+        		            // APPLE
+        		            case 0:
+        		                g.setFont(new Font("SansSerif", Font.BOLD, 14));
+        		                g.setColor(Color.BLACK);
+        		                drawCenter(g, "Apple", x, 0, cellW, height);
+        		                break;
+
+        		            // DELL
+        		            case 1:
+        		                g.setFont(new Font("Arial", Font.BOLD, 14));
+        		                g.setColor(new Color(0, 102, 204));
+        		                drawCenter(g, "DELL", x, 0, cellW, height);
+        		                break;
+
+        		            // HP (circle)
+        		            case 2:
+        		                g.setColor(new Color(0, 102, 204));
+        		                g.drawOval(x + 5, 30, cellW - 10, 50);
+        		                g.setFont(new Font("Arial", Font.BOLD, 13));
+        		                drawCenter(g, "hp", x, 0, cellW, height);
+        		                break;
+
+        		            // LENOVO (red bar)
+        		            case 3:
+        		                g.setColor(Color.RED);
+        		                g.fillRect(x + 2, 30, cellW - 4, 50);
+        		                g.setColor(Color.WHITE);
+        		                g.setFont(new Font("Arial", Font.BOLD, 12));
+        		                drawCenter(g, "Lenovo", x, 0, cellW, height);
+        		                break;
+
+        		            // ASUS
+        		            case 4:
+        		                g.setColor(Color.BLUE);
+        		                g.setFont(new Font("Arial", Font.BOLD, 14));
+        		                drawCenter(g, "ASUS", x, 0, cellW, height);
+        		                break;
+
+        		            // ACER
+        		            case 5:
+        		                g.setColor(new Color(0, 153, 0));
+        		                g.setFont(new Font("Arial", Font.BOLD, 14));
+        		                drawCenter(g, "acer", x, 0, cellW, height);
+        		                break;
+
+        		            // MSI
+        		            case 6:
+        		                g.setColor(Color.RED);
+        		                g.setFont(new Font("Arial", Font.BOLD, 14));
+        		                drawCenter(g, "MSI", x, 0, cellW, height);
+        		                break;
+
+        		            // SAMSUNG
+        		            case 7:
+        		                g.setColor(new Color(0, 51, 153));
+        		                g.setFont(new Font("Arial", Font.BOLD, 12));
+        		                drawCenter(g, "SAMSUNG", x, 0, cellW, height);
+        		                break;
+        		        }
+        		    }
+
+        		    g.dispose();
+
+        		    // Convert to iText Image
+        		    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        		    ImageIO.write(img, "png", baos);
+        		    Image awtImage = new Image(ImageDataFactory.create(baos.toByteArray()));
+        		    awtImage.setAutoScale(true);
+
+        		    awtImage.setFixedPosition(0, 0);
+        		    document.add(awtImage);
+
+        		} catch (Exception e) {
+        		    e.printStackTrace();
+        		}
+          }
            
             document.close();
 
         } catch (Exception e) {
             e.printStackTrace();
         }
+      
     }
 
+    public static void drawCenter(Graphics2D g, String text, int x, int y, int w, int h) {
+        FontMetrics fm = g.getFontMetrics();
+        int textWidth = fm.stringWidth(text);
+        int textHeight = fm.getAscent();
+
+        int tx = x + (w - textWidth) / 2;
+        int ty = y + (h + textHeight) / 2;
+
+        g.drawString(text, tx, ty);
+    }
+    
     private static void addLine(Document document) {
         LineSeparator ls = new LineSeparator(new SolidLine());
         ls.setMarginTop(4);

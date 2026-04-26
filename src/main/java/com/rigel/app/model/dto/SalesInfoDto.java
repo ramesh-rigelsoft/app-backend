@@ -68,6 +68,8 @@ public class SalesInfoDto {
     
 	private String gstRate;
 	
+	private String serialNumber;
+	
     private Double soldPrice;
     
     private int ownerId;

@@ -71,6 +71,8 @@ public class User implements Serializable{
 	private Date lastPasswordResetDate;
 	
     // ================= COMPANY INFO =================
+	private String shopType;
+    
     private String companyName;
     private String companyLogo;
 
