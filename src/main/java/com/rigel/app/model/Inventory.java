@@ -54,6 +54,7 @@ public class Inventory implements Serializable {
     private String screenSize;
     private String itemGen;
     private String gstRate;
+	private String serialNumber;
     private int ownerId;
     private String description;
     

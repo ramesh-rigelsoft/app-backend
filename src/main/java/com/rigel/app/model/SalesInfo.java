@@ -127,6 +127,9 @@ public class SalesInfo implements Serializable{
 	
 	@Column(name = "gst_rate")
 	private String gstRate;
+	
+	@Column(name = "serial_number")
+	private String serialNumber;
 
 	@Column(name = "created_at")
 	private LocalDateTime createdAt;

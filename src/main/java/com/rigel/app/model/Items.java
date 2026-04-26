@@ -63,6 +63,7 @@ public class Items implements Serializable {
     private String screenSize;
     private String itemGen;
     private String gstRate;
+	private String serialNumber;
 	
 	@Column(name = "created_at")
 	private LocalDateTime createdAt;

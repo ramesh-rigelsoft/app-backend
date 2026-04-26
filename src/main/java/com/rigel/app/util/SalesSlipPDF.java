@@ -249,7 +249,7 @@ public class SalesSlipPDF {
                 itemTable.addCell(new Cell().add(new Paragraph(s.getDescription())).setFont(normal).setFontSize(6));
                 itemTable.addCell(new Cell().add(new Paragraph(String.valueOf(s.getQuantity()))).setFont(normal).setFontSize(6).setTextAlignment(TextAlignment.CENTER));
                 itemTable.addCell(new Cell().add(new Paragraph(nf.format(basePrice).toString())).setFont(normal).setFontSize(6).setTextAlignment(TextAlignment.RIGHT));
-                itemTable.addCell(new Cell().add(new Paragraph("18%")).setFont(normal).setFontSize(6).setTextAlignment(TextAlignment.CENTER));
+                itemTable.addCell(new Cell().add(new Paragraph("%")).setFont(normal).setFontSize(6).setTextAlignment(TextAlignment.CENTER));
                 itemTable.addCell(new Cell().add(new Paragraph(nf.format(amt).toString())).setFont(normal).setFontSize(6).setTextAlignment(TextAlignment.RIGHT));
             }
             document.add(itemTable);
