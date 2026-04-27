@@ -169,7 +169,7 @@ public class UserController {
 		Map<String, Object> data2 = new HashMap<>();
 		String secret = null;
 		LoginActivity loginActivity = loginInfoService.findLoginActivityByUsername(login.getUsername());
-//		System.out.println((jwtTokenUtil.isTokenExpired(loginActivity != null ? loginActivity.getToken() : null)) + "------------" + loginActivity);
+		System.out.println((jwtTokenUtil.isTokenExpired(loginActivity != null ? loginActivity.getToken() : null)) + "------------" + loginActivity);
 		if (loginActivity == null || (loginActivity != null	&& jwtTokenUtil.isTokenExpired(loginActivity != null ? loginActivity.getToken() : null))) {
 			ThirdPartyResponse thirdPartyResponse = RAUtility.loginPost(login.toString());
 			if (thirdPartyResponse == null) {
@@ -294,15 +294,11 @@ public class UserController {
 	        String token = authHeader.replace("Bearer ", "");
 
 	        // Validate token
-//	        String username = jwtTokenUtil.getEmailFromToken(token);
-
-	        if (jwtTokenUtil.isTokenExpired(token)) {
-
-	            response.put("status", "OK");
+            System.out.println("token expire---------"+jwtTokenUtil.isTokenExpired(token));
+	        if (!jwtTokenUtil.isTokenExpired(token)) {
+                response.put("status", "OK");
 	            response.put("code", "200");
-	            response.put("message", "Token is valid");
-//	            response.put("username", username);
-
+	            response.put("message", "Token is valid");	         
 	            return ResponseEntity.ok(response);
 	        } else {
 	        	response.put("status", "FAIL");
@@ -312,16 +308,7 @@ public class UserController {
 
 	        }
 
-	    } catch (ExpiredJwtException e) {
-
-	        response.put("status", "FAIL");
-	        response.put("code", "401");
-	        response.put("message", "Token expired");
-
-	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
-
 	    } catch (Exception e) {
-
 	        response.put("status", "FAIL");
 	        response.put("code", "401");
 	        response.put("message", "Invalid token");
@@ -424,43 +411,5 @@ public class UserController {
 			throw new TaskTitleNotFound("Invalid Request");
 		}
 	}
-//	    @RequestMapping(value = "logOut",method = RequestMethod.POST)
-//		public ResponseEntity<Map<String,Object>> logOut(HttpServletRequest request){
-//			Map<String,Object> response=new HashMap<>();
-//			Map<String,Object> data=new HashMap<>();
-//			String email=jwtTokenUtil.getEmailFromToken(request.getHeader(environment.getProperty("security.jwt.header")).substring(7));
-//			User user=userService.findUserByEmailId(email);
-//			     	userLogOutIn.logOutUser(user.getId(), user.getEmail_id());		
-//					response.put("data", data);
-//					response.put("status", "OK");
-//					response.put("code", "200");
-//					response.put("message","Your account has been logout successfully.");
-//					return new ResponseEntity<>(response, HttpStatus.OK);
-//			
-//	    }
 
-//	@RequestMapping(value = "testapi", method = RequestMethod.GET)
-//	public String d() {
-//		return "abc";
-//	}
-//
-//	@RequestMapping(value = "testapi2", method = RequestMethod.GET)
-//	public String d2() {
-//		return "abc";
-//	}
-//
-//	// Deserialize byte[] back to User
-//	public User deserializeUser(byte[] data) {
-//		if (data == null)
-//			return null;
-//		try (ByteArrayInputStream bis = new ByteArrayInputStream(data);
-//				ObjectInputStream ois = new ObjectInputStream(bis)) {
-//
-//			return (User) ois.readObject(); // cast to User
-//
-//		} catch (IOException | ClassNotFoundException e) {
-//			e.printStackTrace();
-//			return null;
-//		}
-//	}
 }

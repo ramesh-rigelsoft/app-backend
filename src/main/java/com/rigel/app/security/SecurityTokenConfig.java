@@ -156,12 +156,8 @@ public class SecurityTokenConfig {
 	        configuration.addAllowedOrigin("http://localhost:8091");
 	        configuration.setAllowedMethods(Arrays.asList("HEAD",
 	                "GET", "POST", "PUT", "DELETE", "PATCH"));
-	        // setAllowCredentials(true) is important, otherwise:
-	        // The value of the 'Access-Control-Allow-Origin' header in the response must not be the wildcard '*' when the request's credentials mode is 'include'.
-	        
-	        // setAllowedHeaders is important! Without it, OPTIONS preflight request
-	        // will fail with 403 Invalid CORS request
-	        configuration.setAllowedHeaders(Arrays.asList("Authorization","filter", "Cache-Control", "Content-Type"));
+	        configuration.addAllowedHeader("*");
+//	        configuration.setAllowedHeaders(Arrays.asList("Authorization","filter", "Cache-Control", "Content-Type"));
 	        final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 	        source.registerCorsConfiguration("/**", configuration);
 	        return source;
