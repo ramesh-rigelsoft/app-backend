@@ -73,6 +73,7 @@ public class JwtTokenUtil implements Serializable {
 		// 2) Log a stable fingerprint (compare across all instances)
 		String fingerprint = Base64.getEncoder().encodeToString(Arrays.copyOfRange(key.getEncoded(), 0, 8));
 		System.out.println("[JWT] Key fingerprint (first 8 bytes, Base64): " + fingerprint);
+		System.out.println("p12 file loaded : "+secretHex);
 	}
 
 	public Key getKey() {
@@ -141,6 +142,20 @@ public class JwtTokenUtil implements Serializable {
 	public Date getExpirationDateFromToken(String token) {
 		return getClaimFromToken(token, Claims::getExpiration);
 	}
+	public Claims getProExpirationDateFromToken(String token) {
+	    try {
+	        return Jwts.parserBuilder()
+	                .setSigningKey(key)
+	                .build()
+	                .parseClaimsJws(token)
+	                .getBody();
+
+	    } catch (ExpiredJwtException ex) {
+	        System.out.println("Token expired");
+//	        throw ex; // or return something custom
+	        return null;
+	    }
+	}
 
 	public <T> T getClaimFromToken(String token, Function<Claims, T> claimsResolver) {
 		final Claims claims = getAllClaimsFromToken(token);
@@ -153,12 +168,17 @@ public class JwtTokenUtil implements Serializable {
 
 	public Boolean isTokenExpired(String token) {
 		try {
-			final Date expiration = getExpirationDateFromToken(token);
-//			System.out.println(expiration.before(Date.from(clock.instant()))+"expiration----"+expiration);
+			Claims clams = getProExpirationDateFromToken(token);
+			final Date expiration;
+			if(clams==null) {
+				return true;
+			}else {
+				expiration=clams.getExpiration();
+			}
+			System.out.println("expiration----"+expiration);
 			return expiration.before(Date.from(clock.instant()));
 		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
+			return true;
 		}
 	}
 

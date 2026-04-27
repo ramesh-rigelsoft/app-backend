@@ -1,4 +1,3 @@
-// spring boot 3 ka security config//
 package com.rigel.app.security;
 
 import java.util.Arrays;
@@ -29,9 +28,7 @@ import jakarta.servlet.http.HttpServletResponse;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true) // Boot 3.x
-public class SecurityTokenConfig1 {
-
-	private boolean isRoleSecure = false;
+public class SecurityTokenConfig {
 
 	@Autowired
 	private JwtConfig jwtConfig;
@@ -89,10 +86,10 @@ public class SecurityTokenConfig1 {
 				.authorizeHttpRequests(auth -> auth.requestMatchers(AUTH_WHITELIST).permitAll()
 
 						
-						.requestMatchers(HttpMethod.GET, "/**").permitAll()
-						.requestMatchers(HttpMethod.POST, "/api/**").permitAll()
+//						.requestMatchers(HttpMethod.GET, "/**").permitAll()
+//						.requestMatchers(HttpMethod.POST, "/api/**").permitAll()
 						
-//						.requestMatchers(HttpMethod.POST, "/api/user/signup/**", "/api/user/login/**").permitAll()
+						.requestMatchers(HttpMethod.POST, "/api/user/signup/**", "/api/user/login/**").permitAll()
 //						.requestMatchers(AppUtill.getUrlRole()).hasAnyAuthority(AppUtill.getAllRole()).anyRequest()
 						.requestMatchers(
 					            "/",

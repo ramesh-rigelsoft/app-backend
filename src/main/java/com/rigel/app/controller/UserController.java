@@ -167,9 +167,8 @@ public class UserController {
 		Map<String, Object> data2 = new HashMap<>();
 		String secret = null;
 		LoginActivity loginActivity = loginInfoService.findLoginActivityByUsername(login.getUsername());
-//		System.out.println((jwtTokenUtil.isTokenExpired(loginActivity.getToken())) + "------------" + loginActivity);
-		if (loginActivity == null || (loginActivity != null
-				&& jwtTokenUtil.isTokenExpired(loginActivity != null ? loginActivity.getToken() : null))) {
+//		System.out.println((jwtTokenUtil.isTokenExpired(loginActivity != null ? loginActivity.getToken() : null)) + "------------" + loginActivity);
+		if (loginActivity == null || (loginActivity != null	&& jwtTokenUtil.isTokenExpired(loginActivity != null ? loginActivity.getToken() : null))) {
 			ThirdPartyResponse thirdPartyResponse = RAUtility.loginPost(login.toString());
 			if (thirdPartyResponse == null) {
 				throw new TaskTitleNotFound("Email id not existing with us.");
@@ -196,10 +195,13 @@ public class UserController {
 							.token(thirdPartyResponse.getData().getAccess_token()).emailId(user.getEmail_id())
 							.mobileNumber(user.getMobile_no()).userObject(json).secret(secret).build();
 					loginInfoService.saveLoginActivity(Arrays.asList(loginActivity1));
+					User userSave=user;
+					userSave.setId(0);
+					userService.saveUser(userSave);
 				}
-//				data.put("access_token",cryptoAES128.encrypt(token));
 				data.put("secret", secret);
 				data.put("user", thirdPartyResponse.getData().getUser());
+				data.put("token", thirdPartyResponse.getData().getAccess_token());
 				response.put("data", data);
 				response.put("status", "OK");
 				response.put("code", "200");
@@ -227,7 +229,8 @@ public class UserController {
 			data2.put("access_token", loginActivity.getToken());
 			data2.put("user", user);
 			secret = RAUtility.generateMD5(data2.toString());
-
+			
+			data.put("token", loginActivity.getToken());
 			data.put("secret", secret);
 			data.put("user", user);
 			response.put("data", data);

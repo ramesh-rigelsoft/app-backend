@@ -31,7 +31,6 @@ public class P12PropertyLoader {
     public void loadFromP12() throws Exception {
         String result=RAUtility.callOwnServer();
         File file=new File(Constaints.PROJECT_DIR+"/secure.p12");
-        System.out.println(file.getAbsolutePath()+"-----------------"+file.exists());
         KeyStore ks = KeyStore.getInstance("PKCS12");
         ks.load(new FileInputStream(file.getAbsoluteFile()), result.toCharArray());
 

@@ -9,9 +9,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -43,23 +40,22 @@ public class User implements Serializable{
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 	
-	@Pattern(
-		    regexp = "^[A-Za-z]+(\\s[A-Za-z]+){0,3}$",
-		    message = "Name must contain maximum 4 words (letters only)"
-		)private String name;
-	
-	@Email
-	@NotBlank(message = "Email is mandatory")
+//	@Pattern(
+//		    regexp = "^[A-Za-z]+(\\s[A-Za-z]+){0,3}$",
+//		    message = "Name must contain maximum 4 words (letters only)"
+//	)
+	private String name;
+//	@Email
+//	@NotBlank(message = "Email is mandatory")
 	private String email_id;
 	
-	@Pattern(regexp = "^[0-9]{10,10}$",message="Enter valid mobile number") 
+//	@Pattern(regexp = "^[0-9]{10,10}$",message="Enter valid mobile number") 
 	private String mobile_no;
 	
-	
-	@Pattern(regexp = "^[0-9]{1,3}$",message="Enter valid contry code") 
+//	@Pattern(regexp = "^[0-9]{1,3}$",message="Enter valid contry code") 
 	private String country_code;
 	
-	@NotBlank(message = "Password is mandatory")
+//	@NotBlank(message = "Password is mandatory")
 	private String password;
 	
 	private int status;// 1-active,2-InActive,3-delete
@@ -71,8 +67,9 @@ public class User implements Serializable{
 	private Date lastPasswordResetDate;
 	
     // ================= COMPANY INFO =================
+	// ================= COMPANY INFO =================
 	private String shopType;
-    
+	    
     private String companyName;
     private String companyLogo;
 
