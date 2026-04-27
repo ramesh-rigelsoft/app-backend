@@ -64,7 +64,7 @@ public class ItemsServiceImpl implements IItemsService {
 	public List<Items> searchItems(SearchCriteria criteria) {
 		List<Items> items=itemsDao.searchItems(criteria);
 		if(criteria.isIsdownload()&&items.size()>0){
-			ExcelDirectSave.saveItemsToDownloads(items);
+			ExcelDirectSave.exportItemsToExcel(items);
 		}
 		return items;
 	}

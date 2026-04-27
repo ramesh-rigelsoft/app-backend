@@ -1,6 +1,7 @@
 package com.rigel.app.util;
 
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import com.rigel.app.model.BuyerInfo;
 import com.rigel.app.model.Items;
@@ -11,167 +12,229 @@ import org.apache.poi.ss.usermodel.*;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.*;
+import java.time.LocalDate;
 import java.util.List;
 
 public class ExcelDirectSave {
 
-    public static void saveItemsToDownloads(List<Items> items) {
+	public static void exportItemsToExcel(List<Items> items) {
 
-        try {
-            // 🔹 User Downloads path
-            String userHome = System.getProperty("user.home");
-            Path downloadDir = Paths.get(userHome, "Downloads", Constaints.DOWNLOAD_FOLDER_NAME);
+	    try (Workbook workbook = new XSSFWorkbook()) {
 
-            // 🔥 Folder check + create (if not exists)
-            if (!Files.exists(downloadDir)) {
-                Files.createDirectories(downloadDir);
-                System.out.println("Folder created: " + downloadDir);
-            }
+	        Sheet sheet = workbook.createSheet("Items");
 
-            // 🔹 File name (unique bana diya to avoid overwrite)
-            String fileName = "entryItems_" + System.currentTimeMillis() + ".xlsx";
-            Path filePath = downloadDir.resolve(fileName);
+	        // 🔥 Header Style
+	        Font headerFont = workbook.createFont();
+	        headerFont.setBold(true);
+	        headerFont.setColor(IndexedColors.WHITE.getIndex());
 
-            // 🔥 Streaming workbook (memory safe)
-            try (SXSSFWorkbook workbook = new SXSSFWorkbook(100);
-                 FileOutputStream fos = new FileOutputStream(filePath.toFile())) {
+	        CellStyle headerStyle = workbook.createCellStyle();
+	        headerStyle.setFont(headerFont);
+	        headerStyle.setFillForegroundColor(IndexedColors.DARK_BLUE.getIndex());
+	        headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+	        headerStyle.setAlignment(HorizontalAlignment.CENTER);
 
-                Sheet sheet = workbook.createSheet("Items");
+	        // 📌 Columns
+	        String[] headers = {
+	                "Item Code", "Category", "Category Type", "Measure Type",
+	                "Brand", "Model", "Condition", "Source",
+	                "RAM",
+	                "Storage", "Storage Type",
+	                "Quantity", "Initial Price", "Selling Price",
+	                "Description", "Color",
+	                "Processor", "OS", "Screen Size",
+	                "Generation", "Serial No", "Created At"
+	        };
 
-                // Header
-                Row header = sheet.createRow(0);
-                String[] cols = {
-                        "ItemCode", "Category", "Brand",
-                        "Model", "Quantity", "Selling Price"
-                };
+	        // 🔹 Create Header Row
+	        Row headerRow = sheet.createRow(0);
 
-                for (int i = 0; i < cols.length; i++) {
-                    header.createCell(i).setCellValue(cols[i]);
-                }
+	        for (int i = 0; i < headers.length; i++) {
+	            Cell cell = headerRow.createCell(i);
+	            cell.setCellValue(headers[i]);
+	            cell.setCellStyle(headerStyle);
+	        }
 
-                // Data
-                int rowNum = 1;
-                for (Items item : items) {
-                    Row row = sheet.createRow(rowNum++);
+	        // 🔹 Data Rows
+	        int rowIndex = 1;
 
-                    row.createCell(0).setCellValue(item.getItemCode());
-                    row.createCell(1).setCellValue(item.getCategory());
-                    row.createCell(2).setCellValue(item.getBrand());
-                    row.createCell(3).setCellValue(item.getModelName());
-                    row.createCell(4).setCellValue(
-                            item.getQuantity() != null ? item.getQuantity() : 0
-                    );
-                    row.createCell(5).setCellValue(
-                            item.getSellingPrice() != null ? item.getSellingPrice() : 0
-                    );
-                }
+	        for (Items item : items) {
 
-                workbook.write(fos);
+	            Row row = sheet.createRow(rowIndex++);
 
-                // 🔥 VERY IMPORTANT (temp cleanup)
-                workbook.dispose();
+	            int col = 0;
 
-                System.out.println("File saved at: " + filePath);
-            }
+	            row.createCell(col++).setCellValue(nvl(item.getItemCode()));
+	            row.createCell(col++).setCellValue(nvl(item.getCategory()));
+	            row.createCell(col++).setCellValue(nvl(item.getCategoryType()));
+	            row.createCell(col++).setCellValue(nvl(item.getMeasureType()));
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-    
-    public static String exportSalesToExcel(List<SalesInfo> list) {
+	            row.createCell(col++).setCellValue(nvl(item.getBrand()));
+	            row.createCell(col++).setCellValue(nvl(item.getModelName()));
+	            row.createCell(col++).setCellValue(nvl(item.getItemCondition()));
+	            row.createCell(col++).setCellValue(nvl(item.getItemSource()));
 
-        String fileName = "sales_" + System.currentTimeMillis() + ".xlsx";
+	            row.createCell(col++).setCellValue(nvl(item.getRam()+""+item.getRamUnit()));
 
-        SXSSFWorkbook workbook = new SXSSFWorkbook(100);
+	            row.createCell(col++).setCellValue(nvl(item.getStorage()+""+item.getStorageUnit()));
+	            row.createCell(col++).setCellValue(nvl(item.getStorageType()));
 
-        try {
-            Sheet sheet = workbook.createSheet("Sales Report");
+	            row.createCell(col++).setCellValue(item.getQuantity() != null ? item.getQuantity() : 0);
+	            row.createCell(col++).setCellValue(item.getInitialPrice() != null ? item.getInitialPrice() : 0);
+	            row.createCell(col++).setCellValue(item.getSellingPrice() != null ? item.getSellingPrice() : 0);
 
-            // ✅ Header Style
-            CellStyle headerStyle = workbook.createCellStyle();
-            Font font = workbook.createFont();
-            font.setBold(true);
-            headerStyle.setFont(font);
-            headerStyle.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
-            headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+	            row.createCell(col++).setCellValue(nvl(item.getDescription()));
+	            row.createCell(col++).setCellValue(nvl(item.getItemColor()));
 
-            int rowNum = 0;
+	            row.createCell(col++).setCellValue(nvl(item.getProcessor()));
+	            row.createCell(col++).setCellValue(nvl(item.getOperatingSystem()));
+	            row.createCell(col++).setCellValue(nvl(item.getScreenSize()));
 
-            String[] columns = {
-                    "Invoice No", "Item Code", "Brand", "Model",
-                    "Quantity", "Purchase Price", "Sold Price",
-                    "Buyer Name", "Mobile", "Date"
-            };
+	            row.createCell(col++).setCellValue(nvl(item.getItemGen()));
+	            row.createCell(col++).setCellValue(nvl(item.getSerialNumber()));
 
-            // ✅ Header
-            Row header = sheet.createRow(rowNum++);
-            for (int i = 0; i < columns.length; i++) {
-                Cell cell = header.createCell(i);
-                cell.setCellValue(columns[i]);
-                cell.setCellStyle(headerStyle);
-            }
+	            row.createCell(col++).setCellValue(
+	                    item.getCreatedAt() != null ? item.getCreatedAt().now().toString() : ""
+	            );
+	        }
 
-            // ✅ Data
-            for (SalesInfo s : list) {
-
-                Row row = sheet.createRow(rowNum++);
-                BuyerInfo b = s.getBuyerInfo();
-
-                row.createCell(0).setCellValue(nvl(b != null ? b.getInvoiceNumber() : null));
-                row.createCell(1).setCellValue(nvl(s.getItemCode()));
-                row.createCell(2).setCellValue(nvl(s.getBrand()));
-                row.createCell(3).setCellValue(nvl(s.getModelName()));
-
-                row.createCell(4).setCellValue(s.getQuantity() != null ? s.getQuantity() : 0);
-                row.createCell(5).setCellValue(s.getInitialPrice() != null ? s.getInitialPrice() : 0);
-                row.createCell(6).setCellValue(s.getSoldPrice() != null ? s.getSoldPrice() : 0);
-
-                row.createCell(7).setCellValue(nvl(b != null ? b.getBuyerName() : null));
-                row.createCell(8).setCellValue(nvl(b != null ? b.getMobileNumber() : null));
-
-                row.createCell(9).setCellValue(
-                        s.getCreatedAt() != null ? s.getCreatedAt().toString() : "-"
-                );
-            }
-
-            // ✅ Auto size
-            for (int i = 0; i < columns.length; i++) {
-                sheet.autoSizeColumn(i);
-            }
-
-            // ✅ Folder Path (Downloads/RigelEMISM)
+	        // 📏 Auto-size columns
+	        for (int i = 0; i < headers.length; i++) {
+	            sheet.autoSizeColumn(i);
+	        }
+	        
             String userHome = System.getProperty("user.home");
             Path folder = Paths.get(userHome, "Downloads", Constaints.DOWNLOAD_FOLDER_NAME);
 
-            // ✅ Create if not exists
+            // 🔥 create folder if not exists
             if (!Files.exists(folder)) {
                 Files.createDirectories(folder);
             }
 
+            String fileName = "items_report_" + LocalDate.now() + ".xlsx";
             Path filePath = folder.resolve(fileName);
 
-            // ❌ Replace नहीं करना (unique name already)
+            // 💾 Save file
             try (FileOutputStream fos = new FileOutputStream(filePath.toFile())) {
                 workbook.write(fos);
             }
+            
+	        System.out.println("Excel file created: " + filePath);
 
-            System.out.println("File saved at: " + filePath);
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	}
 
-            return filePath.toString(); // return path if needed
+	
+    public static void exportSalesToExcel(List<SalesInfo> salesList) {
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "ERROR";
-        } finally {
-            // ✅ VERY IMPORTANT (memory cleanup)
-            workbook.dispose();
-            try {
-                workbook.close();
-            } catch (IOException e) {
-                e.printStackTrace();
+	    try (Workbook workbook = new XSSFWorkbook()) {
+
+	        Sheet sheet = workbook.createSheet("Items");
+
+	        // 🔥 Header Style
+	        Font headerFont = workbook.createFont();
+	        headerFont.setBold(true);
+	        headerFont.setColor(IndexedColors.WHITE.getIndex());
+
+	        CellStyle headerStyle = workbook.createCellStyle();
+	        headerStyle.setFont(headerFont);
+	        headerStyle.setFillForegroundColor(IndexedColors.DARK_BLUE.getIndex());
+	        headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+	        headerStyle.setAlignment(HorizontalAlignment.CENTER);
+
+	        // 📌 Columns
+	        String[] headers = {
+	        		"Invoice Number","Item Code", "Category", "Category Type", "Measure Type",
+	                "Brand", "Model", "Condition", "Source",
+	                "RAM",
+	                "Storage", "Storage Type",
+	                "Quantity", "Initial Price", "Selling Price","Sold Price",
+	                "Description", "Color",
+	                "Processor", "OS", "Screen Size",
+	                "Generation", "Serial No", "Created At"
+	        };
+
+	        // 🔹 Create Header Row
+	        Row headerRow = sheet.createRow(0);
+
+	        for (int i = 0; i < headers.length; i++) {
+	            Cell cell = headerRow.createCell(i);
+	            cell.setCellValue(headers[i]);
+	            cell.setCellStyle(headerStyle);
+	        }
+
+	        // 🔹 Data Rows
+	        int rowIndex = 1;
+
+	        for (SalesInfo item : salesList) {
+
+	            Row row = sheet.createRow(rowIndex++);
+
+	            int col = 0;
+	            row.createCell(col++).setCellValue(nvl(item.getBuyerInfo().getInvoiceNumber()));
+	            row.createCell(col++).setCellValue(nvl(item.getItemCode()));
+	            row.createCell(col++).setCellValue(nvl(item.getCategory()));
+	            row.createCell(col++).setCellValue(nvl(item.getCategoryType()));
+	            row.createCell(col++).setCellValue(nvl(item.getMeasureType()));
+
+	            row.createCell(col++).setCellValue(nvl(item.getBrand()));
+	            row.createCell(col++).setCellValue(nvl(item.getModelName()));
+	            row.createCell(col++).setCellValue(nvl(item.getItemCondition()));
+	            row.createCell(col++).setCellValue(nvl(item.getItemSource()));
+
+	            row.createCell(col++).setCellValue(nvl(item.getRam()+""+item.getRamUnit()));
+
+	            row.createCell(col++).setCellValue(nvl(item.getStorage()+""+item.getStorageUnit()));
+	            row.createCell(col++).setCellValue(nvl(item.getStorageType()));
+
+	            row.createCell(col++).setCellValue(item.getQuantity() != null ? item.getQuantity() : 0);
+	            row.createCell(col++).setCellValue(item.getInitialPrice() != null ? item.getInitialPrice() : 0);
+	            row.createCell(col++).setCellValue(item.getSellingPrice() != null ? item.getSellingPrice() : 0);
+	            row.createCell(col++).setCellValue(item.getSoldPrice() != null ? item.getSoldPrice() : 0);
+
+	            row.createCell(col++).setCellValue(nvl(item.getDescription()));
+	            row.createCell(col++).setCellValue(nvl(item.getItemColor()));
+
+	            row.createCell(col++).setCellValue(nvl(item.getProcessor()));
+	            row.createCell(col++).setCellValue(nvl(item.getOperatingSystem()));
+	            row.createCell(col++).setCellValue(nvl(item.getScreenSize()));
+
+	            row.createCell(col++).setCellValue(nvl(item.getItemGen()));
+	            row.createCell(col++).setCellValue(nvl(item.getSerialNumber()));
+
+	            row.createCell(col++).setCellValue(
+	                    item.getCreatedAt() != null ? item.getCreatedAt().now().toString() : ""
+	            );
+	        }
+
+	        // 📏 Auto-size columns
+	        for (int i = 0; i < headers.length; i++) {
+	            sheet.autoSizeColumn(i);
+	        }
+	        
+            String userHome = System.getProperty("user.home");
+            Path folder = Paths.get(userHome, "Downloads", Constaints.DOWNLOAD_FOLDER_NAME);
+
+            // 🔥 create folder if not exists
+            if (!Files.exists(folder)) {
+                Files.createDirectories(folder);
             }
-        }
+
+            String fileName = "sales_report_" + LocalDate.now() + ".xlsx";
+            Path filePath = folder.resolve(fileName);
+
+            // 💾 Save file
+            try (FileOutputStream fos = new FileOutputStream(filePath.toFile())) {
+                workbook.write(fos);
+            }
+            
+	        System.out.println("Excel file created: " + filePath);
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
     }
     
     private static String nvl(String val) {

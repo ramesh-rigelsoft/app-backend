@@ -74,7 +74,7 @@ public class SalesInfoValidator {
 			if (!salesInfo.getCategory().equalsIgnoreCase(Constaints.SHOP_OWNER_CATEGORY)) {
 				// ❌ Selling price < purchase price
 				if (salesInfo.getSoldPrice() == null || salesInfo.getSoldPrice() < inventory.getInitialPrice()) {
-					throw new ValidationException("Selling price must be grater then purchase price at row " + (i + 1));
+					throw new ValidationException("Sold price must be grater then purchase price at row " + (i + 1));
 				}
 			}
 		}
