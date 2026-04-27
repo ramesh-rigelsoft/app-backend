@@ -38,24 +38,14 @@ public class JwtTokenAuthenticationFilter extends  OncePerRequestFilter {
 			throws ServletException, IOException {
 		
 		String header = request.getHeader(jwtConfig.getHeader());
-//		System.out.println(jwtConfig.getHeader()+" header "+header);
 		if(header == null || !header.startsWith(jwtConfig.getPrefix())) {
 			chain.doFilter(request, response);  		// If not valid, go to the next filter.
 			return;
 		}
 				
 		String token = header.substring(7);
-//		System.out.println("Token 1 "+token);
-//		token= cryptoAES128.decrypt(token);
-//		response.setHeader("Authorization", "Bearer "+token);
-//		System.out.println("Token 2 "+token);
 		try {
-//			if(JwtTokenUtil.isTokenExpired(token)){
-//				token=JwtTokenUtil.refreshToken(token);
-//			}
-			boolean osInfo=!TokenSecure.getOSInfo().equals(JwtTokenUtil.getOSInfoFromToken(token,1));
-			boolean browserInfo=!TokenSecure.getBrowserInfo(request).equals(JwtTokenUtil.getOSInfoFromToken(token, 2));
-         	if(osInfo&&browserInfo) {
+			if(token!=null) {
 				chain.doFilter(request, response);  		// If not valid, go to the next filter.
 				return;
 			}
@@ -69,7 +59,6 @@ public class JwtTokenAuthenticationFilter extends  OncePerRequestFilter {
 			JwtUser userDetails = (JwtUser) userDetailService.loadUserByUsername(username);
 			
 			if(userDetails!=null) {
-//				System.out.println("Username  "+userDetails.getUsername());
 				UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
 						 userDetails.getUsername(), null, userDetails.getAuthorities());
 				SecurityContextHolder.getContext().setAuthentication(auth);
@@ -82,7 +71,6 @@ public class JwtTokenAuthenticationFilter extends  OncePerRequestFilter {
 			// In case of failure. Make sure it's clear; so guarantee user won't be authenticated
 			SecurityContextHolder.clearContext();
 		}
-//		System.out.println("Username111  ");
 		// go to the next filter in the filter chain
 		chain.doFilter(request, response);
 	}

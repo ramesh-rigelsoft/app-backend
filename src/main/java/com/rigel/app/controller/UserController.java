@@ -55,11 +55,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
@@ -197,7 +199,7 @@ public class UserController {
 					loginInfoService.saveLoginActivity(Arrays.asList(loginActivity1));
 					User userSave=user;
 					userSave.setId(0);
-					userService.saveUser(userSave);
+					userService.saveUser(user);
 				}
 				data.put("secret", secret);
 				data.put("user", thirdPartyResponse.getData().getUser());
@@ -279,6 +281,53 @@ public class UserController {
 			response.put("message", "Profile has been fetch.");
 			return new ResponseEntity<>(response, HttpStatus.OK);
 		}
+	}
+	
+	@PostMapping("/token/validate")
+	public ResponseEntity<Map<String, Object>> validateToken(
+	        @RequestHeader("Authorization") String authHeader) {
+
+	    Map<String, Object> response = new HashMap<>();
+
+	    try {
+	        // Extract token
+	        String token = authHeader.replace("Bearer ", "");
+
+	        // Validate token
+//	        String username = jwtTokenUtil.getEmailFromToken(token);
+
+	        if (jwtTokenUtil.isTokenExpired(token)) {
+
+	            response.put("status", "OK");
+	            response.put("code", "200");
+	            response.put("message", "Token is valid");
+//	            response.put("username", username);
+
+	            return ResponseEntity.ok(response);
+	        } else {
+	        	response.put("status", "FAIL");
+	 	        response.put("code", "401");
+	 	        response.put("message", "Token expired");
+	 	       return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+
+	        }
+
+	    } catch (ExpiredJwtException e) {
+
+	        response.put("status", "FAIL");
+	        response.put("code", "401");
+	        response.put("message", "Token expired");
+
+	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+
+	    } catch (Exception e) {
+
+	        response.put("status", "FAIL");
+	        response.put("code", "401");
+	        response.put("message", "Invalid token");
+
+	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+	    }
 	}
 
 	@GetMapping("/view/file")

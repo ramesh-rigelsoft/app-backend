@@ -84,31 +84,6 @@ public class JwtTokenUtil implements Serializable {
 		return expiration;
 	}
 
-//	@Value("${security.jwt.secret}")
-//	private String secret;
-//	
-//	private Key key;
-//
-//
-//	@Value("${security.jwt.expiration}")
-//	private Long expiration;
-//	
-//	@PostConstruct
-//    public void init() {
-//		if (secret.length() < 32) {
-//            throw new IllegalArgumentException("JWT Secret must be at least 32 characters long!");
-//        }
-////        this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
-//        this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
-//
-//    }
-
-//    KeyPair keyPair = Keys.keyPairFor(SignatureAlgorithm.HS256); // ECDSA keys
-//    PrivateKey privateKey = keyPair.getPrivate();
-//    PublicKey publicKey = keyPair.getPublic();
-
-//	@Autowired
-//	private CryptoAES128 cryptoAES128;
 
 	public String getUsernameFromToken(String token) {
 		return getClaimFromToken(token, Claims::getSubject);
@@ -195,8 +170,6 @@ public class JwtTokenUtil implements Serializable {
 
 	public String generateToken(JwtUser userDetails, HttpServletRequest request) {
 		Map<String, Object> claims = new HashMap<>();
-		claims.put(OS_INFO, TokenSecure.getOSInfo());
-		claims.put(BROWSER_INFO, TokenSecure.getBrowserInfo(request));
 		return doGenerateToken(claims, userDetails);
 	}
 
@@ -307,11 +280,11 @@ public class JwtTokenUtil implements Serializable {
 	}
 
 	private Date calculateExpirationDate(Date createdDate) {
-		return new Date(createdDate.getTime() + expiration * 1000);
+		return new Date(createdDate.getTime() + expiration);
 	}
 
 	private Date calculateExpirationDates(Date createdDate, int expiration) {
-		return new Date(createdDate.getTime() + expiration * 1000 * 60 * 60);
+		return new Date(createdDate.getTime() + expiration);
 	}
 
 	// utility
