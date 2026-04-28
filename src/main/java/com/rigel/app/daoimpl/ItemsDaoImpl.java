@@ -76,19 +76,33 @@ public class ItemsDaoImpl implements IItemsDao {
 	@Override
 	public List<Items> searchItems(SearchCriteria criteria) {
 
-		StringBuilder jpql = new StringBuilder("SELECT i FROM Items i WHERE 1=1 ");
+		StringBuilder jpql = new StringBuilder("SELECT i FROM Items i WHERE ");
 
 		Map<String, Object> params = new HashMap<>();
 
 		// mandatory ownerId
-		jpql.append(" AND i.ownerId = :ownerId ");
+		jpql.append(" i.ownerId = :ownerId ");
 		params.put("ownerId", criteria.getUserId());
+		
+		if (criteria.getSearchKeyword() != null && !criteria.getSearchKeyword().trim().isEmpty()) {
 
-		// optional searchKeyword (itemCode / model / brand search)
-		if (criteria.getSearchKeyword() != null && !criteria.getSearchKeyword().isEmpty()) {
-			jpql.append(" AND (i.itemCode = :search OR i.modelName LIKE :search OR i.brand LIKE :search) ");
-			params.put("search", "%" + criteria.getSearchKeyword() + "%");
+		    jpql.append("""
+		        AND (
+		            LOWER(i.itemCode) LIKE :search
+		            OR LOWER(i.modelName) LIKE :search
+		            OR LOWER(i.brand) LIKE :search
+		            OR LOWER(i.description) LIKE :search
+		        )
+		    """);
+
+		    params.put("search", "%" + criteria.getSearchKeyword().toLowerCase().trim() + "%");
 		}
+
+//		// optional searchKeyword (itemCode / model / brand search)
+//		if (criteria.getSearchKeyword() != null && !criteria.getSearchKeyword().isEmpty()) {
+//			jpql.append(" AND (i.itemCode = :search OR i.modelName LIKE :search OR i.brand LIKE :search) ");
+//			params.put("search", "" + criteria.getSearchKeyword() + "");
+//		}
 
 		// optional category filter
 		if (criteria.getCategory() != null && !criteria.getCategory().isEmpty()) {

@@ -15,10 +15,12 @@ import lombok.ToString;
 @AllArgsConstructor
 public class SupplierCreteria {
 	
+	private int startIndex;
+    private int maxRecords;    
 	private String status;
 	private String supplierName;
-	private String gst;
+	private String gstNumber;
 	private String pan;
-	private int ownerId;
+	private int userId;
 
 }

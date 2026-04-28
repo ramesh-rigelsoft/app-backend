@@ -74,23 +74,32 @@ public class SalesDaoImpl implements ISalesDao {
 	@Override
 	public List<SalesInfo> searchSalesInfo(SearchCriteria criteria) {
 
-		StringBuilder jpql = new StringBuilder("SELECT i FROM SalesInfo i INNER JOIN FETCH i.buyerInfo WHERE 1=1 ");
-
+//		StringBuilder jpql = new StringBuilder("SELECT i FROM SalesInfo i INNER JOIN FETCH i.buyerInfo WHERE ");
+		StringBuilder jpql = new StringBuilder("SELECT i FROM SalesInfo i JOIN BuyerInfo bi ON bi.id = i.buyerInfo.id WHERE ");
 		Map<String, Object> params = new HashMap<>();
-		jpql.append(" AND i.ownerId = :ownerId ");
+		jpql.append(" i.ownerId = :ownerId ");
 		params.put("ownerId", criteria.getUserId());
-		
-		if (criteria.getInvoiceNumber() != null && !criteria.getInvoiceNumber().isEmpty()) {
-		    jpql.append(" AND i.buyerInfo.invoiceNumber = :invoiceNumber ");
-		    params.put("invoiceNumber", criteria.getInvoiceNumber());
-		}
+		if (criteria.getSearchKeyword() != null && !criteria.getSearchKeyword().trim().isEmpty()) {
+			System.out.println("hhhhhhhhh-------"+criteria.getSearchKeyword());
+			
+		    jpql.append("""
+		        AND (
+		            LOWER(i.buyerInfo.invoiceNumber) LIKE :search
+		            OR LOWER(i.buyerInfo.custumberId) LIKE :search
+		            OR LOWER(i.buyerInfo.buyerName) LIKE :search
+		            OR LOWER(i.buyerInfo.emailId) LIKE :search
+		            OR LOWER(i.buyerInfo.mobileNumber) LIKE :search
+		            OR LOWER(i.buyerInfo.countryCode) LIKE :search
+		            OR LOWER(i.buyerInfo.buyerAddress) LIKE :search
+		            OR LOWER(i.itemCode) LIKE :search
+		            OR LOWER(i.modelName) LIKE :search
+		            OR LOWER(i.brand) LIKE :search
+		            OR LOWER(i.description) LIKE :search
+		        )
+		    """);
 
-		// optional searchKeyword (itemCode / model / brand search)
-		if (criteria.getSearchKeyword() != null && !criteria.getSearchKeyword().isEmpty()) {
-			jpql.append(" AND (i.itemCode = :search OR i.modelName LIKE :search OR i.brand LIKE :search) ");
-			params.put("search", "%" + criteria.getSearchKeyword() + "%");
+		    params.put("search", "%" + criteria.getSearchKeyword().toLowerCase().trim() + "%");
 		}
-
 		// optional category filter
 		if (criteria.getCategory() != null && !criteria.getCategory().isEmpty()) {
 			jpql.append(" AND i.category = :category ");
@@ -127,6 +136,7 @@ public class SalesDaoImpl implements ISalesDao {
 			query.setParameter(entry.getKey(), entry.getValue());
 		}
 		if (!criteria.isIsdownload()) {
+			System.out.println("criteria.getStartIndex()-----------"+criteria.getStartIndex());
 		    query.setFirstResult(criteria.getStartIndex());
 			query.setMaxResults(criteria.getMaxRecords());
 		}

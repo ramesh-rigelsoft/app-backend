@@ -82,7 +82,7 @@ public class InventoryDaoImpl implements IInventoryDao {
 	
 	@Override
 	public Inventory findInventoryByCode(String itemCode,int ownerId) {
-	    String hql = "SELECT i FROM Inventory i WHERE i.itemCode = :itemCode AND ownerId = :ownerId ";
+	    String hql = "SELECT i FROM Inventory i WHERE i.itemCode = :itemCode AND i.ownerId = :ownerId ORDER BY i.createdAt DESC ";
 
 	    return entityManager
 	            .createQuery(hql, Inventory.class)
@@ -174,6 +174,8 @@ public class InventoryDaoImpl implements IInventoryDao {
 	        jpql.append(" AND LOWER(i.description) LIKE :description ");
 	    }
 
+	    jpql.append(" ORDER BY i.createdAt DESC ");
+	    
 //	    jpql.append(" ORDER BY i.createdAt DESC ");
 
 	    TypedQuery<Inventory> query = entityManager.createQuery(jpql.toString(), Inventory.class);

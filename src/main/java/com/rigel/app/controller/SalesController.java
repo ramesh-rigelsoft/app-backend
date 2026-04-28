@@ -40,11 +40,12 @@ public class SalesController {
 			throw new BadGatewayRequest("Invalid Request");
 		} else {
 			List<SalesInfo> salesResponse = salesService.searchSalesInfo(searchCriteria);
+			System.out.println("salesResponse----------"+salesResponse.size());
 			data.put("sales", salesResponse);
 			response.put("data", data);
 			response.put("status", "CREATED");
 			response.put("code", "201");
-			response.put("message", "Your records has been created successfully.");
+			response.put("message", "Your records has been fetch successfully.");
 			return new ResponseEntity<>(response, HttpStatus.CREATED);
 		}
 	}

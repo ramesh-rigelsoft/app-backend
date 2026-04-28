@@ -42,7 +42,7 @@ public class SupplierDao implements ISupplierDao {
 		if (criteria.getStatus() != null && !criteria.getStatus().isEmpty()) {
 			queryBuilder.append("AND s.status = :status ");
 		}
-		if (criteria.getGst() != null && !criteria.getGst().isEmpty()) {
+		if (criteria.getGstNumber() != null && !criteria.getGstNumber().isEmpty()) {
 			queryBuilder.append("AND s.gstNumber = :gst ");
 		}
 		if (criteria.getPan() != null && !criteria.getPan().isEmpty()) {
@@ -52,20 +52,21 @@ public class SupplierDao implements ISupplierDao {
 		queryBuilder.append(" ORDER BY s.createdAt DESC");
 
 		var query = entityManager.createQuery(queryBuilder.toString(), Supplier.class);
-			query.setParameter("ownerId",+ criteria.getOwnerId()); // partial match
+			query.setParameter("ownerId",+ criteria.getUserId()); // partial match
         if (criteria.getSupplierName() != null && !criteria.getSupplierName().isEmpty()) {
 			query.setParameter("supplierName", "%" + criteria.getSupplierName() + "%"); // partial match
 		}
 		if (criteria.getStatus() != null && !criteria.getStatus().isEmpty()) {
 			query.setParameter("status", criteria.getStatus());
 		}
-		if (criteria.getGst() != null && !criteria.getGst().isEmpty()) {
-			query.setParameter("gst", criteria.getGst());
+		if (criteria.getGstNumber() != null && !criteria.getGstNumber().isEmpty()) {
+			query.setParameter("gst", criteria.getGstNumber());
 		}
 		if (criteria.getPan() != null && !criteria.getPan().isEmpty()) {
 			query.setParameter("pan", criteria.getPan());
 		}
-
+		query.setFirstResult(criteria.getStartIndex());
+		query.setMaxResults(criteria.getMaxRecords());
 		return query.getResultList();
 	}
 

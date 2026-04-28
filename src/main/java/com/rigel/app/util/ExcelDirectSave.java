@@ -20,6 +20,17 @@ public class ExcelDirectSave {
 	public static void exportItemsToExcel(List<Items> items) {
 
 	    try (Workbook workbook = new XSSFWorkbook()) {
+	    	
+	    	CellStyle dateCellStyle = workbook.createCellStyle();
+	    	CreationHelper createHelper = workbook.getCreationHelper();
+	    	dateCellStyle.setDataFormat(
+	    	        createHelper.createDataFormat().getFormat("dd-MM-yyyy HH:mm")
+	    	);
+	    	CellStyle moneyStyle = workbook.createCellStyle();
+	    	DataFormat format = workbook.createDataFormat();
+
+	    	// ₹ with Indian grouping
+	    	moneyStyle.setDataFormat(format.getFormat("₹ #,##,##0.00"));
 
 	        Sheet sheet = workbook.createSheet("Items");
 
@@ -63,7 +74,6 @@ public class ExcelDirectSave {
 	            Row row = sheet.createRow(rowIndex++);
 
 	            int col = 0;
-
 	            row.createCell(col++).setCellValue(nvl(item.getItemCode()));
 	            row.createCell(col++).setCellValue(nvl(item.getCategory()));
 	            row.createCell(col++).setCellValue(nvl(item.getCategoryType()));
@@ -80,8 +90,27 @@ public class ExcelDirectSave {
 	            row.createCell(col++).setCellValue(nvl(item.getStorageType()));
 
 	            row.createCell(col++).setCellValue(item.getQuantity() != null ? item.getQuantity() : 0);
-	            row.createCell(col++).setCellValue(item.getInitialPrice() != null ? item.getInitialPrice() : 0);
-	            row.createCell(col++).setCellValue(item.getSellingPrice() != null ? item.getSellingPrice() : 0);
+	          
+	         // Initial Price
+	            Cell initPriceCell = row.createCell(col++);
+	            if (item.getInitialPrice() != null) {
+	                initPriceCell.setCellValue(item.getInitialPrice());
+	                initPriceCell.setCellStyle(moneyStyle);
+	            } else {
+	                initPriceCell.setCellValue(0);
+	            }
+
+	            // Selling Price
+	            Cell sellPriceCell = row.createCell(col++);
+	            if (item.getSellingPrice() != null) {
+	                sellPriceCell.setCellValue(item.getSellingPrice());
+	                sellPriceCell.setCellStyle(moneyStyle);
+	            } else {
+	                sellPriceCell.setCellValue(0);
+	            }
+	            
+//	            row.createCell(col++).setCellValue(item.getInitialPrice() != null ? item.getInitialPrice() : 0);
+//	            row.createCell(col++).setCellValue(item.getSellingPrice() != null ? item.getSellingPrice() : 0);
 
 	            row.createCell(col++).setCellValue(nvl(item.getDescription()));
 	            row.createCell(col++).setCellValue(nvl(item.getItemColor()));
@@ -92,10 +121,18 @@ public class ExcelDirectSave {
 
 	            row.createCell(col++).setCellValue(nvl(item.getItemGen()));
 	            row.createCell(col++).setCellValue(nvl(item.getSerialNumber()));
+	            
+	            Cell dateCell = row.createCell(col++);
 
-	            row.createCell(col++).setCellValue(
-	                    item.getCreatedAt() != null ? item.getCreatedAt().now().toString() : ""
-	            );
+	            if (item.getCreatedAt() != null) {
+	                dateCell.setCellValue(
+	                    java.sql.Timestamp.valueOf(item.getCreatedAt())
+	                );
+	                dateCell.setCellStyle(dateCellStyle);
+	            } else {
+	                dateCell.setCellValue("");
+	            }
+	         
 	        }
 
 	        // 📏 Auto-size columns
@@ -111,7 +148,7 @@ public class ExcelDirectSave {
                 Files.createDirectories(folder);
             }
 
-            String fileName = "items_report_" + LocalDate.now() + ".xlsx";
+            String fileName = "items_report_" + System.currentTimeMillis() + ".xlsx";
             Path filePath = folder.resolve(fileName);
 
             // 💾 Save file
@@ -222,7 +259,7 @@ public class ExcelDirectSave {
                 Files.createDirectories(folder);
             }
 
-            String fileName = "sales_report_" + LocalDate.now() + ".xlsx";
+            String fileName = "sales_report_" + System.currentTimeMillis() + ".xlsx";
             Path filePath = folder.resolve(fileName);
 
             // 💾 Save file
