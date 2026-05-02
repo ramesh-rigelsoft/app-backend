@@ -79,9 +79,13 @@ public class SalesDaoImpl implements ISalesDao {
 		Map<String, Object> params = new HashMap<>();
 		jpql.append(" i.ownerId = :ownerId ");
 		params.put("ownerId", criteria.getUserId());
-		if (criteria.getSearchKeyword() != null && !criteria.getSearchKeyword().trim().isEmpty()) {
-			System.out.println("hhhhhhhhh-------"+criteria.getSearchKeyword());
+		if(criteria.getInvoiceNumber()!= null && !criteria.getInvoiceNumber().strip().isEmpty()) {
+			 jpql.append(" AND i.buyerInfo.invoiceNumber = :invoiceNumber");
+	         params.put("invoiceNumber", criteria.getInvoiceNumber().strip());
 			
+		}
+		
+		if (criteria.getSearchKeyword() != null && !criteria.getSearchKeyword().strip().isEmpty()) {
 		    jpql.append("""
 		        AND (
 		            LOWER(i.buyerInfo.invoiceNumber) LIKE :search
@@ -98,7 +102,7 @@ public class SalesDaoImpl implements ISalesDao {
 		        )
 		    """);
 
-		    params.put("search", "%" + criteria.getSearchKeyword().toLowerCase().trim() + "%");
+		    params.put("search", "%" + criteria.getSearchKeyword().toLowerCase().strip() + "%");
 		}
 		// optional category filter
 		if (criteria.getCategory() != null && !criteria.getCategory().isEmpty()) {

@@ -69,6 +69,7 @@ public class User implements Serializable{
     // ================= COMPANY INFO =================
 	// ================= COMPANY INFO =================
 	private String shopType;
+	private String softwareType;
 	    
     private String companyName;
     private String companyLogo;

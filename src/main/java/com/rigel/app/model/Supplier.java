@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.Builder.Default;
 
@@ -30,7 +31,8 @@ public class Supplier implements Serializable {
     @Column(nullable = false)
     private String supplierName;
 
-//    @Column(length = 15)
+    @NotBlank(message = "GST name is required")
+    @Column(nullable = false, unique = true)
     private String gstNumber;
 
 //    @Column(length = 10)
@@ -46,8 +48,10 @@ public class Supplier implements Serializable {
 //    @Pattern(regexp = "^[0-9]{12}$", message = "Phone must be 10 digits")
 //    @Column(length = 10)
     private String phone;
-
-//    @Column(length = 300)
+    
+    @NotBlank(message = "Address is required")
+    @Size(max = 500, message = "Address can't exceed 500 characters")
+    @Column(length = 500, nullable = false)
     private String address;
  
     private String status;

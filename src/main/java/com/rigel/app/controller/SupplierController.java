@@ -50,9 +50,14 @@ public class SupplierController {
 		} else if (result.hasFieldErrors()) {
 			throw new BadGatewayRequest(result.getFieldError().getDefaultMessage());
 		} else {
-			List<Supplier> suppliers=supplierService.searchSupplier(SupplierCreteria.builder().userId(dtoRequest.getOwnerId()).gstNumber(dtoRequest.getGstNumber()).pan(dtoRequest.getPanNumber()).build());
+			SupplierCreteria creteria=SupplierCreteria.builder().userId(dtoRequest.getOwnerId()).maxRecords(100).gstNumber(dtoRequest.getGstNumber()).build();
+			
+			System.out.println("creteria---"+creteria.toString());
+			List<Supplier> suppliers=supplierService.searchSupplier(creteria);
+			System.out.println("supplier-------"+suppliers.size());
+			System.out.println("dtoRequest=-----"+dtoRequest.toString());
 			if(dtoRequest.getId()==null&&suppliers.size()>0) {
-				throw new BadGatewayRequest("This Supplier Already Existing with Us.");
+				throw new BadGatewayRequest("This vendor already existing with Us.");
 			}else {
 				Supplier supplierRes = supplierService.saveSupplier(dtoRequest);
 				data.put("supplier", supplierRes);

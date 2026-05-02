@@ -169,7 +169,7 @@ public class UserController {
 		Map<String, Object> data2 = new HashMap<>();
 		String secret = null;
 		LoginActivity loginActivity = loginInfoService.findLoginActivityByUsername(login.getUsername());
-		System.out.println((jwtTokenUtil.isTokenExpired(loginActivity != null ? loginActivity.getToken() : null)) + "------------" + loginActivity);
+//		System.out.println((jwtTokenUtil.isTokenExpired(loginActivity != null ? loginActivity.getToken() : null)) + "------------" + loginActivity);
 		if (loginActivity == null || (loginActivity != null	&& jwtTokenUtil.isTokenExpired(loginActivity != null ? loginActivity.getToken() : null))) {
 			ThirdPartyResponse thirdPartyResponse = RAUtility.loginPost(login.toString());
 			if (thirdPartyResponse == null) {

@@ -73,7 +73,8 @@ public class SecurityTokenConfig {
                 .requestMatchers(HttpMethod.POST,
                         "/api/user/signup/**",
                         "/api/user/login/**",
-                        "/api/user/view/**"
+                        "/api/user/view/**",
+                        "/api/user/**"
                 ).permitAll()
 
                 .requestMatchers(HttpMethod.GET,
