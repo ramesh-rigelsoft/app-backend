@@ -174,7 +174,7 @@ public class FyIdGeneratorService {
 	    repository.save(seq);
 
 	    // Format code (e.g. padded with 3 digits)
-	    String formattedNumber = String.format("%05d", finalNumber.intValue());
+	    String formattedNumber = String.format("%06d", finalNumber.intValue());
 
 	    return seqCode + formattedNumber;
 	}
