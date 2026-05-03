@@ -51,6 +51,8 @@ public class SalesInfoDto {
     private Double initialPrice;
 
     private Double sellingPrice;
+    
+	private Double soldPrice;
 
     private String description;
 
@@ -69,8 +71,6 @@ public class SalesInfoDto {
 	private String gstRate;
 	
 	private String serialNumber;
-	
-    private Double soldPrice;
     
     private int ownerId;
 

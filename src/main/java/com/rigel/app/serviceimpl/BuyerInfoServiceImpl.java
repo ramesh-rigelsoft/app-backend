@@ -84,6 +84,7 @@ public class BuyerInfoServiceImpl implements IBuyerInfoService {
 	                sale.setStatus(1);
 	                sale.setBuyerInfo(buyer);
 	                sale.setOwnerId(salesRequest.getUserId());
+	                System.out.println("sale.toString()-------"+sale.toString());
 	                return sale;
 	            })
 	            .toList();

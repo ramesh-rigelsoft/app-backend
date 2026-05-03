@@ -35,6 +35,7 @@ public class ItemsDTO {
     private String ramUnit;
 
     private String storage;
+    private String storageType;
     private String storageUnit;
 
     private Integer quantity;
@@ -50,9 +51,15 @@ public class ItemsDTO {
 
     private int ownerId;
     
-	private String gstRate;
+    private String processor;
+    private String operatingSystem;
+    private String screenSize;
+    private String itemGen;
+    private String gstRate;
 	private String serialNumber;
-	private String itemCondition;
-	    
+	
+
+    private String itemCondition;
+    private String itemSource;
 	private String description;
 }

@@ -91,6 +91,7 @@ public class ItemsDaoImpl implements IItemsDao {
 		            LOWER(i.itemCode) LIKE :search
 		            OR LOWER(i.modelName) LIKE :search
 		            OR LOWER(i.brand) LIKE :search
+		            OR LOWER(i.categoryType) LIKE :search
 		            OR LOWER(i.description) LIKE :search
 		        )
 		    """);

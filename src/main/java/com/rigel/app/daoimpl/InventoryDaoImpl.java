@@ -169,15 +169,19 @@ public class InventoryDaoImpl implements IInventoryDao {
 	    if (criteria.getItemGen() != null) {
 	        jpql.append(" AND i.itemGen = :itemGen ");
 	    }
-
+	    
 	    if (criteria.getDescription() != null && !criteria.getDescription().isEmpty()) {
-	        jpql.append(" AND LOWER(i.description) LIKE :description ");
+	        jpql.append(" AND (");
+	        jpql.append("LOWER(i.description) LIKE :description ");
+	        jpql.append("OR LOWER(i.modelName) LIKE :description ");
+	        jpql.append("OR LOWER(i.brand) LIKE :description ");
+	        jpql.append("OR LOWER(i.categoryType) LIKE :description ");
+	        jpql.append("OR LOWER(i.itemCode) LIKE :description ");
+	        jpql.append(")");
 	    }
 
 	    jpql.append(" ORDER BY i.createdAt DESC ");
-	    
-//	    jpql.append(" ORDER BY i.createdAt DESC ");
-
+	   
 	    TypedQuery<Inventory> query = entityManager.createQuery(jpql.toString(), Inventory.class);
     	query.setParameter("ownerId",criteria.getUserId());
     	
@@ -235,8 +239,6 @@ public class InventoryDaoImpl implements IInventoryDao {
 	    if (criteria.getDescription() != null && !criteria.getDescription().isEmpty()) {
 	        query.setParameter("description", "%" + criteria.getDescription().toLowerCase() + "%");
 	    }
-	  System.out.println("start-"+criteria.getStartIndex());
-	  System.out.println("max-"+criteria.getMaxRecords());
 	    query.setFirstResult(criteria.getStartIndex());
 	    query.setMaxResults(criteria.getMaxRecords());	    
 	    return query.getResultList();

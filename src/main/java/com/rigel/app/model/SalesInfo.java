@@ -101,7 +101,7 @@ public class SalesInfo implements Serializable{
 	@Column(name = "sold_price")
 	private Double soldPrice;
 
-	@Column(name = "description", length = 1000)
+	@Column(name = "description", length = 600)
 	private String description;
 
 	@Column(name = "item_color")

@@ -37,7 +37,7 @@ public class SupplierDao implements ISupplierDao {
 		queryBuilder.append("s.ownerId = :ownerId ");
 		
 		if (criteria.getSupplierName() != null && !criteria.getSupplierName().isEmpty()) {
-			queryBuilder.append("AND s.supplierName LIKE :supplierName ");
+		    queryBuilder.append(" AND LOWER(s.supplierName) LIKE :supplierName ");
 		}
 		if (criteria.getStatus() != null && !criteria.getStatus().isEmpty()) {
 			queryBuilder.append("AND s.status = :status ");
@@ -53,9 +53,10 @@ public class SupplierDao implements ISupplierDao {
 
 		var query = entityManager.createQuery(queryBuilder.toString(), Supplier.class);
 			query.setParameter("ownerId",+ criteria.getUserId()); // partial match
+			
         if (criteria.getSupplierName() != null && !criteria.getSupplierName().isEmpty()) {
-			query.setParameter("supplierName", "%" + criteria.getSupplierName() + "%"); // partial match
-		}
+        	query.setParameter("supplierName", "%" + criteria.getSupplierName().toLowerCase() + "%");
+        }
 		if (criteria.getStatus() != null && !criteria.getStatus().isEmpty()) {
 			query.setParameter("status", criteria.getStatus());
 		}
