@@ -34,15 +34,16 @@ public class FySequence {
     private int fyMonth;
 
     @Column(name = "last_number")
-    private int lastNumber;
-
-    @Column(name = "userid")
-    private int userId;
+    private String lastNumber;
 
     @Column(name = "seqName")
     private String seqName;
     
-    @Column(name = "seqCode")
+   
+    @Column(name = "userid")
+    private int userId;
+   
+    @Column(name = "seqCode")//, unique = true)
     private String seqCode;
     
 //    public FySequence() {}

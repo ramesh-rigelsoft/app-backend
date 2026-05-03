@@ -71,7 +71,7 @@ public class InventoryService implements IInventoryService {
 				   return null;
 				}
 			}
-			String itemCode = fyIdGeneratorService.generateFyId(inventory.getOwnerId(), "ITM", "");
+			String itemCode = fyIdGeneratorService.generateItemCode(inventory.getOwnerId(), "ITM");
 			inventory.setItemCode(itemCode);
 			inventory.setFingerPrint(fingerPrint);
 			em.persist(inventory);

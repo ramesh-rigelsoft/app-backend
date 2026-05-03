@@ -1,5 +1,6 @@
 package com.rigel.app.serviceimpl;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Optional;
 
@@ -91,8 +92,8 @@ public class FyIdGeneratorService {
 				.orElseGet(() -> createOrUpdateSequence(userId, seqCode, seqName, fyYear, fyMonth));
 
 		// increment
-		int next = seq.getLastNumber() + 1;
-		seq.setLastNumber(next);
+		int next = Integer.valueOf(seq.getLastNumber()) + 1;
+		seq.setLastNumber(String.valueOf(next));
 
 		repository.save(seq);
 
@@ -101,20 +102,20 @@ public class FyIdGeneratorService {
 
 	private FySequence createOrUpdateSequence(int userId, String seqCode, String seqName, String fyYear, int fyMonth) {
 
-        // Try existing sequence
+		// Try existing sequence
 		Optional<FySequence> seqOrgOpt = repository.findSequence(userId, seqCode);
 
 		if (seqOrgOpt.isEmpty()) {
-        // Fresh entry
-			FySequence newSeq = FySequence.builder().fyYear(fyYear).fyMonth(fyMonth).lastNumber(0).userId(userId)
-					.seqCode(seqCode).seqName(seqName).build();
+			// Fresh entry
+			FySequence newSeq = FySequence.builder().fyYear(fyYear).fyMonth(fyMonth).lastNumber(String.valueOf(0))
+					.userId(userId).seqCode(seqCode).seqName(seqName).build();
 
 			return repository.save(newSeq);
 		}
 
 		FySequence seqOrg = seqOrgOpt.get();
 
-        // Check same month
+		// Check same month
 		Optional<FySequence> seqMonthOpt = repository.findSequenceByMonth(fyMonth, userId, seqCode);
 		if (seqMonthOpt.isEmpty()) {
 			seqOrg.setFyMonth(fyMonth);
@@ -123,11 +124,59 @@ public class FyIdGeneratorService {
 
 		FySequence seqMonth = seqMonthOpt.get();
 
-        // Reset for new FY
+		// Reset for new FY
 		seqMonth.setFyYear(fyYear);
 		seqMonth.setFyMonth(fyMonth);
-		seqMonth.setLastNumber(0);
+		seqMonth.setLastNumber(String.valueOf(0));
 
 		return repository.save(seqMonth);
 	}
+
+	@Transactional
+	public String generateItemCode(int userId, String seqCode) {
+	    String fy = getFinancialYear(); // e.g. 04-2024
+	    String[] parts = fy.split("-");
+	    if (parts.length < 2) {
+	        throw new IllegalArgumentException("Invalid financial year format: " + fy);
+	    }
+	    int fyMonth = Integer.parseInt(parts[0]);
+	    String fyYear = parts[1];
+
+	    // Fetch existing sequence
+	    FySequence seq = repository.findSequence(userId, seqCode)
+	        .orElseGet(() -> {
+	            // First time entry → insert new record
+	            FySequence newSeq = FySequence.builder()
+	                    .fyYear(fyYear)
+	                    .fyMonth(fyMonth)
+	                    .lastNumber("0")
+	                    .userId(userId)
+	                    .seqCode(seqCode)
+	                    .seqName("")
+	                    .build();
+	            return repository.save(newSeq);
+	        });
+
+	    // Null-safe lastNumber
+	    String lastNumber = (seq.getLastNumber() == null || seq.getLastNumber().isBlank())
+	            ? "0"
+	            : seq.getLastNumber();
+
+	    BigDecimal finalNumber;
+	    try {
+	        finalNumber = new BigDecimal(lastNumber).add(BigDecimal.ONE);
+	    } catch (NumberFormatException e) {
+	        finalNumber = BigDecimal.ONE; // fallback
+	    }
+
+	    // Update DB with new lastNumber
+	    seq.setLastNumber(finalNumber.toPlainString());
+	    repository.save(seq);
+
+	    // Format code (e.g. padded with 3 digits)
+	    String formattedNumber = String.format("%05d", finalNumber.intValue());
+
+	    return seqCode + formattedNumber;
+	}
+
 }
