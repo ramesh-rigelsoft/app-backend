@@ -118,6 +118,11 @@ public class InventoryDaoImpl implements IInventoryDao {
             jpql.append(" AND i.itemCode IN :itemCodes ");
         }
         
+        if (criteria.getItemCode() != null && !criteria.getItemCode().isEmpty()) {
+            jpql.append(" AND i.itemCode LIKE :itemCode ");    
+        }
+
+        
 	    if (criteria.getCategory() != null) {
 	        jpql.append(" AND i.category = :category ");
 	    }
@@ -188,6 +193,11 @@ public class InventoryDaoImpl implements IInventoryDao {
     	if (criteria.getItemCodes() != null && !criteria.getItemCodes().isEmpty()) {
     	    query.setParameter("itemCodes", criteria.getItemCodes());
     	}
+    	
+    	if (criteria.getItemCode() != null && !criteria.getItemCode().isEmpty()) {
+             query.setParameter("itemCode", "%" + criteria.getItemCode() + "%");
+        }
+    	
 	    if (criteria.getCategory() != null) {
 	        query.setParameter("category", criteria.getCategory());
 	    }
