@@ -1,5 +1,6 @@
 package com.rigel.app.serviceimpl;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Optional;
 
@@ -43,8 +44,9 @@ public class InvoiceGeneratorService {
 				.orElseGet(() -> createOrUpdateSequence(userId, seqCode, seqName, fyYear, fyMonth));
 
 		// increment
-		int next = seq.getLastNumber() + 1;
-		seq.setLastNumber(next);
+		BigDecimal next = new BigDecimal(seq.getLastNumber()).add(BigDecimal.ONE);
+		seq.setLastNumber(String.valueOf(next));
+
 
 		repository.save(seq);
 
@@ -64,8 +66,8 @@ public class InvoiceGeneratorService {
 				.orElseGet(() -> createOrUpdateSequence(userId, seqCode, seqName, fyYear, fyMonth));
 
 		// increment
-		int next = seq.getLastNumber() + 1;
-		seq.setLastNumber(next);
+		BigDecimal next = new BigDecimal(seq.getLastNumber()).add(BigDecimal.ONE);
+		seq.setLastNumber(String.valueOf(next));
 
 		repository.save(seq);
 
@@ -78,7 +80,7 @@ public class InvoiceGeneratorService {
 
 		if (seqOrgOpt.isEmpty()) {
         // New entry
-			FySequence newSeq = FySequence.builder().fyYear(fyYear).fyMonth(fyMonth).lastNumber(0).userId(userId)
+			FySequence newSeq = FySequence.builder().fyYear(fyYear).fyMonth(fyMonth).lastNumber(String.valueOf(0)).userId(userId)
 					.seqCode(seqCode).seqName(seqName).build();
 
 			return repository.save(newSeq);
@@ -90,7 +92,7 @@ public class InvoiceGeneratorService {
 		if (!fyYear.equals(seq.getFyYear())) {
 			seq.setFyYear(fyYear);
 			seq.setFyMonth(fyMonth);
-			seq.setLastNumber(0);
+			seq.setLastNumber(String.valueOf(0));
 			return repository.save(seq);
 		}
 
