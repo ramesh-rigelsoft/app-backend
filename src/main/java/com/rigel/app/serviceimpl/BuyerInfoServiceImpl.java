@@ -81,7 +81,7 @@ public class BuyerInfoServiceImpl implements IBuyerInfoService {
 	                SalesInfo sale = objectMapper.convertValue(dto, SalesInfo.class);
 	                sale.setBuyerInfo(buyer);
 	                sale.setCreatedAt(LocalDateTime.now());
-	                sale.setStatus(1);
+	                sale.setStatus(true);
 	                sale.setBuyerInfo(buyer);
 	                sale.setOwnerId(salesRequest.getUserId());
 	                System.out.println("sale.toString()-------"+sale.toString());

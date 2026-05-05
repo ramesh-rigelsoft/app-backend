@@ -73,5 +73,9 @@ public class SalesInfoDto {
 	private String serialNumber;
     
     private int ownerId;
+    
+    private boolean status; 
+    private String additionalDetails;
+
 
 }

@@ -47,6 +47,7 @@ public class ItemsServiceImpl implements IItemsService {
 		items.setOperatingSystem(operatingSystem);
 		items.setCreatedAt(LocalDateTime.now());
 		items.setGstRate(gstRate);
+		items.setStatus(true);
 		return itemsDao.saveItems(items);
 	}
 

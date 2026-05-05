@@ -64,11 +64,13 @@ public class Items implements Serializable {
     private String itemGen;
     private String gstRate;
 	private String serialNumber;
+	private boolean status;
 	
 	@Column(name = "created_at")
 	private LocalDateTime createdAt;
  
     private int ownerId;
+    private String additionalDetails;
     
 
 }

@@ -45,8 +45,6 @@ public class ItemsDTO {
 //    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private MultipartFile image;
 
-    private Integer status;
-
     private Long createdAt;
 
     private int ownerId;
@@ -62,4 +60,8 @@ public class ItemsDTO {
     private String itemCondition;
     private String itemSource;
 	private String description;
+	
+	private boolean status; 
+	private String additionalDetails;
+
 }

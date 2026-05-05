@@ -46,4 +46,7 @@ public class SupplierDTO {
     
     private int ownerId;
     
+    private String additionalDetails;
+
+    
 }

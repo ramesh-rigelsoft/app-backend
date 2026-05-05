@@ -33,6 +33,7 @@ public class Inventory implements Serializable {
 
     @Column(unique = true, nullable = false)
     private String itemCode;
+   
     private String category;
     private String categoryType;
     private String measureType;
@@ -65,5 +66,8 @@ public class Inventory implements Serializable {
     private String image;
     @Column(name = "created_at")
 	private LocalDateTime createdAt;
+
+    private boolean status; 
+    private String additionalDetails;
 
 }

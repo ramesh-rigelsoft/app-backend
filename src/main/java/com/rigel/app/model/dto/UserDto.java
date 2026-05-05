@@ -80,5 +80,8 @@ public class UserDto {
     // ================= RELATION =================
 
     private MultipartFile logo;
+    
+    private String additionalDetails;
+
 }
 

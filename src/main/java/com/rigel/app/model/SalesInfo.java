@@ -123,7 +123,7 @@ public class SalesInfo implements Serializable{
 	private String itemGen;
 
 	@Column(name = "status")
-	private int status;
+	private boolean status;
 	
 	@Column(name = "gst_rate")
 	private String gstRate;
@@ -136,6 +136,9 @@ public class SalesInfo implements Serializable{
 
 	@Column(name = "owner_id")
 	private int ownerId;
+	
+	@Column(name = "additional_details")
+	private String additionalDetails;
 	
 	@ManyToOne(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
 	@JoinColumn(name="buyerInfo")

@@ -111,8 +111,12 @@ public class InventoryDaoImpl implements IInventoryDao {
 	@Override
 	public List<Inventory> searchInventory(SearchCriteria criteria) {
 
-	    StringBuilder jpql = new StringBuilder("SELECT i FROM Inventory i WHERE ");
+	    StringBuilder jpql = new StringBuilder("SELECT i FROM Inventory i WHERE i.status=true AND ");
         jpql.append("i.ownerId = :ownerId ");
+        
+        if (criteria.getItemQuentity() != null && !criteria.getItemQuentity().isEmpty()) {
+        	jpql.append(" AND i.quantity <= :quantity ");
+        }
         
         if (criteria.getItemCodes() != null && !criteria.getItemCodes().isEmpty()) {
             jpql.append(" AND i.itemCode IN :itemCodes ");
@@ -127,10 +131,6 @@ public class InventoryDaoImpl implements IInventoryDao {
 	        jpql.append(" AND i.category = :category ");
 	    }
 	    
-	    if (criteria.getCategory() != null) {
-	        jpql.append(" AND i.category = :category ");
-	    }
-
 	    if (criteria.getCategoryType() != null) {
 	        jpql.append(" AND i.categoryType = :categoryType ");
 	    }
@@ -190,6 +190,10 @@ public class InventoryDaoImpl implements IInventoryDao {
 	    TypedQuery<Inventory> query = entityManager.createQuery(jpql.toString(), Inventory.class);
     	query.setParameter("ownerId",criteria.getUserId());
     	
+		if (criteria.getItemQuentity() != null && !criteria.getItemQuentity().isEmpty()) {
+		  	query.setParameter("quantity", criteria.getItemQuentity());
+	    }
+    	  
     	if (criteria.getItemCodes() != null && !criteria.getItemCodes().isEmpty()) {
     	    query.setParameter("itemCodes", criteria.getItemCodes());
     	}

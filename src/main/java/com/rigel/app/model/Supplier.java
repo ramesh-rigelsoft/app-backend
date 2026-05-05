@@ -20,46 +20,48 @@ import java.time.LocalDateTime;
 @Table(name = "SUPPLIER")
 public class Supplier implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(length = 36, updatable = false, nullable = false)
-    private String id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.UUID)
+	@Column(length = 36, updatable = false, nullable = false)
+	private String id;
 
-    @NotBlank(message = "Supplier name is required")
-    @Column(nullable = false)
-    private String supplierName;
+	@NotBlank(message = "Supplier name is required")
+	@Column(nullable = false)
+	private String supplierName;
 
-    @NotBlank(message = "GST name is required")
-    @Column(nullable = false, unique = true)
-    private String gstNumber;
+	@NotBlank(message = "GST name is required")
+	@Column(nullable = false, unique = true)
+	private String gstNumber;
 
 //    @Column(length = 10)
-    private String panNumber;
-    
-//    @Column(length = 6)
-    private String pinCode;
+	private String panNumber;
 
-    @Email(message = "Invalid email format")
+//    @Column(length = 6)
+	private String pinCode;
+
+	@Email(message = "Invalid email format")
 //    @Column(length = 100)
-    private String email;
+	private String email;
 
 //    @Pattern(regexp = "^[0-9]{12}$", message = "Phone must be 10 digits")
 //    @Column(length = 10)
-    private String phone;
-    
-    @NotBlank(message = "Address is required")
-    @Size(max = 500, message = "Address can't exceed 500 characters")
-    @Column(length = 500, nullable = false)
-    private String address;
- 
-    private String status;
-    
-    private String district;
-    
-    private int ownerId; // optional if multi-user system
+	private String phone;
 
-    private LocalDateTime createdAt;
-    }
+	@NotBlank(message = "Address is required")
+	@Size(max = 500, message = "Address can't exceed 500 characters")
+	@Column(length = 500, nullable = false)
+	private String address;
 
+	private String status;
+
+	private String district;
+
+	private int ownerId; // optional if multi-user system
+
+	private LocalDateTime createdAt;
+
+	private String additionalDetails;
+
+}

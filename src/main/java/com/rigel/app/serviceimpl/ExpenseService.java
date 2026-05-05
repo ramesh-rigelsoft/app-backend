@@ -49,6 +49,7 @@ public class ExpenseService implements IExpenseService{
 	            .description(dto.getDescription())
 	            .amount(dto.getAmount())
 	            .proof(filName)
+	            .status(true)
 	            .date(RAUtility.epochToLocalDateTime(Long.valueOf(dto.getDate())))
 	            .ownerId(dto.getOwnerId())
 	            .createdAt(LocalDateTime.now())

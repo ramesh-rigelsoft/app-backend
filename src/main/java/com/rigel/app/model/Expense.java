@@ -42,8 +42,12 @@ public class Expense implements Serializable {
 
     @NotNull(message = "Date is required")
     private LocalDateTime date;
-
+   
     private int ownerId; // reference to the user/owner
     private LocalDateTime createdAt;
+    
+    private boolean status; 
+    private String additionalDetails;
+
 
 }

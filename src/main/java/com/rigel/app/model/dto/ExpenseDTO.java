@@ -36,4 +36,8 @@ public class ExpenseDTO {
     private int ownerId;
 
     private LocalDateTime createdAt;
+    
+    private boolean status; 
+    private String additionalDetails;
+
 }
