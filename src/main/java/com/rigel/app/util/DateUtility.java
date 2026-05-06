@@ -7,8 +7,8 @@ import java.time.format.DateTimeParseException;
 public final class DateUtility {
 
     private DateUtility() {}
-
-    public static LocalDateTime parseToDateTime(String dateStr, boolean isEnd) {
+    
+    public static LocalDateTime parseToDateTimes(String dateStr, boolean isEnd) {
 
         if (dateStr == null || dateStr.isBlank()) {
             return null;
@@ -17,30 +17,74 @@ public final class DateUtility {
         dateStr = dateStr.trim();
 
         try {
-            // 1️⃣ ISO Instant format: 2026-04-09T18:30:00.000Z
+
+            // 1️⃣ ISO Instant format
             if (dateStr.endsWith("Z")) {
                 Instant instant = Instant.parse(dateStr);
                 LocalDate date = instant.atZone(ZoneId.systemDefault()).toLocalDate();
 
-                return isEnd ? date.atTime(LocalTime.MAX) : date.atStartOfDay();
+                return isEnd
+                        ? date.atTime(23, 59, 59)
+                        : date.atTime(0, 0, 0);
             }
 
-            // 2️⃣ DateTime format: 2026-04-10T00:00 or 2026-04-10T00:00:00
+            // 2️⃣ DateTime format
             if (dateStr.contains("T")) {
-                String clean = dateStr.substring(0, 16); // yyyy-MM-ddTHH:mm
+                String clean = dateStr.substring(0, 16);
                 LocalDateTime ldt = LocalDateTime.parse(clean);
 
                 LocalDate date = ldt.toLocalDate();
-                return isEnd ? date.atTime(LocalTime.MAX) : date.atStartOfDay();
+
+                return isEnd
+                        ? date.atTime(23, 59, 59)
+                        : date.atTime(0, 0, 0);
             }
 
-            // 3️⃣ Only date: 2026-04-10
+            // 3️⃣ Only date
             LocalDate date = LocalDate.parse(dateStr);
 
-            return isEnd ? date.atTime(LocalTime.MAX) : date.atStartOfDay();
+            return isEnd
+                    ? date.atTime(23, 59, 59)
+                    : date.atTime(0, 0, 0);
 
         } catch (DateTimeParseException e) {
             throw new IllegalArgumentException("Invalid date format: " + dateStr, e);
         }
     }
+
+//    public static LocalDateTime parseToDateTime(String dateStr, boolean isEnd) {
+//
+//        if (dateStr == null || dateStr.isBlank()) {
+//            return null;
+//        }
+//
+//        dateStr = dateStr.trim();
+//
+//        try {
+//            // 1️⃣ ISO Instant format: 2026-04-09T18:30:00.000Z
+//            if (dateStr.endsWith("Z")) {
+//                Instant instant = Instant.parse(dateStr);
+//                LocalDate date = instant.atZone(ZoneId.systemDefault()).toLocalDate();
+//
+//                return isEnd ? date.atTime(LocalTime.MAX) : date.atStartOfDay();
+//            }
+//
+//            // 2️⃣ DateTime format: 2026-04-10T00:00 or 2026-04-10T00:00:00
+//            if (dateStr.contains("T")) {
+//                String clean = dateStr.substring(0, 16); // yyyy-MM-ddTHH:mm
+//                LocalDateTime ldt = LocalDateTime.parse(clean);
+//
+//                LocalDate date = ldt.toLocalDate();
+//                return isEnd ? date.atTime(LocalTime.MAX) : date.atStartOfDay();
+//            }
+//
+//            // 3️⃣ Only date: 2026-04-10
+//            LocalDate date = LocalDate.parse(dateStr);
+//
+//            return isEnd ? date.atTime(LocalTime.MAX) : date.atStartOfDay();
+//
+//        } catch (DateTimeParseException e) {
+//            throw new IllegalArgumentException("Invalid date format: " + dateStr, e);
+//        }
+//    }
 }

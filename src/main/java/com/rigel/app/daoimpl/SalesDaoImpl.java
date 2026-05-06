@@ -125,8 +125,10 @@ public class SalesDaoImpl implements ISalesDao {
 
 		if (criteria.getStartDate() != null && criteria.getEndDate() != null) {
 
-			LocalDateTime start = DateUtility.parseToDateTime(criteria.getStartDate(), false);
-			LocalDateTime end = DateUtility.parseToDateTime(criteria.getEndDate(), true);
+			LocalDateTime start = DateUtility.parseToDateTimes(criteria.getStartDate(), false);
+			LocalDateTime end = DateUtility.parseToDateTimes(criteria.getEndDate(), true);
+			System.out.println("start----"+start);
+			System.out.println("end----"+end);
 		    jpql.append(" AND i.createdAt BETWEEN :startDate AND :endDate ");
 			params.put("startDate", start);
 			params.put("endDate", end);
