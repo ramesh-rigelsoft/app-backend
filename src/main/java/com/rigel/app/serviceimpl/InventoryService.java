@@ -3,6 +3,7 @@ package com.rigel.app.serviceimpl;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -43,6 +44,7 @@ public class InventoryService implements IInventoryService {
 
 		try {
 			String fingerPrint = generateFingerprint(inventory);
+			System.out.println("fingerPrint:::::::::::"+fingerPrint);
 			CriteriaBuilder cb = em.getCriteriaBuilder();
 			CriteriaQuery<Inventory> cq = cb.createQuery(Inventory.class);
 			Root<Inventory> i = cq.from(Inventory.class);
@@ -66,14 +68,17 @@ public class InventoryService implements IInventoryService {
 				if(!inventory.getCategory().equalsIgnoreCase(Constaints.SHOP_OWNER_CATEGORY)) {
 				   Inventory existing = results.get(0);
 				   existing.setQuantity(existing.getQuantity() + inventory.getQuantity());
+				   existing.setUpdatedAt(LocalDateTime.now());
 				   return em.merge(existing);
 				}else {
 				   return null;
 				}
 			}
 			String itemCode = fyIdGeneratorService.generateItemCode(inventory.getOwnerId(), "ITM");
+			System.out.println("itemCode::::::::::: "+itemCode);
 			inventory.setItemCode(itemCode);
 			inventory.setFingerPrint(fingerPrint);
+			inventory.setCreatedAt(LocalDateTime.now());
 			em.persist(inventory);
 			return inventory;
 
@@ -158,6 +163,7 @@ public class InventoryService implements IInventoryService {
 		append(sb, inv.getItemGen());
 		append(sb, inv.getGstRate());
 		append(sb, inv.getDescription());
+		System.out.println("g-----"+inv.getDescription());
 
 		return sha256(sb.toString());
 	}

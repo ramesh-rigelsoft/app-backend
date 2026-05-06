@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import com.rigel.app.dao.IInventoryDao;
 import com.rigel.app.model.Inventory;
 import com.rigel.app.model.dto.SearchCriteria;
-import com.rigel.app.querybuilder.InventoryQueryBuilder;
+//import com.rigel.app.querybuilder.InventoryQueryBuilder;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
@@ -22,8 +22,8 @@ public class InventoryDaoImpl implements IInventoryDao {
 	@Autowired
 	private EntityManager entityManager;
 
-	@Autowired
-	private InventoryQueryBuilder inventoryQueryBuilder;
+//	@Autowired
+//	private InventoryQueryBuilder inventoryQueryBuilder;
 
 //	@Override
 //	public Inventory saveInventory(Inventory inventory) {

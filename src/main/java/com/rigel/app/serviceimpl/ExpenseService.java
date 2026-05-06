@@ -50,7 +50,7 @@ public class ExpenseService implements IExpenseService{
 	            .amount(dto.getAmount())
 	            .proof(filName)
 	            .status(true)
-	            .date(RAUtility.epochToLocalDateTime(Long.valueOf(dto.getDate())))
+	            .expenseDate(RAUtility.isoToLocalDateTime(String.valueOf(dto.getExpenseDate())))
 	            .ownerId(dto.getOwnerId())
 	            .createdAt(LocalDateTime.now())
 //	            .status("active");

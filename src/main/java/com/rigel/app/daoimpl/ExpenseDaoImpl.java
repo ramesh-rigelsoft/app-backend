@@ -36,7 +36,7 @@ public class ExpenseDaoImpl implements IExpenseDao {
 	@Override
 	public List<Expense> searchExpense(ExpenseCreteria creteria) {
 
-	    StringBuilder jpql = new StringBuilder("FROM Expense e WHERE ");
+	    StringBuilder jpql = new StringBuilder("FROM Expense e WHERE e.status=true AND ");
 
 	    if (creteria.getUserId() != 0) {
 	        jpql.append(" e.ownerId = :ownerId");
@@ -51,10 +51,10 @@ public class ExpenseDaoImpl implements IExpenseDao {
 	    }
 
 	    int year = (creteria.getYear() != 0) ? creteria.getYear() : LocalDate.now().getYear();
-	    jpql.append(" AND YEAR(e.date) = :year");
+	    jpql.append(" AND YEAR(e.expenseDate) = :year");
 
 	    if (creteria.getMonth() != 0) {
-	        jpql.append(" AND MONTH(e.date) = :month");
+	        jpql.append(" AND MONTH(e.expenseDate) = :month");
 	    }
 
 	    Query query = entityManager.createQuery(jpql.toString(), Expense.class);

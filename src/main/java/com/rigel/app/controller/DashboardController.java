@@ -37,7 +37,7 @@ public class DashboardController {
 			BindingResult result, HttpServletRequest request) {
 		Map<String, Object> response = new HashMap<>();
 		Map<String, Object> data = new HashMap<>();
-		Map<String, Object> dashboard = dashboardService.viewDashboard(dashboardRequest.getCycle().replace('"', ' ').replace('"', ' ').trim(),dashboardRequest.getUserId());
+		Map<String, Object> dashboard = dashboardService.viewDashboard(dashboardRequest);
 			data.put("dashboard", dashboard);
 			response.put("data", data);
 			response.put("status", "OK");

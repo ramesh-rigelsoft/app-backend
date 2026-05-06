@@ -31,7 +31,7 @@ public class ExpenseDTO {
     private MultipartFile proof;
 
     @NotNull(message = "Date is required")
-    private String date;
+    private String expenseDate;
 
     private int ownerId;
 

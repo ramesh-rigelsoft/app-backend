@@ -41,7 +41,7 @@ public class Expense implements Serializable {
     private String proof;  // file path / image URL
 
     @NotNull(message = "Date is required")
-    private LocalDateTime date;
+    private LocalDateTime expenseDate;
    
     private int ownerId; // reference to the user/owner
     private LocalDateTime createdAt;

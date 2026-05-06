@@ -96,8 +96,10 @@ public class RAUtility {
 		return epochMilli;
 	}
 
-	public static LocalDateTime epochToLocalDateTime(long epochMs) {
-		return Instant.ofEpochMilli(epochMs).atZone(ZoneId.systemDefault()).toLocalDateTime();
+	public static LocalDateTime isoToLocalDateTime(String input) {
+	    return Instant.parse(input)
+	            .atZone(ZoneId.systemDefault())
+	            .toLocalDateTime();
 	}
 
 	public static ThirdPartyResponse sendOtp(ResetPasswordRequest request) {

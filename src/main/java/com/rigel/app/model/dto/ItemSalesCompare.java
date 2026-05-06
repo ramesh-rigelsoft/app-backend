@@ -23,11 +23,13 @@ public class ItemSalesCompare {
     private int day;         // Current daily sold quantity
     private int month;       // Current monthly sold quantity
     private int year;        // Current yearly sold quantity
+    private int selectedFilter;  
 
     // Previous Sales
     private int previousDay;     // Previous day sold quantity
     private int previousMonth;   // Previous month sold quantity
     private int previousYear;    // Previous year sold quantity
+    private int previousSelectedFilter;  
 
 //    private double selling;  // Total selling amount
     private LocalDate date;     // Reference date

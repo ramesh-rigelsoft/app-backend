@@ -15,6 +15,7 @@ import com.rigel.app.model.dto.SearchCriteria;
 import com.rigel.app.service.IItemsService;
 import com.rigel.app.util.AppUtill;
 import com.rigel.app.util.ExcelDirectSave;
+import com.rigel.app.validate.*;
 
 @Lazy 
 @Service
@@ -24,8 +25,12 @@ public class ItemsServiceImpl implements IItemsService {
 	@Autowired
 	IItemsDao itemsDao;
 	
+	@Autowired
+	EntryInfoValidator entryInfoValidator;
+	
 	@Override
 	public Items saveItems(Items items) {
+		
 		String desc=AppUtill.replaceAllSpace(items.getDescription());
 		String brand=AppUtill.replaceAllSpace(items.getBrand());
 		String modelName=AppUtill.replaceAllSpace(items.getModelName());
@@ -48,6 +53,7 @@ public class ItemsServiceImpl implements IItemsService {
 		items.setCreatedAt(LocalDateTime.now());
 		items.setGstRate(gstRate);
 		items.setStatus(true);
+		entryInfoValidator.validate(items);
 		return itemsDao.saveItems(items);
 	}
 

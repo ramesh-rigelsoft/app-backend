@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import com.rigel.app.dao.IDashboardDao;
 import com.rigel.app.model.Inventory;
 import com.rigel.app.model.SalesInfo;
+import com.rigel.app.model.dto.DashboardRequest;
 import com.rigel.app.model.dto.ItemSalesCompare;
 import com.rigel.app.service.IDashboardService;
 
@@ -28,8 +29,8 @@ public class DashboardService implements IDashboardService {
 	private IDashboardDao dashboardDao;
 	
 	@Override
-	public Map<String, Object> viewDashboard(String cycle,int ownerId) {
-		return dashboardDao.viewDashboard(cycle, ownerId);
+	public Map<String, Object> viewDashboard(DashboardRequest dashboardRequest) {
+		return dashboardDao.viewDashboard(dashboardRequest);
 	}
 }
 //		LocalDate today = LocalDate.now(zoneId);

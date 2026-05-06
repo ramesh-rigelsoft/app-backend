@@ -16,7 +16,7 @@ import com.rigel.app.dao.IItemsDao;
 import com.rigel.app.model.Inventory;
 import com.rigel.app.model.Items;
 import com.rigel.app.model.dto.SearchCriteria;
-import com.rigel.app.querybuilder.ItemsQueryBuilder;
+//import com.rigel.app.querybuilder.ItemsQueryBuilder;
 import com.rigel.app.service.IInventoryService;
 import com.rigel.app.serviceimpl.FyIdGeneratorService;
 import com.rigel.app.util.Constaints;
@@ -76,7 +76,7 @@ public class ItemsDaoImpl implements IItemsDao {
 	@Override
 	public List<Items> searchItems(SearchCriteria criteria) {
 
-		StringBuilder jpql = new StringBuilder("SELECT i FROM Items i WHERE ");
+		StringBuilder jpql = new StringBuilder("SELECT i FROM Items i WHERE i.status=true AND ");
 
 		Map<String, Object> params = new HashMap<>();
 

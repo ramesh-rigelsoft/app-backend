@@ -15,7 +15,7 @@ import com.rigel.app.model.Inventory;
 import com.rigel.app.model.Items;
 import com.rigel.app.model.SalesInfo;
 import com.rigel.app.model.dto.SearchCriteria;
-import com.rigel.app.querybuilder.SalesQueryBuilder;
+//import com.rigel.app.querybuilder.SalesQueryBuilder;
 import com.rigel.app.service.IInventoryService;
 import com.rigel.app.util.DateUtility;
 
@@ -33,8 +33,8 @@ public class SalesDaoImpl implements ISalesDao {
 	@Autowired
 	IInventoryService iInventoryService;
 
-	@Autowired
-	SalesQueryBuilder salesQueryBuilder;
+//	@Autowired
+//	SalesQueryBuilder salesQueryBuilder;
 
 	@Override
 	public List<SalesInfo> saveSalesInfo(List<SalesInfo> salesInfoList) {
@@ -75,7 +75,7 @@ public class SalesDaoImpl implements ISalesDao {
 	public List<SalesInfo> searchSalesInfo(SearchCriteria criteria) {
 
 //		StringBuilder jpql = new StringBuilder("SELECT i FROM SalesInfo i INNER JOIN FETCH i.buyerInfo WHERE ");
-		StringBuilder jpql = new StringBuilder("SELECT i FROM SalesInfo i JOIN BuyerInfo bi ON bi.id = i.buyerInfo.id WHERE ");
+		StringBuilder jpql = new StringBuilder("SELECT i FROM SalesInfo i JOIN BuyerInfo bi ON bi.id = i.buyerInfo.id WHERE i.status=true AND ");
 		Map<String, Object> params = new HashMap<>();
 		jpql.append(" i.ownerId = :ownerId ");
 		params.put("ownerId", criteria.getUserId());
