@@ -1,4 +1,5 @@
 package com.rigel.app.daoimpl;
+
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -39,22 +40,25 @@ public class ItemsDaoImpl implements IItemsDao {
 	ObjectMapper mapper;
 
 	@Override
-	public Items saveItems(Items items) {
+	public Items saveItems(Items items, boolean isUpdate) {
 
 		Inventory Inventory = mapper.convertValue(items, Inventory.class);
-		
+
 		if (Inventory.getCategory().equalsIgnoreCase(Constaints.SHOP_OWNER_CATEGORY)) {
 			Inventory.setQuantity(100);
-		}
-
-		Inventory existingInventory =inventoryService.saveInventory(Inventory,entityManager);
-		if (existingInventory != null) {
-			items.setItemCode(existingInventory.getItemCode());
-		}
-		if (Inventory.getCategory().equalsIgnoreCase(Constaints.SHOP_OWNER_CATEGORY)) {
 			items.setQuantity(100);
 		}
-		return existingInventory!=null?entityManager.merge(items):items;
+
+		Inventory existingInventory = inventoryService.saveInventory(Inventory, entityManager, isUpdate);
+		if (existingInventory == null) {
+			return items;
+		}
+		items.setItemCode(existingInventory.getItemCode());
+		if (!isUpdate) {
+			items.setId(null);
+		}
+
+		return entityManager.merge(items);
 	}
 
 	@Override
@@ -63,9 +67,9 @@ public class ItemsDaoImpl implements IItemsDao {
 	}
 
 	@Override
-	public int deleteItems(List<Long> itemsId, int ownerId) {
+	public int deleteItems(Items items) {
 		String hql = "DELETE FROM Items i WHERE i.id IN :ids";
-		return entityManager.createQuery(hql).setParameter("ids", itemsId).executeUpdate();
+		return entityManager.createQuery(hql).setParameter("ids", items.getId()).executeUpdate();
 	}
 
 //	@Override
@@ -83,20 +87,20 @@ public class ItemsDaoImpl implements IItemsDao {
 		// mandatory ownerId
 		jpql.append(" i.ownerId = :ownerId ");
 		params.put("ownerId", criteria.getUserId());
-		
+
 		if (criteria.getSearchKeyword() != null && !criteria.getSearchKeyword().trim().isEmpty()) {
 
-		    jpql.append("""
-		        AND (
-		            LOWER(i.itemCode) LIKE :search
-		            OR LOWER(i.modelName) LIKE :search
-		            OR LOWER(i.brand) LIKE :search
-		            OR LOWER(i.categoryType) LIKE :search
-		            OR LOWER(i.description) LIKE :search
-		        )
-		    """);
+			jpql.append("""
+					    AND (
+					        LOWER(i.itemCode) LIKE :search
+					        OR LOWER(i.modelName) LIKE :search
+					        OR LOWER(i.brand) LIKE :search
+					        OR LOWER(i.categoryType) LIKE :search
+					        OR LOWER(i.description) LIKE :search
+					    )
+					""");
 
-		    params.put("search", "%" + criteria.getSearchKeyword().toLowerCase().trim() + "%");
+			params.put("search", "%" + criteria.getSearchKeyword().toLowerCase().trim() + "%");
 		}
 
 //		// optional searchKeyword (itemCode / model / brand search)
@@ -127,7 +131,7 @@ public class ItemsDaoImpl implements IItemsDao {
 
 			LocalDateTime start = DateUtility.parseToDateTimes(criteria.getStartDate(), false);
 			LocalDateTime end = DateUtility.parseToDateTimes(criteria.getEndDate(), true);
-		    jpql.append(" AND i.createdAt BETWEEN :startDate AND :endDate ");
+			jpql.append(" AND i.createdAt BETWEEN :startDate AND :endDate ");
 			params.put("startDate", start);
 			params.put("endDate", end);
 		}

@@ -9,7 +9,7 @@ import jakarta.persistence.EntityManager;
 
 public interface IInventoryService {
 
-	public Inventory saveInventory(Inventory inventory,EntityManager entityManager);
+	public Inventory saveInventory(Inventory inventory,EntityManager entityManager,boolean isUpdate);
 
 	public Inventory getInventryByItemCode(String itemCode,int qty,int ownerId, EntityManager entityManager);
 	

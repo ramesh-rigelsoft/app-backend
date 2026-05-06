@@ -7,11 +7,11 @@ import com.rigel.app.model.dto.SearchCriteria;
 
 public interface IItemsDao {
 
-    public Items saveItems(Items items);
+    public Items saveItems(Items items,boolean isUpdate);
 	
     public Items updateItems(Items items);
 	
-	public int deleteItems(List<Long> itemsId,int ownerId);
+	public int deleteItems(Items items);
 	
 	public List<Items> searchItems(SearchCriteria criteria);
 

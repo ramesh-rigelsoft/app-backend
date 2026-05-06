@@ -1,6 +1,8 @@
 package com.rigel.app.model.dto;
 
 
+import java.time.LocalDateTime;
+
 import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -20,7 +22,7 @@ import lombok.ToString;
 @ToString
 public class ItemsDTO {
 
-    private Long id;
+    private String id;
 
     private String itemCode;
     private String category;
@@ -45,7 +47,9 @@ public class ItemsDTO {
 //    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private MultipartFile image;
 
-    private Long createdAt;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+ 	
 
     private int ownerId;
     
@@ -63,5 +67,6 @@ public class ItemsDTO {
 	
 	private boolean status; 
 	private String additionalDetails;
+	private boolean isUpdate;
 
 }

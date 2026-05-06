@@ -10,38 +10,44 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import com.rigel.app.dao.IItemsDao;
+import com.rigel.app.model.Inventory;
 import com.rigel.app.model.Items;
 import com.rigel.app.model.dto.SearchCriteria;
+import com.rigel.app.service.IInventoryService;
 import com.rigel.app.service.IItemsService;
 import com.rigel.app.util.AppUtill;
 import com.rigel.app.util.ExcelDirectSave;
 import com.rigel.app.validate.*;
 
-@Lazy 
+@Lazy
 @Service
 //@CacheConfig(cacheNames = "userCache", keyGenerator = "TransferKeyGenerator")
 public class ItemsServiceImpl implements IItemsService {
 
 	@Autowired
 	IItemsDao itemsDao;
-	
+
 	@Autowired
 	EntryInfoValidator entryInfoValidator;
-	
+
+	@Autowired
+	ItemsUpdateValidation itemsUpdateValidation;
+
+//	@Autowired
+//	IInventoryService inventoryDao;
+
 	@Override
-	public Items saveItems(Items items) {
-		
-		String desc=AppUtill.replaceAllSpace(items.getDescription());
-		String brand=AppUtill.replaceAllSpace(items.getBrand());
-		String modelName=AppUtill.replaceAllSpace(items.getModelName());
-		String itemColor=AppUtill.replaceAllSpace(items.getItemColor());
-		String itemGen=AppUtill.replaceAllSpace(items.getItemGen());
-		String screenSize=AppUtill.replaceAllSpace(items.getScreenSize());
-		String operatingSystem=AppUtill.replaceAllSpace(items.getOperatingSystem());
-		String gstRate=AppUtill.replaceAllSpace(items.getGstRate());
-		System.out.println("gst--"+gstRate);
-		System.out.println("desc--"+desc);
-		
+	public Items saveItems(Items items, boolean isUpdate) {
+
+		String desc = AppUtill.replaceAllSpace(items.getDescription());
+		String brand = AppUtill.replaceAllSpace(items.getBrand());
+		String modelName = AppUtill.replaceAllSpace(items.getModelName());
+		String itemColor = AppUtill.replaceAllSpace(items.getItemColor());
+		String itemGen = AppUtill.replaceAllSpace(items.getItemGen());
+		String screenSize = AppUtill.replaceAllSpace(items.getScreenSize());
+		String operatingSystem = AppUtill.replaceAllSpace(items.getOperatingSystem());
+		String gstRate = AppUtill.replaceAllSpace(items.getGstRate());
+
 		items.setCreatedAt(LocalDateTime.now());
 		items.setDescription(desc);
 		items.setBrand(brand);
@@ -54,7 +60,12 @@ public class ItemsServiceImpl implements IItemsService {
 		items.setGstRate(gstRate);
 		items.setStatus(true);
 		entryInfoValidator.validate(items);
-		return itemsDao.saveItems(items);
+		if (isUpdate) {
+			items.setUpdatedAt(LocalDateTime.now());
+			Items existingItem = itemsDao.searchItems(SearchCriteria.builder().isdownload(true).itemCode(items.getItemCode()).userId(items.getOwnerId()).build()).stream().findFirst().orElse(null);
+			itemsUpdateValidation.isValidForEditItems(items,existingItem);
+		}
+		return itemsDao.saveItems(items, isUpdate);
 	}
 
 	@Override
@@ -63,17 +74,22 @@ public class ItemsServiceImpl implements IItemsService {
 	}
 
 	@Override
-	public int deleteItems(List<Long> itemsId,int ownerId) {
-		return itemsDao.deleteItems(itemsId,ownerId);
+	public int deleteItems(Items items) {
+
+		Items existingItem = itemsDao.searchItems(SearchCriteria.builder().isdownload(true).itemCode(items.getItemCode()).userId(items.getOwnerId()).build()).stream().findFirst().orElse(null);
+		
+		itemsUpdateValidation.isValidForEditItems(items,existingItem);
+		
+		return itemsDao.deleteItems(items);
 	}
 
 	@Override
 	public List<Items> searchItems(SearchCriteria criteria) {
-		List<Items> items=itemsDao.searchItems(criteria);
-		if(criteria.isIsdownload()&&items.size()>0){
+		List<Items> items = itemsDao.searchItems(criteria);
+		if (criteria.isIsdownload() && items.size() > 0) {
 			ExcelDirectSave.exportItemsToExcel(items);
 		}
 		return items;
 	}
-	
+
 }

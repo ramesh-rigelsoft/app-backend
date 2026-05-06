@@ -69,6 +69,9 @@ public class Items implements Serializable {
 	@Column(name = "created_at")
 	private LocalDateTime createdAt;
  
+	@Column(name = "updated_at")
+	private LocalDateTime updatedAt;
+ 	
     private int ownerId;
     private String additionalDetails;
     

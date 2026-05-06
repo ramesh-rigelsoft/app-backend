@@ -40,7 +40,7 @@ public class InventoryService implements IInventoryService {
 	FyIdGeneratorService fyIdGeneratorService;
 
 	@Override
-	public Inventory saveInventory(Inventory inventory, EntityManager em) {
+	public Inventory saveInventory(Inventory inventory, EntityManager em, boolean isUpdate) {
 
 		try {
 			String fingerPrint = generateFingerprint(inventory);
@@ -74,7 +74,7 @@ public class InventoryService implements IInventoryService {
 				   return null;
 				}
 			}
-			String itemCode = fyIdGeneratorService.generateItemCode(inventory.getOwnerId(), "ITM");
+			String itemCode = isUpdate?inventory.getItemCode():fyIdGeneratorService.generateItemCode(inventory.getOwnerId(), "ITM");
 			System.out.println("itemCode::::::::::: "+itemCode);
 			inventory.setItemCode(itemCode);
 			inventory.setFingerPrint(fingerPrint);

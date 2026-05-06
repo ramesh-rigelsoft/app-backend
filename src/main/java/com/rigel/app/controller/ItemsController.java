@@ -56,7 +56,7 @@ public class ItemsController {
 			String image=itemDto.getImage()==null?null:UploadFileUtlity.uploadImageNfiles(itemDto.getImage(),"product",null);			
 			Items items=mapper.convertValue(itemDto, Items.class);
 			items.setImage(image);
-			Items itemsDetails = itemsService.saveItems(items);
+			Items itemsDetails = itemsService.saveItems(items,itemDto.isUpdate());
 			
 //			barcodeService.barcodeGenerate(itemsDetails.getItemCode(), itemsDetails.getQuantity());
 			data.put("items", itemsDetails);
@@ -86,6 +86,28 @@ public class ItemsController {
 			response.put("status", "OK");
 			response.put("code", "200");
 			response.put("message", "Your records has been fetch successfully.");
+			return new ResponseEntity<>(response, HttpStatus.OK);
+		}
+	}
+	
+	@PostMapping("delete")
+	public ResponseEntity<Map<String, Object>> deleteItem(@RequestBody(required = true) SearchCriteria criteria,
+			BindingResult result, HttpServletRequest request) {
+		Map<String, Object> response = new HashMap<>();
+		Map<String, Object> data = new HashMap<>();
+
+		if (criteria == null) {
+			throw new BadGatewayRequest("Invalid Request");
+		} else if (result.hasFieldErrors()) {
+			throw new BadGatewayRequest(result.getFieldError().getDefaultMessage());
+		} else {
+			Items itemsDetails = itemsService.searchItems(criteria).stream().findFirst().orElse(null);
+			itemsService.deleteItems(itemsDetails);
+			data.put("items", itemsDetails);
+			response.put("data", data);
+			response.put("status", "OK");
+			response.put("code", "200");
+			response.put("message", "Your records has been deleted successfully.");
 			return new ResponseEntity<>(response, HttpStatus.OK);
 		}
 	}
