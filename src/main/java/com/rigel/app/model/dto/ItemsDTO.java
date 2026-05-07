@@ -44,7 +44,6 @@ public class ItemsDTO {
     private Double initialPrice;
     private Double sellingPrice;
 
-//    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private MultipartFile image;
 
     private LocalDateTime createdAt;
