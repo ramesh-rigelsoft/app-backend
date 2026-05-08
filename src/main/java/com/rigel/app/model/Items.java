@@ -71,9 +71,12 @@ public class Items implements Serializable {
  
 	@Column(name = "updated_at")
 	private LocalDateTime updatedAt;
+	
+    private String vendorName;
+    private String vendorGSTNumber;
  	
     private int ownerId;
     private String additionalDetails;
-    
+       
 
 }

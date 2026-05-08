@@ -137,11 +137,16 @@ public class SalesInfo implements Serializable{
 	@Column(name = "owner_id")
 	private int ownerId;
 	
+	
+	private String vendorName;
+    private String vendorGSTNumber;
+	
 	@Column(name = "additional_details")
 	private String additionalDetails;
 	
 	@ManyToOne(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
 	@JoinColumn(name="buyerInfo")
 	private BuyerInfo buyerInfo;
+
 		
 }

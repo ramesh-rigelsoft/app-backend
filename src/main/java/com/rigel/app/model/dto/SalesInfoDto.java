@@ -74,6 +74,9 @@ public class SalesInfoDto {
     
     private int ownerId;
     
+    private String vendorName;
+    private String vendorGSTNumber;
+    
     private boolean status; 
     private String additionalDetails;
 

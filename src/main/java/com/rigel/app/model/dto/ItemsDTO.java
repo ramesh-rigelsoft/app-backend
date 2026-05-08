@@ -67,5 +67,8 @@ public class ItemsDTO {
 	private boolean status; 
 	private String additionalDetails;
 	private boolean isUpdate;
+	
+    private String vendorName;
+    private String vendorGSTNumber;
 
 }

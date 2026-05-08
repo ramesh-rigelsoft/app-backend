@@ -197,6 +197,9 @@ public class InventoryDaoImpl implements IInventoryDao {
 	        jpql.append("OR LOWER(i.brand) LIKE :description ");
 	        jpql.append("OR LOWER(i.categoryType) LIKE :description ");
 	        jpql.append("OR LOWER(i.itemCode) LIKE :description ");
+	        jpql.append("OR LOWER(i.vendorName) LIKE :description ");
+	        jpql.append("OR LOWER(i.vendorGSTNumber) LIKE :description ");
+	        jpql.append("OR LOWER(i.itemCondition) LIKE :description ");
 	        jpql.append(")");
 	    }
 

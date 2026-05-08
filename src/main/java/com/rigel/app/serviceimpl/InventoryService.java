@@ -70,7 +70,7 @@ public class InventoryService implements IInventoryService {
 			System.out.println("fingerPrint:::::::::::"+fingerPrint);
 			
 			if(exinventory!=null) {
-					exinventory.setStatus(true);	
+					exinventory.setStatus(true);
 					exinventory.setQuantity(exinventory.getQuantity()+inventory.getQuantity());
 					exinventory.setCategory(inventory.getCategory());
 					exinventory.setCategoryType(inventory.getCategoryType());
@@ -79,6 +79,8 @@ public class InventoryService implements IInventoryService {
 					exinventory.setModelName(inventory.getModelName());
 					exinventory.setItemCondition(inventory.getItemCondition());
 					exinventory.setItemSource(inventory.getItemSource());
+					exinventory.setVendorGSTNumber(inventory.getVendorGSTNumber());
+					exinventory.setVendorName(inventory.getVendorName());
 					exinventory.setRam(inventory.getRam());
 					exinventory.setRamUnit(inventory.getRamUnit());
 					exinventory.setStorage(inventory.getStorage());

@@ -100,6 +100,9 @@ public class SalesDaoImpl implements ISalesDao {
 		            OR LOWER(i.brand) LIKE :search
 		            OR LOWER(i.categoryType) LIKE :search
 		            OR LOWER(i.description) LIKE :search
+			        OR LOWER(i.vendorName) LIKE :search
+			        OR LOWER(i.vendorGSTNumber) LIKE :search
+			        OR LOWER(i.itemCondition) LIKE :search		            
 		        )
 		    """);
 

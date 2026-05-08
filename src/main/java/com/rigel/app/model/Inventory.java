@@ -70,6 +70,9 @@ public class Inventory implements Serializable {
 
     @Column(name = "updated_at")
 	private LocalDateTime updatedAt;
+    
+    private String vendorName;
+    private String vendorGSTNumber;
 
     private boolean status; 
     private String additionalDetails;
