@@ -18,7 +18,7 @@ public interface IInventoryDao {
 	
 	public Inventory findInventoryByCode(String itemCode,int ownerId);
 	
-	public int deleteInventoryByItemCode(String itemCode, int ownerId);
+//	public int deleteInventoryByItemCode(String itemCode, int ownerId);
 	
 	public List<Inventory> searchInventory(SearchCriteria criteria);
 

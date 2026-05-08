@@ -65,11 +65,19 @@ public class ItemsDaoImpl implements IItemsDao {
 	public Items updateItems(Items items) {
 		return entityManager.merge(items);
 	}
+	
+	
 
 	@Override
 	public int deleteItems(Items items) {
-		String hql = "DELETE FROM Items i WHERE i.id IN :ids";
-		return entityManager.createQuery(hql).setParameter("ids", items.getId()).executeUpdate();
+		 String hql = "UPDATE Items i SET i.status = false WHERE i.id IN :ids";
+		    
+		    return entityManager.createQuery(hql)
+		            .setParameter("ids", items.getId())
+		            .executeUpdate();
+		    
+//		String hql = "DELETE FROM Items i WHERE i.id IN :ids";
+//		return entityManager.createQuery(hql).setParameter("ids", items.getId()).executeUpdate();
 	}
 
 //	@Override

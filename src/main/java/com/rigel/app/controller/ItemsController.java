@@ -111,28 +111,4 @@ public class ItemsController {
 			return new ResponseEntity<>(response, HttpStatus.OK);
 		}
 	}
-	
-	@PostMapping("searchForEdit")
-	public ResponseEntity<Map<String, Object>> searchByItemCode(@RequestBody(required = true) SearchCriteria criteria,
-			BindingResult result, HttpServletRequest request) {
-		Map<String, Object> response = new HashMap<>();
-		Map<String, Object> data = new HashMap<>();
-
-		if (criteria == null) {
-			throw new BadGatewayRequest("Invalid Request");
-		} else if (result.hasFieldErrors()) {
-			throw new BadGatewayRequest(result.getFieldError().getDefaultMessage());
-		} else {
-			Items itemsDetails = itemsService.searchItems(criteria).stream().findFirst().orElse(null);
-			ItemsDTO itemDto = mapper.convertValue(itemsDetails, ItemsDTO.class);
-			itemDto.setUpdate(true);
-			
-			data.put("items", itemDto);
-			response.put("data", data);
-			response.put("status", "OK");
-			response.put("code", "200");
-			response.put("message", "Your records has been fetch successfully.");
-			return new ResponseEntity<>(response, HttpStatus.OK);
-		}
-	}
 }

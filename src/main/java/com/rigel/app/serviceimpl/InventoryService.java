@@ -62,8 +62,47 @@ public class InventoryService implements IInventoryService {
 			TypedQuery<Inventory> query = em.createQuery(cq);
 			query.setMaxResults(1);
 
+			
+			if(isUpdate) {
+				String itemCode = inventory.getItemCode();	
+			Inventory exinventory = iInventoryDao.findInventoryByCode(itemCode, inventory.getOwnerId());
+			String fingerPrintUpdate = generateFingerprint(exinventory);
+			System.out.println("fingerPrint:::::::::::"+fingerPrint);
+			
+			if(exinventory!=null) {
+					exinventory.setStatus(true);	
+					exinventory.setQuantity(exinventory.getQuantity()+inventory.getQuantity());
+					exinventory.setCategory(inventory.getCategory());
+					exinventory.setCategoryType(inventory.getCategoryType());
+					exinventory.setMeasureType(inventory.getMeasureType());
+					exinventory.setBrand(inventory.getBrand());
+					exinventory.setModelName(inventory.getModelName());
+					exinventory.setItemCondition(inventory.getItemCondition());
+					exinventory.setItemSource(inventory.getItemSource());
+					exinventory.setRam(inventory.getRam());
+					exinventory.setRamUnit(inventory.getRamUnit());
+					exinventory.setStorage(inventory.getStorage());
+					exinventory.setStorageType(inventory.getStorageType());
+					exinventory.setStorageUnit(inventory.getStorageUnit());
+					exinventory.setInitialPrice(inventory.getInitialPrice());
+					exinventory.setSellingPrice(inventory.getSellingPrice());
+					exinventory.setItemColor(inventory.getItemColor());
+					exinventory.setProcessor(inventory.getProcessor());
+					exinventory.setOperatingSystem(inventory.getOperatingSystem());
+					exinventory.setScreenSize(inventory.getScreenSize());
+					exinventory.setItemGen(inventory.getItemGen());
+					exinventory.setGstRate(inventory.getGstRate());
+					exinventory.setSerialNumber(inventory.getSerialNumber());
+					exinventory.setDescription(inventory.getDescription());
+					exinventory.setImage(inventory.getImage());
+					exinventory.setUpdatedAt(LocalDateTime.now());
+					exinventory.setAdditionalDetails(inventory.getAdditionalDetails());
+					exinventory.setFingerPrint(fingerPrintUpdate);
+					return iInventoryDao.updateInventory(exinventory);
+				}	
+			}
+			
 			List<Inventory> results = query.getResultList();
-
 			if (!results.isEmpty()) {
 				if(!inventory.getCategory().equalsIgnoreCase(Constaints.SHOP_OWNER_CATEGORY)) {
 				   Inventory existing = results.get(0);
@@ -74,8 +113,8 @@ public class InventoryService implements IInventoryService {
 				   return null;
 				}
 			}
-			String itemCode = isUpdate?inventory.getItemCode():fyIdGeneratorService.generateItemCode(inventory.getOwnerId(), "ITM");
-			System.out.println("itemCode::::::::::: "+itemCode);
+			
+			String itemCode = fyIdGeneratorService.generateItemCode(inventory.getOwnerId(), "ITM");
 			inventory.setItemCode(itemCode);
 			inventory.setFingerPrint(fingerPrint);
 			inventory.setCreatedAt(LocalDateTime.now());
@@ -140,9 +179,7 @@ public class InventoryService implements IInventoryService {
 
 	public static String generateFingerprint(Inventory inv) {
 		StringBuilder sb = new StringBuilder();
-
 		append(sb, inv.getOwnerId());
-
 		append(sb, inv.getCategory());
 		append(sb, inv.getCategoryType());
 		append(sb, inv.getMeasureType());
@@ -161,10 +198,7 @@ public class InventoryService implements IInventoryService {
 		append(sb, inv.getOperatingSystem());
 		append(sb, inv.getScreenSize());
 		append(sb, inv.getItemGen());
-		append(sb, inv.getGstRate());
 		append(sb, inv.getDescription());
-		System.out.println("g-----"+inv.getDescription());
-
 		return sha256(sb.toString());
 	}
 
@@ -172,8 +206,7 @@ public class InventoryService implements IInventoryService {
 		if (sb.length() > 0) {
 			sb.append("|");
 		}
-		// IMPORTANT: whitespace preserve ho raha hai
-		sb.append(value == null ? "NULL" : value.toString().strip());
+		sb.append(value == null ? "NULL" : value.toString().replaceAll("\\s+", " ").toLowerCase().strip());
 	}
 
 	private static String sha256(String input) {

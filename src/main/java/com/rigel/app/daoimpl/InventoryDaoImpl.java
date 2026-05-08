@@ -80,20 +80,20 @@ public class InventoryDaoImpl implements IInventoryDao {
 	     }
 	}
 	
-	@Override
-	public int deleteInventoryByItemCode(String itemCode, int ownerId) {
-	    String hql = "DELETE FROM Inventory WHERE ownerId = :ownerId AND itemCode = :itemCode";
-
-	    try {
-	        return entityManager.createQuery(hql)
-	                .setParameter("ownerId", ownerId)
-	                .setParameter("itemCode", itemCode)
-	                .executeUpdate();
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	        return 0;
-	    }
-	}
+//	@Override
+//	public int deleteInventoryByItemCode(String itemCode, int ownerId) {
+//	    String hql = "DELETE FROM Inventory WHERE ownerId = :ownerId AND itemCode = :itemCode";
+//
+//	    try {
+//	        return entityManager.createQuery(hql)
+//	                .setParameter("ownerId", ownerId)
+//	                .setParameter("itemCode", itemCode)
+//	                .executeUpdate();
+//	    } catch (Exception e) {
+//	        e.printStackTrace();
+//	        return 0;
+//	    }
+//	}
 	
 	@Override
 	public Inventory findInventoryByCode(String itemCode,int ownerId) {

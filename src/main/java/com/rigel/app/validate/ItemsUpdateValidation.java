@@ -35,12 +35,15 @@ public class ItemsUpdateValidation {
 						SearchCriteria.builder().userId(items.getOwnerId()).startIndex(0).maxRecords(10).itemCode(items.getItemCode()).build())
 				.stream().findFirst().orElse(null);
 
-		if (inventory.getQuantity() > existingItem.getQuantity()) {
+		if (inventory.getQuantity() >=existingItem.getQuantity()) {
 			int updatedQty = inventory.getQuantity() - existingItem.getQuantity();
 			inventory.setQuantity(updatedQty);
 			inventoryDao.updateInventory(inventory);
 		} else if (inventory.getQuantity() == existingItem.getQuantity()) {
-			inventoryDao.deleteInventoryByItemCode(items.getItemCode(), items.getOwnerId());
+			int updatedQty = inventory.getQuantity() - existingItem.getQuantity();
+			inventory.setQuantity(updatedQty);
+			inventory.setStatus(false);
+			inventoryDao.updateInventory(inventory);
 		} else {
 			throw new ValidationException("This items has been sold so you can not be update or update.");
 		}
