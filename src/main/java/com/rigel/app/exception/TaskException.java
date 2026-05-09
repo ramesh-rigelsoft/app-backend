@@ -18,7 +18,6 @@ public class TaskException {
 //          @ExceptionHandler(value = { IllegalArgumentException.class, IllegalStateException.class })
             @ExceptionHandler(BadGatewayRequest.class)
 		    public ResponseEntity<Map<String,Object>> addTaskException(BadGatewayRequest badGatewayRequest) {
-            	badGatewayRequest.printStackTrace();
             	HashMap<String, Object> response=new  HashMap<>();		        
 		    	response.put("data", "");
 				response.put("status", "BAD_GATEWAY");

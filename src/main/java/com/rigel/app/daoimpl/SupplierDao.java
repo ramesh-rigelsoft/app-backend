@@ -87,6 +87,8 @@ public class SupplierDao implements ISupplierDao {
 				.address(dto.getAddress())
 				.district(dto.getDistrict())
 				.pinCode(dto.getPinCode())
+				.state(dto.getState())
+				.stateCode(dto.getStateCode())
 				.createdAt(LocalDateTime.now())
 				.status("active")
 				.ownerId(dto.getOwnerId())

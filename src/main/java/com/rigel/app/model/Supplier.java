@@ -31,7 +31,7 @@ public class Supplier implements Serializable {
 	@Column(nullable = false)
 	private String supplierName;
 
-	@NotBlank(message = "GST name is required")
+	@NotBlank(message = "GST Number is required")
 	@Column(nullable = false, unique = true)
 	private String gstNumber;
 
@@ -41,7 +41,7 @@ public class Supplier implements Serializable {
 //    @Column(length = 6)
 	private String pinCode;
 
-	@Email(message = "Invalid email format")
+//	@Email(message = "Invalid email format")
 //    @Column(length = 100)
 	private String email;
 
@@ -57,6 +57,12 @@ public class Supplier implements Serializable {
 	private String status;
 
 	private String district;
+	
+	@NotBlank(message = "State name is required")
+	private String state;
+	
+	@NotBlank(message = "State code is required")
+	private String stateCode;
 
 	private int ownerId; // optional if multi-user system
 

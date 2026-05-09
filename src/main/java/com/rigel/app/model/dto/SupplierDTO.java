@@ -3,6 +3,7 @@ package com.rigel.app.model.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.*;
 
@@ -37,11 +38,18 @@ public class SupplierDTO {
     
     private String district;
     
-    @Pattern(regexp = "^[0-9]{6}$", message = "Pincode must be 6 digits")
+    @NotBlank(message = "State is required")
+    private String state;
+
+    @NotBlank(message = "State code is required")
+    private String stateCode;
+    
+//    @Pattern(regexp = "^[0-9]{6}$", message = "Pincode must be 6 digits")
     private String pinCode;
     
     private String status;
 
+    @NotBlank(message = "Address is required")
     private String address;
     
     private int ownerId;

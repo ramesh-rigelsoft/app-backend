@@ -24,6 +24,7 @@ import com.rigel.app.model.dto.SupplierCreteria;
 import com.rigel.app.model.dto.SupplierDTO;
 import com.rigel.app.service.IExpenseService;
 import com.rigel.app.service.ISupplierService;
+import com.rigel.app.serviceimpl.GSTNumberService;
 import com.rigel.app.util.RAUtility;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -39,6 +40,9 @@ public class SupplierController {
 	@Autowired
 	ObjectMapper objMapper;
 
+	@Autowired
+	GSTNumberService gstNumberService;
+
 	@PostMapping("save")
 	public ResponseEntity<Map<String, Object>> save(@RequestBody(required = true) @Valid SupplierDTO dtoRequest,
 			BindingResult result, HttpServletRequest request) {
@@ -50,15 +54,16 @@ public class SupplierController {
 		} else if (result.hasFieldErrors()) {
 			throw new BadGatewayRequest(result.getFieldError().getDefaultMessage());
 		} else {
-			SupplierCreteria creteria=SupplierCreteria.builder().userId(dtoRequest.getOwnerId()).maxRecords(100).gstNumber(dtoRequest.getGstNumber()).build();
-			
-			System.out.println("creteria---"+creteria.toString());
-			List<Supplier> suppliers=supplierService.searchSupplier(creteria);
-			System.out.println("supplier-------"+suppliers.size());
-			System.out.println("dtoRequest=-----"+dtoRequest.toString());
-			if(dtoRequest.getId()==null&&suppliers.size()>0) {
+			SupplierCreteria creteria = SupplierCreteria.builder().userId(dtoRequest.getOwnerId()).maxRecords(100)
+					.gstNumber(dtoRequest.getGstNumber()).build();
+
+			System.out.println("creteria---" + creteria.toString());
+			List<Supplier> suppliers = supplierService.searchSupplier(creteria);
+			System.out.println("supplier-------" + suppliers.size());
+			System.out.println("dtoRequest=-----" + dtoRequest.toString());
+			if (dtoRequest.getId() == null && suppliers.size() > 0) {
 				throw new BadGatewayRequest("This vendor already existing with Us.");
-			}else {
+			} else {
 				Supplier supplierRes = supplierService.saveSupplier(dtoRequest);
 				data.put("supplier", supplierRes);
 				response.put("data", data);
@@ -69,7 +74,7 @@ public class SupplierController {
 			}
 		}
 	}
-	
+
 	@PostMapping("search")
 	public ResponseEntity<Map<String, Object>> search(@RequestBody(required = true) SupplierCreteria creteria) {
 		Map<String, Object> response = new HashMap<>();
@@ -81,5 +86,21 @@ public class SupplierController {
 		response.put("code", "200");
 		response.put("message", "Your records has been fetch successfully.");
 		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+
+	@PostMapping("searchGst")
+	public ResponseEntity<Map<String, Object>> searchGst(@RequestBody SupplierCreteria creteria) {
+
+		Map<String, Object> response = new HashMap<>();
+		Map<String, Object> data = new HashMap<>();
+
+		gstNumberService.openGstBrowser(creteria.getGstNumber(), creteria.getUserId());
+
+		response.put("data", data);
+		response.put("status", "OK");
+		response.put("code", "200");
+		response.put("message", "Fetched successfully");
+
+		return ResponseEntity.ok(response);
 	}
 }
