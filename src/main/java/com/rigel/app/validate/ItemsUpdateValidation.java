@@ -27,7 +27,7 @@ public class ItemsUpdateValidation {
 //		    throw new ValidationException("You can delete or update item only under 20 minutes of creation.");
 //		}
 		
-		if (items.getId() == null || existingItem==null) {
+		if (items.getId() == null || existingItem==null||items.getItemCode()==null) {
 			throw new ValidationException("Item can not be update or delete at this time.");
 		}
 		Inventory inventory = inventoryDao
@@ -35,7 +35,7 @@ public class ItemsUpdateValidation {
 						SearchCriteria.builder().userId(items.getOwnerId()).startIndex(0).maxRecords(10).itemCode(items.getItemCode()).build())
 				.stream().findFirst().orElse(null);
 
-		if (inventory.getQuantity() >=existingItem.getQuantity()) {
+		if (inventory.getQuantity() > existingItem.getQuantity()) {
 			int updatedQty = inventory.getQuantity() - existingItem.getQuantity();
 			inventory.setQuantity(updatedQty);
 			inventoryDao.updateInventory(inventory);
@@ -45,7 +45,7 @@ public class ItemsUpdateValidation {
 			inventory.setStatus(false);
 			inventoryDao.updateInventory(inventory);
 		} else {
-			throw new ValidationException("This items has been sold so you can not be update or update.");
+			throw new ValidationException("This items has been sold so you can not be delete or update.");
 		}
 	}
 

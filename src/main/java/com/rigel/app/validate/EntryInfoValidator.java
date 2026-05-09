@@ -27,7 +27,7 @@ public class EntryInfoValidator {
 		if (items.getOwnerId() == 0) {
 			throw new ValidationException("Session Expired, Please Login agin then try....");
 		}
-
+	
 	}
 
 	public static String normalizeCode(String code) {
