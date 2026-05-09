@@ -24,6 +24,7 @@ public class SearchCriteria {
 	private int startIndex;
 	private int maxRecords;
 	private String order;
+	private String itemId;
 	private boolean isdownload;
 
 	// items search

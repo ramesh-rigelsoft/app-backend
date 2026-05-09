@@ -126,6 +126,10 @@ public class ItemsDaoImpl implements IItemsDao {
 			params.put("category", criteria.getCategory());
 		}
 
+		if (criteria.getItemId() != null && !criteria.getItemId().isEmpty()) {
+			jpql.append(" AND i.id = :itemId ");
+			params.put("itemId", criteria.getItemId());
+		}
 		// optional categoryType filter
 		if (criteria.getCategoryType() != null && !criteria.getCategoryType().isEmpty()) {
 			jpql.append(" AND i.categoryType = :categoryType ");

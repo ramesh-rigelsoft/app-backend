@@ -23,11 +23,11 @@ public class ItemsUpdateValidation {
 
 		LocalDateTime oneHourAfterCreation = existingItem.getCreatedAt().plusMinutes(20);
 
-		if (LocalDateTime.now().isAfter(oneHourAfterCreation)) {
-		    throw new ValidationException("You can delete or update item only under 20 minutes of creation.");
-		}
+//		if (LocalDateTime.now().isAfter(oneHourAfterCreation)) {
+//		    throw new ValidationException("You can delete or update item only under 20 minutes of creation.");
+//		}
 		
-		if (items.getId() == null) {
+		if (items.getId() == null || existingItem==null) {
 			throw new ValidationException("Item can not be update or delete at this time.");
 		}
 		Inventory inventory = inventoryDao

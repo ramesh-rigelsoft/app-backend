@@ -61,8 +61,10 @@ public class ItemsServiceImpl implements IItemsService {
 		items.setStatus(true);
 		entryInfoValidator.validate(items);
 		if (isUpdate) {
+			System.out.println("itemId--"+items.getId());
+			System.out.println("itemCode--"+items.getItemCode());
 			items.setUpdatedAt(LocalDateTime.now());
-			Items existingItem = itemsDao.searchItems(SearchCriteria.builder().isdownload(true).itemCode(items.getItemCode()).userId(items.getOwnerId()).build()).stream().findFirst().orElse(null);
+			Items existingItem = itemsDao.searchItems(SearchCriteria.builder().itemId(items.getId()).isdownload(true).userId(items.getOwnerId()).build()).stream().findFirst().orElse(null);
 			itemsUpdateValidation.isValidForEditItems(items,existingItem);
 		}
 		return itemsDao.saveItems(items, isUpdate);
@@ -76,7 +78,7 @@ public class ItemsServiceImpl implements IItemsService {
 	@Override
 	public int deleteItems(Items items) {
 
-		Items existingItem = itemsDao.searchItems(SearchCriteria.builder().isdownload(true).itemCode(items.getItemCode()).userId(items.getOwnerId()).build()).stream().findFirst().orElse(null);
+		Items existingItem = itemsDao.searchItems(SearchCriteria.builder().isdownload(true).itemId(items.getId()).userId(items.getOwnerId()).build()).stream().findFirst().orElse(null);
 		
 		itemsUpdateValidation.isValidForEditItems(items,existingItem);
 		

@@ -65,11 +65,11 @@ public class InventoryService implements IInventoryService {
 			
 			if(isUpdate) {
 				String itemCode = inventory.getItemCode();	
-			Inventory exinventory = iInventoryDao.findInventoryByCode(itemCode, inventory.getOwnerId());
-			String fingerPrintUpdate = generateFingerprint(exinventory);
-			System.out.println("fingerPrint:::::::::::"+fingerPrint);
-			
-			if(exinventory!=null) {
+				Inventory exinventory = iInventoryDao.findInventoryByCode(itemCode, inventory.getOwnerId());
+				String fingerPrintUpdate = generateFingerprint(exinventory);
+				System.out.println("fingerPrint:::::::::::"+fingerPrint);
+				
+				if(exinventory!=null&&exinventory.getQuantity()==0) {
 					exinventory.setStatus(true);
 					exinventory.setQuantity(exinventory.getQuantity()+inventory.getQuantity());
 					exinventory.setCategory(inventory.getCategory());
@@ -120,7 +120,14 @@ public class InventoryService implements IInventoryService {
 			inventory.setItemCode(itemCode);
 			inventory.setFingerPrint(fingerPrint);
 			inventory.setCreatedAt(LocalDateTime.now());
-			em.persist(inventory);
+			inventory.setId(null);
+			  
+			if(isUpdate) {
+			  em.merge(inventory);
+			}else {
+			  em.persist(inventory);
+			}
+			
 			return inventory;
 
 		} catch (Exception e) {
