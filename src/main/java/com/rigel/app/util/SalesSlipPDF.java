@@ -207,6 +207,7 @@ public class SalesSlipPDF {
 							.add("Address : " + shipAddress + "\n").add("Pin Code : " + shipPincode))
 					.setBorder(null);
 
+
 			// Add cells to table
 			table.addCell(billCell);
 			table.addCell(shipCell);
@@ -225,15 +226,15 @@ public class SalesSlipPDF {
 			if (gstApplicable) {
 
 				if (isIgstNotApplicable) {
-					itemTable = new Table(UnitValue.createPercentArray(new float[] { 1f, 4f, 1f, 1f, 1f, 1f, 2f }))
+					itemTable = new Table(UnitValue.createPercentArray(new float[] { 1f, 3f, 1f, 1f,1f, 1f, 1f, 2f }))
 							.useAllAvailableWidth();
 				} else {
-					itemTable = new Table(UnitValue.createPercentArray(new float[] { 1f, 5f, 1f, 1f, 1f, 2f }))
+					itemTable = new Table(UnitValue.createPercentArray(new float[] { 1f, 4f, 1f, 1f,1f, 1f, 2f }))
 							.useAllAvailableWidth();
 				}
 
 			} else {
-				itemTable = new Table(UnitValue.createPercentArray(new float[] { 1f, 5f, 1f, 2f, 2f }))
+				itemTable = new Table(UnitValue.createPercentArray(new float[] { 1f, 4f, 1f, 2f,1f, 2f }))
 						.useAllAvailableWidth();
 			}
 
@@ -244,9 +245,12 @@ public class SalesSlipPDF {
 					.setBackgroundColor(ColorConstants.LIGHT_GRAY).setTextAlignment(TextAlignment.CENTER));
 			itemTable.addHeaderCell(new Cell().add(new Paragraph("QTY").setFont(bold).setFontSize(6))
 					.setBackgroundColor(ColorConstants.LIGHT_GRAY).setTextAlignment(TextAlignment.CENTER));
-			itemTable.addHeaderCell(new Cell().add(new Paragraph("PRICE").setFont(bold).setFontSize(6))
+			itemTable.addHeaderCell(new Cell().add(new Paragraph("RATE").setFont(bold).setFontSize(6))
 					.setBackgroundColor(ColorConstants.LIGHT_GRAY).setTextAlignment(TextAlignment.CENTER));
 
+			itemTable.addHeaderCell(new Cell().add(new Paragraph("Discount").setFont(bold).setFontSize(6))
+					.setBackgroundColor(ColorConstants.LIGHT_GRAY).setTextAlignment(TextAlignment.CENTER));
+			
 			if (gstApplicable) {
 				// Create header row
 				if (isIgstNotApplicable) {
@@ -274,52 +278,37 @@ public class SalesSlipPDF {
 				// Jackson library use karke
 				GstRate gstValue = mapper.readValue(s.getGstRate(), GstRate.class);
 
-				BigDecimal soldPrice = BigDecimal.valueOf(s.getSoldPrice());
 				BigDecimal gstRate = BigDecimal.valueOf(Integer.valueOf(isIgstNotApplicable?(gstValue.getCgst()+gstValue.getSgst()):gstValue.getIgst()));
 				// 1 + GST/100
-				BigDecimal divisor = BigDecimal.ONE
-						.add(gstRate.divide(BigDecimal.valueOf(100), 6, RoundingMode.HALF_UP));
-
-				// Base price
-				BigDecimal basePrice = soldPrice.divide(divisor, 2, RoundingMode.HALF_UP);
-
-				// GST amount
-//                BigDecimal gstAmount = soldPrice.subtract(basePrice);
-
+				
+				BigDecimal basePrice = gstApplicable ? BigDecimal.valueOf(s.getSoldPrice()).multiply(BigDecimal.valueOf(100)).divide(BigDecimal.valueOf(100).add(gstRate), 8, java.math.RoundingMode.HALF_UP) 
+						: BigDecimal.valueOf(s.getSoldPrice());	
+				
 				BigDecimal qty = BigDecimal.valueOf(s.getQuantity());
+			    BigDecimal discountedAmt =BigDecimal.valueOf(s.getSellingPrice()).subtract(BigDecimal.valueOf(s.getSoldPrice()));
+				
+			    BigDecimal discountPercentage=discountedAmt.multiply(BigDecimal.valueOf(100).divide(basePrice.add(discountedAmt), 8, java.math.RoundingMode.HALF_UP));
 
-				BigDecimal amt = gstApplicable ? basePrice.multiply(qty)
-						: new BigDecimal(s.getSoldPrice()).multiply(qty);
-
+			    
+			    BigDecimal amt = basePrice.add(discountedAmt).multiply(qty);
 				total = total.add(amt);
+
 				StringBuilder itemDesc = new StringBuilder();
-
-				if (s.getSerialNumber() != null) {
-					itemDesc.append("S/No-").append(s.getSerialNumber());
-				}
-				itemDesc.append(",").append(s.getBrand()).append("/").append(s.getModelName()).append(",");
-
+				itemDesc.append("").append(s.getCategoryType()+": "+s.getBrand()+" ").append(s.getModelName());
+				
 				if (s.getRam() != null) {
 					itemDesc.append(s.getRam()).append("/");
 				}
 				if (s.getStorage() != null) {
-					itemDesc.append(s.getStorage()).append(s.getStorageUnit()).append(",");
+					itemDesc.append(s.getStorage()).append(s.getStorageUnit()).append(s.getCategoryType().equalsIgnoreCase("laptop")?","+s.getStorageType():"");
 				}
-				if (s.getItemColor() != null) {
-					itemDesc.append(s.getItemColor()).append(",");
+				if (s.getSerialNumber() != null) {
+					itemDesc.append(",SNo:").append(s.getSerialNumber()).append(" ");
 				}
-				if (s.getItemGen() != null) {
-					itemDesc.append(s.getItemGen()).append(",");
-				}
-				if (s.getProcessor() != null) {
-					itemDesc.append(s.getProcessor()).append(",");
-				}
-				if (s.getScreenSize() != null) {
-					itemDesc.append(s.getScreenSize()).append(",");
-				}
-				if (s.getDescription() != null) {
-					itemDesc.append(s.getDescription());
-				}
+				
+				if(!s.getCategoryType().equalsIgnoreCase("Smartphone")&&!s.getCategoryType().equalsIgnoreCase("laptop")) {
+				    itemDesc.append(s.getDescription());
+			    }
 
 				String finalDesc = itemDesc.toString();
 
@@ -328,19 +317,37 @@ public class SalesSlipPDF {
 				itemTable.addCell(new Cell().add(new Paragraph(finalDesc)).setFont(normal).setFontSize(6));
 				itemTable.addCell(new Cell().add(new Paragraph(String.valueOf(s.getQuantity()))).setFont(normal)
 						.setFontSize(6).setTextAlignment(TextAlignment.CENTER));
+
+				//price
 				itemTable.addCell(new Cell()
 						.add(new Paragraph(
-								nf.format(gstApplicable ? basePrice : new BigDecimal(s.getSoldPrice())).toString()))
+								nf.format(basePrice.add(discountedAmt)).toString()))
+						.setFont(normal).setFontSize(6).setTextAlignment(TextAlignment.RIGHT));
+                
+//				itemTable.addCell(new Cell()
+//						.add(new Paragraph(
+//								nf.format(gstApplicable ? basePrice : new BigDecimal(s.getSoldPrice())).toString()))
+//						.setFont(normal).setFontSize(6).setTextAlignment(TextAlignment.RIGHT));
+                
+				//discount
+				String discountFormate="";
+				if(s.getDiscountType().equals(DiscountType.PERCENTAGE.toString())){
+					discountFormate="%";
+				}
+				itemTable.addCell(new Cell()
+						.add(new Paragraph(
+								nf.format(discountPercentage).toString()+discountFormate))
 						.setFont(normal).setFontSize(6).setTextAlignment(TextAlignment.RIGHT));
 
+				
 				if (gstApplicable) {
 					// Create value row based on condition
 					if (isIgstNotApplicable) {// buyer.getState() == null) {
 
 						BigDecimal cgstValue = basePrice.multiply(new BigDecimal(gstValue.getCgst()))
-								.divide(new BigDecimal("100"), 2, RoundingMode.HALF_UP);
+								.divide(new BigDecimal("100"), 2, RoundingMode.HALF_UP).multiply(new BigDecimal(s.getQuantity()));
 						BigDecimal sgstValue = basePrice.multiply(new BigDecimal(gstValue.getSgst()))
-								.divide(new BigDecimal("100"), 2, RoundingMode.HALF_UP);
+								.divide(new BigDecimal("100"), 2, RoundingMode.HALF_UP).multiply(new BigDecimal(s.getQuantity()));
 
 						itemTable.addCell(new Cell().add(
 								new Paragraph(cgstValue + "").setFontSize(6).setTextAlignment(TextAlignment.CENTER)));
@@ -349,7 +356,7 @@ public class SalesSlipPDF {
 					} else {
 						// Different state → IGST apply
 						BigDecimal igstValue = basePrice.multiply(new BigDecimal(gstValue.getIgst()))
-								.divide(new BigDecimal("100"), 2, RoundingMode.HALF_UP);
+								.divide(new BigDecimal("100"), 2, RoundingMode.HALF_UP).multiply(new BigDecimal(s.getQuantity()));
 						itemTable.addCell(new Cell().add(
 								new Paragraph(igstValue + "").setFontSize(6).setTextAlignment(TextAlignment.CENTER)));
 					}
@@ -374,33 +381,37 @@ public class SalesSlipPDF {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-
-				double rate = s.getSoldPrice() / (1 + Integer.valueOf(gstValue2.getIgst()) / 100.0);
-				double gstAmt = rate * (Integer.valueOf(gstValue2.getIgst()) / 100.0);
-				return gstAmt * s.getQuantity();
+				BigDecimal gstRate = BigDecimal.valueOf(Integer.valueOf(isIgstNotApplicable?(gstValue2.getCgst()+gstValue2.getSgst()):gstValue2.getIgst()));
+				BigDecimal basePrice = gstApplicable ? BigDecimal.valueOf(s.getSoldPrice()).multiply(BigDecimal.valueOf(100)).divide(BigDecimal.valueOf(100).add(gstRate), 8, java.math.RoundingMode.HALF_UP) 
+						: BigDecimal.valueOf(s.getSoldPrice());		
+                BigDecimal gstRateAmt = basePrice.multiply(gstRate).divide(BigDecimal.valueOf(100), 2, java.math.RoundingMode.HALF_UP);
+				return gstRateAmt.multiply(new BigDecimal(s.getQuantity())).doubleValue();
 			}).sum();
 
-			double subTotal = sales.stream().mapToDouble(s -> {
+			double subTotal=total.floatValue();
+			
+//			double subTotal = sales.stream().mapToDouble(s -> {
+//
+//				GstRate gstValue2 = null;
+//				try {
+//					gstValue2 = mapper.readValue(s.getGstRate(), GstRate.class);
+//				} catch (JsonMappingException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				} catch (JsonProcessingException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+//
+//				double rate = gstApplicable ? (s.getSoldPrice() / (1 + Integer.valueOf(gstValue2.getIgst()) / 100.0))
+//						: s.getSoldPrice();
+//				return rate * s.getQuantity();
+//			}).sum();
 
-				GstRate gstValue2 = null;
-				try {
-					gstValue2 = mapper.readValue(s.getGstRate(), GstRate.class);
-				} catch (JsonMappingException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (JsonProcessingException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-
-				double rate = gstApplicable ? (s.getSoldPrice() / (1 + Integer.valueOf(gstValue2.getIgst()) / 100.0))
-						: s.getSoldPrice();
-				return rate * s.getQuantity();
-			}).sum();
-
-			double discount = 0;
-			double grandTotal = subTotal + (gstApplicable ? gst : 0.0) - discount;
-
+			double discount = sales.stream().map(s -> BigDecimal.valueOf(s.getSellingPrice()).subtract(BigDecimal.valueOf(s.getSoldPrice())).multiply(BigDecimal.valueOf(s.getQuantity()))).reduce(BigDecimal.ZERO, BigDecimal::add).doubleValue();
+			//			double discount = sales.stream().mapToDouble(s -> {return s.getSellingPrice()-s.getSoldPrice();}).sum();
+//			double grandTotal = subTotal -discount+ (gstApplicable ? gst : 0.0);// - discount;
+			double grandTotal = BigDecimal.valueOf(subTotal).subtract(BigDecimal.valueOf(discount)).add(BigDecimal.valueOf(gstApplicable ? gst : 0.0)).doubleValue();
 			Table summary = new Table(2).useAllAvailableWidth();
 
 			summary.addCell(cell("Subtotal", normal));

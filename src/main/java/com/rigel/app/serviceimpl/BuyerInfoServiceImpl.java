@@ -1,5 +1,7 @@
 package com.rigel.app.serviceimpl;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,6 +31,7 @@ import com.rigel.app.model.dto.SalesResponse;
 import com.rigel.app.model.dto.SearchCriteria;
 import com.rigel.app.service.IBuyerInfoService;
 import com.rigel.app.util.Constaints;
+import com.rigel.app.util.DiscountType;
 import com.rigel.app.validate.SalesInfoValidator;
 
 @Lazy 
@@ -78,10 +81,11 @@ public class BuyerInfoServiceImpl implements IBuyerInfoService {
 	            .getBuyerInfoDto().getSalesInfo()
 	            .stream()
 	            .map(dto -> {
-	                SalesInfo sale = objectMapper.convertValue(dto, SalesInfo.class);
-	                sale.setBuyerInfo(buyer);
+	            	SalesInfo sale = objectMapper.convertValue(dto, SalesInfo.class);
+		            sale.setBuyerInfo(buyer);
 	                sale.setCreatedAt(LocalDateTime.now());
 	                sale.setStatus(true);
+	                sale.setDiscountType(DiscountType.PERCENTAGE.toString());
 	                sale.setBuyerInfo(buyer);
 	                sale.setOwnerId(salesRequest.getUserId());
 	                System.out.println("sale.toString()-------"+sale.toString());

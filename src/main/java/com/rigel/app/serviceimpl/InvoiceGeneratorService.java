@@ -50,7 +50,7 @@ public class InvoiceGeneratorService {
 
 		repository.save(seq);
 
-		return seqCode + fyMonth + fyYear + userId + String.format("%08d", next);
+		return seqCode + fyMonth + fyYear + userId + String.format("%08d", next.longValue());
 	}
 	
 	@Transactional
@@ -71,7 +71,7 @@ public class InvoiceGeneratorService {
 
 		repository.save(seq);
 
-		return userId + String.format("%08d", next)+fyYear+fyMonth;
+		return userId + String.format("%08d", next.longValue())+fyYear+fyMonth;
 	}
 
 	private FySequence createOrUpdateSequence(int userId, String seqCode, String seqName, String fyYear, int fyMonth) {
