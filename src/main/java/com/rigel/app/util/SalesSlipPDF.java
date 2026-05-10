@@ -136,7 +136,7 @@ public class SalesSlipPDF {
 			if (gstApplicable) {
 				Table gstTable = new Table(2).useAllAvailableWidth();
 				gstTable.addCell(new Cell()
-						.add(new Paragraph("GSTN Number: " + user.getGstNumber()).setFont(bold).setFontSize(6))
+						.add(new Paragraph("GSTIN Number: " + user.getGstNumber()).setFont(bold).setFontSize(6))
 						.setBorder(Border.NO_BORDER).setTextAlignment(TextAlignment.RIGHT));
 				document.add(gstTable);
 			}
@@ -195,15 +195,19 @@ public class SalesSlipPDF {
 
 			// BILL TO Column
 			Cell billCell = new Cell().add(new Paragraph("BILL TO").setFont(bold).setFontSize(7).setMarginBottom(4))
-					.add(new Paragraph().setFont(normal).setFontSize(6).add("Name : " + shipName + "\n")
-							.add("State : " + shipState + "\n").add("Distic : " + shipDist + "\n")
+					.add(new Paragraph().setFont(normal).setFontSize(6)
+							.add("GSTIN Number : " + buyer.getGstNumber() + "\n")
+							.add("Name : " + shipName + "\n")
+							.add("State : " + shipState + "\n").add("Distric : " + shipDist + "\n")
 							.add("Address : " + shipAddress + "\n").add("Pin Code : " + shipPincode))
 					.setBorder(null); // No border, optional
 
 			// SHIP TO Column
 			Cell shipCell = new Cell().add(new Paragraph("SHIP TO").setFont(bold).setFontSize(7).setMarginBottom(4))
-					.add(new Paragraph().setFont(normal).setFontSize(6).add("Name : " + shipName + "\n")
-							.add("State : " + shipState + "\n").add("Distic : " + shipDist + "\n")
+					.add(new Paragraph().setFont(normal).setFontSize(6)
+							.add("GSTIN Number : " + buyer.getGstNumber() + "\n")
+							.add("Name : " + shipName + "\n")
+							.add("State : " + shipState + "\n").add("Distric : " + shipDist + "\n")
 							.add("Address : " + shipAddress + "\n").add("Pin Code : " + shipPincode))
 					.setBorder(null);
 
