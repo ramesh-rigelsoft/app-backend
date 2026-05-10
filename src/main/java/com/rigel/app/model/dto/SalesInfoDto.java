@@ -72,7 +72,7 @@ public class SalesInfoDto {
     
 	private String gstRate;
 	
-	private double discount;
+//	private double discount;
 	
 	private String discountType;
 	

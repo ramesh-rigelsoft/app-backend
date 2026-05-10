@@ -128,8 +128,8 @@ public class SalesInfo implements Serializable{
 	@Column(name = "gst_rate")
 	private String gstRate;
 	
-	@Column(name = "discount")
-	private double discount;
+//	@Column(name = "discount")
+//	private double discount;
 	
 	@Column(name = "discount_type")
 	private String discountType;

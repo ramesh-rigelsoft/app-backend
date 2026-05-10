@@ -14,6 +14,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ExpenseCreteria {
+	private String id;
 	private int startIndex;
 	private int maxRecords;
 	private int year;

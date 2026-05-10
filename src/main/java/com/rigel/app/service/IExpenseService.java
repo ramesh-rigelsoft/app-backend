@@ -13,5 +13,7 @@ public interface IExpenseService {
 	public Expense updateExpense(Expense expense);
 	
 	public List<Expense> searchExpense(ExpenseCreteria creteria);
+	
+	public int deleteExpense(ExpenseCreteria creteria);
 
 }

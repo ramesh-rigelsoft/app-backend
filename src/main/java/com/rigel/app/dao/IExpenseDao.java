@@ -12,5 +12,7 @@ public interface IExpenseDao {
 	public Expense updateExpense(Expense expense);
 
 	public List<Expense> searchExpense(ExpenseCreteria creteria);
+	
+	public int deleteExpense(ExpenseCreteria creteria);
 
 }

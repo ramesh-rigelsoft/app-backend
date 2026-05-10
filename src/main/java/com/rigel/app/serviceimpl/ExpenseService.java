@@ -41,21 +41,26 @@ public class ExpenseService implements IExpenseService{
 	
 	public Expense convertToEntity(ExpenseDTO dto) {
 		String filName=UploadFileUtlity.uploadImageNfiles(dto.getProof(),"expense",null);
-		
 	    return Expense.builder()
 	            // Skip ID → DB will generate
+	    		.id(dto.getId()==null?null:dto.getId())
 	            .type(dto.getType())
 	            .scope(dto.getScope())
 	            .description(dto.getDescription())
 	            .amount(dto.getAmount())
 	            .proof(filName)
 	            .status(true)
-	            .expenseDate(RAUtility.isoToLocalDateTime(String.valueOf(dto.getExpenseDate())))
+	            .expenseDate(dto.getId()==null?RAUtility.isoToLocalDateTime(String.valueOf(dto.getExpenseDate())):LocalDateTime.parse(dto.getExpenseDate()))
 	            .ownerId(dto.getOwnerId())
 	            .createdAt(LocalDateTime.now())
 //	            .status("active");
 	            // Skip createdAt → default set in entity
 	            .build();
+	}
+
+	@Override
+	public int deleteExpense(ExpenseCreteria creteria) {
+		return expenseDao.deleteExpense(creteria);
 	}
 
 

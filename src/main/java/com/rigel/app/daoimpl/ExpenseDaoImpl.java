@@ -14,11 +14,10 @@ import jakarta.persistence.Query;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 
-
 @Repository
 @Transactional
 public class ExpenseDaoImpl implements IExpenseDao {
-	
+
 	@Autowired
 	EntityManager entityManager;
 
@@ -36,53 +35,60 @@ public class ExpenseDaoImpl implements IExpenseDao {
 	@Override
 	public List<Expense> searchExpense(ExpenseCreteria creteria) {
 
-	    StringBuilder jpql = new StringBuilder("FROM Expense e WHERE e.status=true AND ");
+		StringBuilder jpql = new StringBuilder("FROM Expense e WHERE e.status=true AND ");
 
-	    if (creteria.getUserId() != 0) {
-	        jpql.append(" e.ownerId = :ownerId");
-	    }
+		if (creteria.getUserId() != 0) {
+			jpql.append(" e.ownerId = :ownerId");
+		}
 
-	    if (creteria.getScope() != null && !creteria.getScope().isEmpty()) {
-	        jpql.append(" AND e.scope = :scope");
-	    }
+		if (creteria.getScope() != null && !creteria.getScope().isEmpty()) {
+			jpql.append(" AND e.scope = :scope");
+		}
 
-	    if (creteria.getType() != null && !creteria.getType().isEmpty()) {
-	        jpql.append(" AND e.type = :type");
-	    }
+		if (creteria.getType() != null && !creteria.getType().isEmpty()) {
+			jpql.append(" AND e.type = :type");
+		}
 
-	    int year = (creteria.getYear() != 0) ? creteria.getYear() : LocalDate.now().getYear();
-	    jpql.append(" AND YEAR(e.expenseDate) = :year");
+		int year = (creteria.getYear() != 0) ? creteria.getYear() : LocalDate.now().getYear();
+		jpql.append(" AND YEAR(e.expenseDate) = :year");
 
-	    if (creteria.getMonth() != 0) {
-	        jpql.append(" AND MONTH(e.expenseDate) = :month");
-	    }
+		if (creteria.getMonth() != 0) {
+			jpql.append(" AND MONTH(e.expenseDate) = :month");
+		}
 
-	    Query query = entityManager.createQuery(jpql.toString(), Expense.class);
+		Query query = entityManager.createQuery(jpql.toString(), Expense.class);
 
-	    if (creteria.getUserId() != 0) {
-	        query.setParameter("ownerId", creteria.getUserId());
-	    }
+		if (creteria.getUserId() != 0) {
+			query.setParameter("ownerId", creteria.getUserId());
+		}
 
-	    if (creteria.getScope() != null && !creteria.getScope().isEmpty()) {
-	        query.setParameter("scope", creteria.getScope());
-	    }
+		if (creteria.getScope() != null && !creteria.getScope().isEmpty()) {
+			query.setParameter("scope", creteria.getScope());
+		}
 
-	    if (creteria.getType() != null && !creteria.getType().isEmpty()) {
-	        query.setParameter("type", creteria.getType());
-	    }
+		if (creteria.getType() != null && !creteria.getType().isEmpty()) {
+			query.setParameter("type", creteria.getType());
+		}
 
-	    query.setParameter("year", year);
+		query.setParameter("year", year);
 
-	    if (creteria.getMonth() != 0) {
-	        query.setParameter("month", creteria.getMonth());
-	    }
-	    query.setFirstResult(creteria.getStartIndex());
-	    query.setMaxResults(creteria.getMaxRecords());
-	    return query.getResultList();
+		if (creteria.getMonth() != 0) {
+			query.setParameter("month", creteria.getMonth());
+		}
+		query.setFirstResult(creteria.getStartIndex());
+		query.setMaxResults(creteria.getMaxRecords());
+		return query.getResultList();
 	}
 
-
-
-
+	@Override
+	public int deleteExpense(ExpenseCreteria creteria) {
+		String hql = "DELETE FROM Expense WHERE id = :id";
+		try {
+			return entityManager.createQuery(hql).setParameter("id", creteria.getId()).executeUpdate();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return 0;
+		}
+	}
 
 }

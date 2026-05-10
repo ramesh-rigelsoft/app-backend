@@ -495,7 +495,25 @@ public class SalesSlipPDF {
 			/* ----------- THANK YOU ----------- */
 			Paragraph thanks = new Paragraph("***** THANK YOU VISIT AGAIN *****").setFont(bold).setFontSize(7)
 					.setTextAlignment(TextAlignment.CENTER);
+
 			document.add(thanks);
+			
+			// Signature Section
+			Table signTable = new Table(1).useAllAvailableWidth();
+			signTable.setMarginTop(8);
+
+			Cell signCell = new Cell()
+			        .add(new Paragraph("\n\n\nAuthorized Signatory")
+			                .setFont(bold)
+			                .setFontSize(7)
+			                .setTextAlignment(TextAlignment.RIGHT))
+			        .setBorder(Border.NO_BORDER)
+			        .setWidth(120)
+			        .setHorizontalAlignment(HorizontalAlignment.RIGHT);
+
+			signTable.addCell(signCell);
+			
+			document.add(signTable);
 
 			if (user.getShopType() != null) {
 				try {

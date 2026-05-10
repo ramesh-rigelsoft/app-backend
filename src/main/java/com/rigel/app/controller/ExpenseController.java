@@ -82,4 +82,25 @@ public class ExpenseController {
 			return new ResponseEntity<>(response, HttpStatus.OK);
 		}
 	}
+	
+	@PostMapping("delete")
+	public ResponseEntity<Map<String, Object>> delete(@RequestBody(required = true) @Valid ExpenseCreteria creteria,
+			BindingResult result, HttpServletRequest request) {
+		Map<String, Object> response = new HashMap<>();
+		Map<String, Object> data = new HashMap<>();
+
+		if (creteria == null) {
+			throw new BadGatewayRequest("Invalid Request");
+		} else if (result.hasFieldErrors()) {
+			throw new BadGatewayRequest(result.getFieldError().getDefaultMessage());
+		} else {
+			 expenseService.deleteExpense(creteria);
+//			data.put("expenses", expenseResponse);
+			response.put("data", data);
+			response.put("status", "OK");
+			response.put("code", "200");
+			response.put("message", "Your records has been deleted successfully.");
+			return new ResponseEntity<>(response, HttpStatus.OK);
+		}
+	}
 }

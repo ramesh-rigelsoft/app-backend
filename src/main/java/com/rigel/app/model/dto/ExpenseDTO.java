@@ -16,6 +16,8 @@ import org.springframework.web.multipart.MultipartFile;
 @Setter
 @Getter
 public class ExpenseDTO {
+	
+	private String id;
 
 	@NotBlank(message = "Type is required")
     private String type;
