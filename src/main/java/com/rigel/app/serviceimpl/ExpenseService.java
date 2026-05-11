@@ -53,8 +53,7 @@ public class ExpenseService implements IExpenseService{
 	            .expenseDate(dto.getId()==null?RAUtility.isoToLocalDateTime(String.valueOf(dto.getExpenseDate())):LocalDateTime.parse(dto.getExpenseDate()))
 	            .ownerId(dto.getOwnerId())
 	            .createdAt(LocalDateTime.now())
-//	            .status("active");
-	            // Skip createdAt → default set in entity
+	            .status(true)
 	            .build();
 	}
 
