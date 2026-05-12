@@ -59,6 +59,13 @@ public class BuyerInfo implements Serializable{
 	
 	private String paymentModes;
 	
+	
+//	private String financeId;
+//    private int emiTenure;          // months
+//    private double downPaymentIncluedFinance;
+//    private String imeiNumber;
+	
+	
 //	@Pattern(regexp="^[a-zA-Z ]+$", message="Enter valid Name")
 	private String buyerName;
 		

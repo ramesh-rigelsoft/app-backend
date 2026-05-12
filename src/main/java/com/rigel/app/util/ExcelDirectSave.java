@@ -47,7 +47,7 @@ public class ExcelDirectSave {
 
 	        // 📌 Columns
 	        String[] headers = {
-	                "Item Code", "Category", "Category Type", "Measure Type",
+	                "Item Code","Vendor Name","GSTIN Number", "Category", "Category Type", "Measure Type",
 	                "Brand", "Model", "Condition", "Source",
 	                "RAM",
 	                "Storage", "Storage Type",
@@ -75,6 +75,11 @@ public class ExcelDirectSave {
 
 	            int col = 0;
 	            row.createCell(col++).setCellValue(nvl(item.getItemCode()));
+	            
+
+	            row.createCell(col++).setCellValue(nvl(item.getVendorName()));
+	            row.createCell(col++).setCellValue(nvl(item.getVendorGSTNumber()));
+	            
 	            row.createCell(col++).setCellValue(nvl(item.getCategory()));
 	            row.createCell(col++).setCellValue(nvl(item.getCategoryType()));
 	            row.createCell(col++).setCellValue(nvl(item.getMeasureType()));
@@ -84,9 +89,8 @@ public class ExcelDirectSave {
 	            row.createCell(col++).setCellValue(nvl(item.getItemCondition()));
 	            row.createCell(col++).setCellValue(nvl(item.getItemSource()));
 
-	            row.createCell(col++).setCellValue(nvl(item.getRam()+""+item.getRamUnit()));
-
-	            row.createCell(col++).setCellValue(nvl(item.getStorage()+""+item.getStorageUnit()));
+	            row.createCell(col++).setCellValue(nvl(item.getRam()!="null"&&item.getRam()!=null?(item.getRam()+""+item.getRamUnit()):"-"));
+	            row.createCell(col++).setCellValue(nvl(item.getStorage()!="null"&&item.getStorage()!=null?(item.getStorage()+""+item.getStorageUnit()):"-"));
 	            row.createCell(col++).setCellValue(nvl(item.getStorageType()));
 
 	            row.createCell(col++).setCellValue(item.getQuantity() != null ? item.getQuantity() : 0);
@@ -183,7 +187,7 @@ public class ExcelDirectSave {
 
 	        // 📌 Columns
 	        String[] headers = {
-	        		"Invoice Number","Item Code", "Category", "Category Type", "Measure Type",
+	        		"Invoice Number","Item Code", "Vendor Name","GSTIN Number","Category", "Category Type", "Measure Type",
 	                "Brand", "Model", "Condition", "Source",
 	                "RAM",
 	                "Storage", "Storage Type",
@@ -212,6 +216,10 @@ public class ExcelDirectSave {
 	            int col = 0;
 	            row.createCell(col++).setCellValue(nvl(item.getBuyerInfo().getInvoiceNumber()));
 	            row.createCell(col++).setCellValue(nvl(item.getItemCode()));
+	         
+	            row.createCell(col++).setCellValue(nvl(item.getVendorName()));
+	            row.createCell(col++).setCellValue(nvl(item.getVendorGSTNumber()));
+	         
 	            row.createCell(col++).setCellValue(nvl(item.getCategory()));
 	            row.createCell(col++).setCellValue(nvl(item.getCategoryType()));
 	            row.createCell(col++).setCellValue(nvl(item.getMeasureType()));
@@ -221,9 +229,9 @@ public class ExcelDirectSave {
 	            row.createCell(col++).setCellValue(nvl(item.getItemCondition()));
 	            row.createCell(col++).setCellValue(nvl(item.getItemSource()));
 
-	            row.createCell(col++).setCellValue(nvl(item.getRam()+""+item.getRamUnit()));
+	            row.createCell(col++).setCellValue(nvl(item.getRam()!="null"&&item.getRam()!=null?(item.getRam()+""+item.getRamUnit()):"-"));
+	            row.createCell(col++).setCellValue(nvl(item.getStorage()!="null"&&item.getStorage()!=null?(item.getStorage()+""+item.getStorageUnit()):"-"));
 
-	            row.createCell(col++).setCellValue(nvl(item.getStorage()+""+item.getStorageUnit()));
 	            row.createCell(col++).setCellValue(nvl(item.getStorageType()));
 
 	            row.createCell(col++).setCellValue(item.getQuantity() != null ? item.getQuantity() : 0);

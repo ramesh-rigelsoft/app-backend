@@ -143,8 +143,10 @@ public class SalesInfo implements Serializable{
 	@Column(name = "owner_id")
 	private int ownerId;
 	
-	
+	@Column(name = "vendor_name")
 	private String vendorName;
+	
+	@Column(name = "vendor_gst_number")
     private String vendorGSTNumber;
 	
 	@Column(name = "additional_details")
