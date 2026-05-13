@@ -27,6 +27,11 @@ public class BuyerInfoDto {
 	    
 	    @JsonProperty("paymentModes")
 	    private String paymentModes;
+	    
+		private String financeId;
+	    private String emiTenure;          // months
+	    private double paidAmount;
+	    private String imeiNumber;
 
 	    @JsonProperty("buyerName")
 	    private String buyerName;
