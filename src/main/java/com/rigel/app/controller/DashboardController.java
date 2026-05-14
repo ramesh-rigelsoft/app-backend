@@ -33,16 +33,40 @@ public class DashboardController {
 	IDashboardService dashboardService;
 
 	@PostMapping("view")
-	public ResponseEntity<Map<String, Object>> save(@RequestBody(required = true) @Valid DashboardRequest dashboardRequest,
-			BindingResult result, HttpServletRequest request) {
-		Map<String, Object> response = new HashMap<>();
-		Map<String, Object> data = new HashMap<>();
-		Map<String, Object> dashboard = dashboardService.viewDashboard(dashboardRequest);
-			data.put("dashboard", dashboard);
-			response.put("data", data);
-			response.put("status", "OK");
-			response.put("code", "200");
-			response.put("message", "Your records has been fech successfully.");
-			return new ResponseEntity<>(response, HttpStatus.OK);
+	public ResponseEntity<Map<String, Object>> save(
+	        @RequestBody(required = true) @Valid DashboardRequest dashboardRequest,
+	        BindingResult result,
+	        HttpServletRequest request) {
+
+	    Map<String, Object> response = new HashMap<>();
+
+	    // 🔴 Validation check
+	    if (result.hasErrors()) {
+
+	        Map<String, String> errors = new HashMap<>();
+
+	        result.getFieldErrors().forEach(error ->
+	                errors.put(error.getField(), error.getDefaultMessage())
+	        );
+
+	        response.put("status", "ERROR");
+	        response.put("code", "400");
+	        response.put("message", "Validation failed");
+	        response.put("errors", errors);
+
+	        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+	    }
+
+	    // ✅ If valid request
+	    Map<String, Object> data = new HashMap<>();
+	    Map<String, Object> dashboard = dashboardService.viewDashboard(dashboardRequest);
+
+	    data.put("dashboard", dashboard);
+	    response.put("data", data);
+	    response.put("status", "OK");
+	    response.put("code", "200");
+	    response.put("message", "Your records have been fetched successfully.");
+
+	    return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 }

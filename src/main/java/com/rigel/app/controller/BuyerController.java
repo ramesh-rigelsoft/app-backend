@@ -1,6 +1,7 @@
 package com.rigel.app.controller;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,8 +14,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.rigel.app.exception.BadGatewayRequest;
+import com.rigel.app.model.BuyerInfo;
+import com.rigel.app.model.SalesInfo;
+import com.rigel.app.model.dto.BuyerInfoDto;
 import com.rigel.app.model.dto.SalesRequest;
 import com.rigel.app.model.dto.SalesResponse;
+import com.rigel.app.model.dto.SearchCriteria;
 import com.rigel.app.service.IBuyerInfoService;
 
 import jakarta.servlet.http.HttpServletRequest;

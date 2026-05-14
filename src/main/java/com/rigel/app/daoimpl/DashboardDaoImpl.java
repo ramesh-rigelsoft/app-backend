@@ -91,7 +91,7 @@ public class DashboardDaoImpl implements IDashboardDao {
 			}
 		}
 		List<SalesInfo> sales = entityManager
-				.createQuery("SELECT e FROM SalesInfo e " + "WHERE e.status=true AND e.ownerId = :ownerId "
+				.createQuery("SELECT e FROM SalesInfo e " + "WHERE e.status=true AND e.returnStatus=false AND returnStatus=false AND e.ownerId = :ownerId "
 						+ "AND e.createdAt BETWEEN :start AND :end", SalesInfo.class)
 				.setParameter("ownerId", ownerId).setParameter("start", start).setParameter("end", end).getResultList();
 

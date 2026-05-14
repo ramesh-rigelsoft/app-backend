@@ -7,8 +7,10 @@ import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
+import com.rigel.app.dao.IInventoryDao;
 import com.rigel.app.dao.IItemsDao;
 import com.rigel.app.dao.ISalesDao;
+import com.rigel.app.model.Inventory;
 import com.rigel.app.model.Items;
 import com.rigel.app.model.SalesInfo;
 import com.rigel.app.model.dto.SearchCriteria;
@@ -18,12 +20,14 @@ import com.rigel.app.util.ExcelDirectSave;
 
 @Lazy 
 @Service
-//@CacheConfig(cacheNames = "userCache", keyGenerator = "TransferKeyGenerator")
 public class SalesServiceImpl implements ISalesService {
 
 	@Autowired
 	ISalesDao salesDao;
-
+	
+	@Autowired
+	IInventoryDao inventoryDao;
+	
 	@Override
 	public List<SalesInfo> saveSalesInfo(List<SalesInfo> salesInfo) {
 		return salesDao.saveSalesInfo(salesInfo);
@@ -33,12 +37,21 @@ public class SalesServiceImpl implements ISalesService {
 	public SalesInfo updateSalesInfo(SalesInfo salesInfo) {
 		return salesDao.updateSalesInfo(salesInfo);
 	}
-
+	
 	@Override
-	public int deleteItems(List<Long> salesId,int ownerId) {
-		return salesDao.deleteItems(salesId,ownerId);
+	public SalesInfo returnSalesInfo(String returnReason,String salesId,int ownerId) {
+		SalesInfo salesInfo=salesDao.findById(salesId);
+		salesInfo.setReturnStatus(true);
+		salesInfo.setReturnReason(returnReason);
+		
+		Inventory inventory = inventoryDao.findInventoryByCode(salesInfo.getItemCode(), ownerId);
+		inventory.setQuantity(inventory.getQuantity()+1);
+		inventoryDao.updateInventory(inventory);
+		
+		return salesDao.updateSalesInfo(salesInfo);
 	}
-
+	
+	
 	@Override
 	public List<SalesInfo> searchSalesInfo(SearchCriteria criteria) {
 		List<SalesInfo> sales=salesDao.searchSalesInfo(criteria);

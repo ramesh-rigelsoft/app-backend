@@ -12,7 +12,7 @@ public interface ISalesService {
 	
     public SalesInfo updateSalesInfo(SalesInfo salesInfo);
 	
-	public int deleteItems(List<Long> salesId,int ownerId);
+    public SalesInfo returnSalesInfo(String returnReason,String salesId,int ownerId);
 	
 	public List<SalesInfo> searchSalesInfo(SearchCriteria criteria);
 }

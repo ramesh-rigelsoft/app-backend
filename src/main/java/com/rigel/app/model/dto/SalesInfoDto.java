@@ -85,6 +85,12 @@ public class SalesInfoDto {
     
     private boolean status; 
     private String additionalDetails;
+    
+    private boolean returnStatus;
+	private boolean replaceStatus;
+	private int replaceCount;
+	private int warrantyInMonth;
+    private String returnReason;
 
 
 }

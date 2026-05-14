@@ -149,6 +149,21 @@ public class SalesInfo implements Serializable{
 	@Column(name = "vendor_gst_number")
     private String vendorGSTNumber;
 	
+	@Column(name = "return_status")
+    private boolean returnStatus;
+	
+	@Column(name = "replace_status")
+    private boolean replaceStatus;
+	
+	@Column(name = "replace_count")
+    private int replaceCount;
+	
+	@Column(name = "warranty_in_month")
+    private int warrantyInMonth;
+
+	@Column(name = "return_reason")
+    private String returnReason;
+	
 	@Column(name = "additional_details")
 	private String additionalDetails;
 	

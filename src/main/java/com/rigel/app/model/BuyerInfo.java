@@ -15,6 +15,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -60,9 +61,13 @@ public class BuyerInfo implements Serializable{
 	@NotNull
 	private String paymentModes;
 	
+	@Transient
 	private String financeId;
-    private String emiTenure;          // months
+	@Transient
+    private String emiTenure;
+	@Transient// months
     private double paidAmount;
+	@Transient
     private String imeiNumber;
 		
 //	@Pattern(regexp="^[a-zA-Z ]+$", message="Enter valid Name")

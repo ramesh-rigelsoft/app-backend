@@ -36,7 +36,6 @@ import com.rigel.app.validate.SalesInfoValidator;
 
 @Lazy 
 @Service
-//@CacheConfig(cacheNames = "userCache", keyGenerator = "TransferKeyGenerator")
 public class BuyerInfoServiceImpl implements IBuyerInfoService {
 	
 	@Autowired
@@ -134,7 +133,33 @@ public class BuyerInfoServiceImpl implements IBuyerInfoService {
 
 	@Override
 	public SalesResponse searchBuyerInfo(SearchCriteria criteria) {
-		return null;//buyerDao.searchBuyerInfo(criteria);
+//		List<BuyerInfoDto> list = objectMapper.convertValue(
+//		        buyerDao.searchBuyerInfo(criteria),
+//		        new TypeReference<List<BuyerInfoDto>>() {}
+//		);
+//
+//		list = list.stream().map(d -> {
+//
+//		    Set<SalesInfoDto> salesList = objectMapper.convertValue(
+//		            salesDao.searchSalesInfo(criteria),
+//		            new TypeReference<Set<SalesInfoDto>>() {}
+//		    );
+//
+//		    d.setSalesInfo(salesList);
+//
+//		    return d;
+//
+//		}).toList();
+//	    
+//	    return SalesResponse.builder()
+//	            .buyerInfoDto(list)
+//	           .build();
+		return null;
+	}
+
+	@Override
+	public List<BuyerInfoDto> searchSalesInfoDto(SearchCriteria criteria) {
+		return buyerDao.searchSalesInfoDto(criteria);
 	}
 	
 }

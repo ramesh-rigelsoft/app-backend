@@ -9,6 +9,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import jakarta.validation.constraints.NotNull;
+
 import java.util.Set;
 
 
@@ -24,6 +27,9 @@ public class BuyerInfoDto {
 
 	    @JsonProperty("invoiceNumber")
 	    private String invoiceNumber;
+	    
+		@NotNull
+		private String custumberId;
 	    
 	    @JsonProperty("paymentModes")
 	    private String paymentModes;

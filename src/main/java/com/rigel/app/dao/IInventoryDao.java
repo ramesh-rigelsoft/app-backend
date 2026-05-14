@@ -11,6 +11,8 @@ public interface IInventoryDao {
 //    public Inventory saveInventory(Inventory inventory);
 	
     public Inventory updateInventory(Inventory inventory);
+    
+    public Inventory findById(String id);
 	
 	public int deleteInventory(String itemCode,int ownerId);
 	

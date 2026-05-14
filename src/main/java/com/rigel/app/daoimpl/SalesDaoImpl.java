@@ -2,6 +2,7 @@ package com.rigel.app.daoimpl;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Repository;
 
 import com.rigel.app.dao.IItemsDao;
 import com.rigel.app.dao.ISalesDao;
+import com.rigel.app.model.BuyerInfo;
 import com.rigel.app.model.Inventory;
 import com.rigel.app.model.Items;
 import com.rigel.app.model.SalesInfo;
@@ -33,26 +35,45 @@ public class SalesDaoImpl implements ISalesDao {
 	@Autowired
 	IInventoryService iInventoryService;
 
-//	@Autowired
-//	SalesQueryBuilder salesQueryBuilder;
 
 	@Override
 	public List<SalesInfo> saveSalesInfo(List<SalesInfo> salesInfoList) {
-		List<SalesInfo> savedSales = new ArrayList<>();
-		int batchSize = 10;
+		
+		if (salesInfoList == null || salesInfoList.isEmpty()) {
+	        return Collections.emptyList();
+	    }
 
-		for (int i = 0; i < salesInfoList.size(); i++) {
-			SalesInfo saved = entityManager.merge(salesInfoList.get(i));
-			savedSales.add(saved);
+	    BuyerInfo buyerInfo = salesInfoList.get(0).getBuyerInfo();
 
-			if (i % batchSize == 0) {
-				entityManager.flush(); // DB sync
-				entityManager.clear(); // memory free
-			}
-		}
-		return savedSales;
+	    if (buyerInfo == null) {
+	        throw new RuntimeException("BuyerInfo is required");
+	    }
+
+	    // SAVE / UPDATE BUYER
+	    BuyerInfo savedBuyer = entityManager.merge(buyerInfo);
+
+	    // SET SAME BUYER INTO ALL SALES
+	    salesInfoList.forEach(s -> s.setBuyerInfo(savedBuyer));
+
+	    List<SalesInfo> savedSales = new ArrayList<>();
+
+	    int batchSize = 10;
+
+	    for (int i = 0; i < salesInfoList.size(); i++) {
+
+	        SalesInfo saved = entityManager.merge(salesInfoList.get(i));
+
+	        savedSales.add(saved);
+
+	        if (i > 0 && i % batchSize == 0) {
+
+	            entityManager.flush();
+	            entityManager.clear();
+	        }
+	    }
+
+	    return savedSales;
 	}
-
 	@Override
 	public SalesInfo updateSalesInfo(SalesInfo salesInfo) {
 		try {
@@ -62,19 +83,13 @@ public class SalesDaoImpl implements ISalesDao {
 			return null;
 		}
 	}
-
-	@Override
-	public int deleteItems(List<Long> salesId, int ownerId) {
-		int count = entityManager.createQuery("DELETE FROM SalesInfo s WHERE s.id IN :ids AND s.ownerId = :ownerId")
-				.setParameter("ids", salesId).setParameter("ownerId", ownerId).executeUpdate();
-
-		return count;
+	public SalesInfo findById(String id) {
+	    return entityManager.find(SalesInfo.class, id);
 	}
 
 	@Override
 	public List<SalesInfo> searchSalesInfo(SearchCriteria criteria) {
 
-//		StringBuilder jpql = new StringBuilder("SELECT i FROM SalesInfo i INNER JOIN FETCH i.buyerInfo WHERE ");
 		StringBuilder jpql = new StringBuilder("SELECT i FROM SalesInfo i JOIN BuyerInfo bi ON bi.id = i.buyerInfo.id WHERE i.status=true AND ");
 		Map<String, Object> params = new HashMap<>();
 		jpql.append(" i.ownerId = :ownerId ");

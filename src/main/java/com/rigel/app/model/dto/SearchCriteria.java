@@ -26,6 +26,10 @@ public class SearchCriteria {
 	private String order;
 	private String itemId;
 	private boolean isdownload;
+	private long limit;
+	private long offset;
+	private String id;
+	
 
 	// items search
 	private String searchKeyword;

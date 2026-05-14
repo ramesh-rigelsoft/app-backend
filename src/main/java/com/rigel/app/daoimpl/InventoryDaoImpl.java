@@ -64,6 +64,11 @@ public class InventoryDaoImpl implements IInventoryDao {
 	public Inventory updateInventory(Inventory inventory) {
 		return entityManager.merge(inventory);
 	}
+	
+
+	public Inventory findById(String id) {
+	    return entityManager.find(Inventory.class, id);
+	}
 
 	@Override
 	public int deleteInventory(String itemCode,int ownerId) {

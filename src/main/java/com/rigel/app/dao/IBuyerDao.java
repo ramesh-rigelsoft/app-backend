@@ -3,6 +3,7 @@ package com.rigel.app.dao;
 import java.util.List;
 
 import com.rigel.app.model.BuyerInfo;
+import com.rigel.app.model.dto.BuyerInfoDto;
 import com.rigel.app.model.dto.SearchCriteria;
 
 public interface IBuyerDao {
@@ -16,5 +17,6 @@ public interface IBuyerDao {
 	
 	
 	public List<BuyerInfo> searchBuyerInfo(SearchCriteria criteria);
+	public List<BuyerInfoDto> searchSalesInfoDto(SearchCriteria criteria);
 
 }
