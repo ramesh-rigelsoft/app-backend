@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 
@@ -18,7 +19,7 @@ public class BuyerInfoRowMapper implements ResultSetExtractor<List<BuyerInfoDTO>
 
     @Override
     public List<BuyerInfoDTO> extractData(ResultSet rs) throws SQLException {
-
+   	    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM yyyy, hh:mm a");
         Map<String, BuyerInfoDTO> map = new LinkedHashMap<>();
 
         while (rs.next()) {
@@ -48,9 +49,13 @@ public class BuyerInfoRowMapper implements ResultSetExtractor<List<BuyerInfoDTO>
                         .district(rs.getString("district"))
                         .companyAddress(rs.getString("company_address"))
                         .status(rs.getInt("buyer_status"))
-                        .createdAt(rs.getTimestamp("created_at") != null
-                                ? rs.getTimestamp("created_at").toLocalDateTime()
-                                : null)
+                        .createdAt(
+                        	    rs.getTimestamp("created_at") != null
+                        	        ? rs.getTimestamp("created_at")
+                        	            .toLocalDateTime()
+                        	            .format(formatter)
+                        	        : null
+                        	)
                         .noteComment(rs.getString("note_comment"))
                         .ownerId(rs.getInt("owner_id"))
 //                        .financeId(rs.getString("finance_id"))

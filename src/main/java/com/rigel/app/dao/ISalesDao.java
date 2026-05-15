@@ -11,7 +11,7 @@ public interface ISalesDao {
 	
     public SalesInfo updateSalesInfo(SalesInfo salesInfo);
 	
-	public SalesInfo findById(String Id);
+	public SalesInfo findById(String Id,int ownerId);
 	
 	public List<SalesInfo> searchSalesInfo(SearchCriteria criteria);
 	

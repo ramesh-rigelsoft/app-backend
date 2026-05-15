@@ -13,6 +13,8 @@ public interface ISalesService {
     public SalesInfo updateSalesInfo(SalesInfo salesInfo);
 	
     public SalesInfo returnSalesInfo(String returnReason,String salesId,int ownerId);
+    
+    public SalesInfo replaceSalesInfo(String returnReason,String salesId,int ownerId);
 	
 	public List<SalesInfo> searchSalesInfo(SearchCriteria criteria);
 }

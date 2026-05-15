@@ -83,10 +83,32 @@ public class SalesDaoImpl implements ISalesDao {
 			return null;
 		}
 	}
-	public SalesInfo findById(String id) {
-	    return entityManager.find(SalesInfo.class, id);
-	}
+	
+	public SalesInfo findById(String id, int ownerId) {
 
+	    String jpql = """
+	        SELECT s
+	        FROM SalesInfo s
+	        JOIN FETCH s.buyerInfo b
+	        WHERE s.id = :id
+	        AND s.ownerId = :ownerId
+	        AND s.status = true
+	        AND s.replaceStatus = false
+	        AND s.returnStatus = false
+	    """;
+
+	    try {
+	        return entityManager.createQuery(jpql, SalesInfo.class)
+	                .setParameter("id", id)
+	                .setParameter("ownerId", ownerId)
+	                .getSingleResult();
+
+	    } catch (Exception e) {
+	        return null;
+	    }
+	}
+	
+	
 	@Override
 	public List<SalesInfo> searchSalesInfo(SearchCriteria criteria) {
 

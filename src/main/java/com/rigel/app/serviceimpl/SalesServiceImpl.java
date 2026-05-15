@@ -1,5 +1,6 @@
 package com.rigel.app.serviceimpl;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import com.rigel.app.model.dto.SearchCriteria;
 import com.rigel.app.service.IItemsService;
 import com.rigel.app.service.ISalesService;
 import com.rigel.app.util.ExcelDirectSave;
+import com.rigel.app.validate.OwnerIdValidation;
 
 @Lazy 
 @Service
@@ -28,29 +30,55 @@ public class SalesServiceImpl implements ISalesService {
 	@Autowired
 	IInventoryDao inventoryDao;
 	
+	@Autowired
+	OwnerIdValidation ownerIdValidation;
+	
 	@Override
 	public List<SalesInfo> saveSalesInfo(List<SalesInfo> salesInfo) {
+		salesInfo.stream().forEach(s->{
+			ownerIdValidation.validate(s.getOwnerId());	
+		});
 		return salesDao.saveSalesInfo(salesInfo);
 	}
 
 	@Override
 	public SalesInfo updateSalesInfo(SalesInfo salesInfo) {
+		ownerIdValidation.validate(salesInfo.getOwnerId());
 		return salesDao.updateSalesInfo(salesInfo);
 	}
 	
 	@Override
 	public SalesInfo returnSalesInfo(String returnReason,String salesId,int ownerId) {
-		SalesInfo salesInfo=salesDao.findById(salesId);
+		ownerIdValidation.validate(ownerId);
+		SalesInfo salesInfo=salesDao.findById(salesId,ownerId);
+		if(salesInfo==null)return null;
 		salesInfo.setReturnStatus(true);
 		salesInfo.setReturnReason(returnReason);
+		
+		LocalDateTime orderedDate=salesInfo.getBuyerInfo().getCreatedAt();
+		ownerIdValidation.orderReturnValidation(orderedDate, 15);
 		
 		Inventory inventory = inventoryDao.findInventoryByCode(salesInfo.getItemCode(), ownerId);
 		inventory.setQuantity(inventory.getQuantity()+1);
 		inventoryDao.updateInventory(inventory);
-		
 		return salesDao.updateSalesInfo(salesInfo);
 	}
 	
+	@Override
+	public SalesInfo replaceSalesInfo(String returnReason,String salesId,int ownerId) {
+		ownerIdValidation.validate(ownerId);
+		SalesInfo salesInfo=salesDao.findById(salesId,ownerId);
+		if(salesInfo==null)return null;
+		salesInfo.setReplaceCount(salesInfo.getReplaceCount()+1);
+		salesInfo.setReplaceStatus(true);
+		salesInfo.setReturnReason(returnReason);
+		LocalDateTime orderedDate=salesInfo.getBuyerInfo().getCreatedAt();
+		ownerIdValidation.orderedDateValidation(orderedDate, salesInfo.getWarrantyInMonth());
+		Inventory inventory = inventoryDao.findInventoryByCode(salesInfo.getItemCode(), ownerId);
+		inventory.setQuantity(inventory.getQuantity()-1);
+		inventoryDao.updateInventory(inventory);
+		return salesDao.updateSalesInfo(salesInfo);
+	}
 	
 	@Override
 	public List<SalesInfo> searchSalesInfo(SearchCriteria criteria) {

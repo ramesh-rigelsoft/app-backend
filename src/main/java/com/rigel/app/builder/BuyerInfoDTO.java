@@ -74,7 +74,7 @@ public class BuyerInfoDTO {
     private int status;
 
     @JsonProperty("createdAt")
-    private LocalDateTime createdAt;
+    private String createdAt;
 
     @JsonProperty("noteComment")
     private String noteComment;
