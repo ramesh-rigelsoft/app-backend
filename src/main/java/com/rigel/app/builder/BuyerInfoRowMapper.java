@@ -58,9 +58,10 @@ public class BuyerInfoRowMapper implements ResultSetExtractor<List<BuyerInfoDTO>
                         	)
                         .noteComment(rs.getString("note_comment"))
                         .ownerId(rs.getInt("owner_id"))
-//                        .financeId(rs.getString("finance_id"))
-//                        .imeiNumber(rs.getString("imei_number"))
-//                        .emiTenure(rs.getString("emi_tenure"))
+                        .financeId(rs.getString("finance_id"))
+                        .imeiNumber(rs.getString("imei_number"))
+                        .emiTenure(rs.getString("emi_tenure"))
+                        .paidAmount(rs.getDouble("paid_amount"))
                         .build();
 
                 map.put(buyerId, buyer);
@@ -84,10 +85,10 @@ public class BuyerInfoRowMapper implements ResultSetExtractor<List<BuyerInfoDTO>
                         .itemCondition(rs.getString("item_condition"))
                         .itemSource(rs.getString("item_source"))
                         .ram(rs.getString("ram"))
-//                        .ramUnit(rs.getString("ram_unit"))
+                        .ramUnit(rs.getString("ram_unit"))
                         .storage(rs.getString("storage"))
-//                        .storageType(rs.getString("storage_type"))
-//                        .storageUnit(rs.getString("storage_unit"))
+                        .storageType(rs.getString("storage_type"))
+                        .storageUnit(rs.getString("storage_unit"))
                         .quantity(rs.getInt("quantity"))
                         .initialPrice(rs.getDouble("initial_price"))
                         .sellingPrice(rs.getDouble("selling_price"))

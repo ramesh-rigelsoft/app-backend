@@ -81,6 +81,11 @@ public class BuyerInfoDTO {
 
     @JsonProperty("ownerId")
     private int ownerId;
+    
+	private String financeId;
+    private String emiTenure;
+    private double paidAmount;
+    private String imeiNumber;
 
     // 👇 Nested Sales DTO list
     @JsonProperty("salesInfo")

@@ -48,7 +48,19 @@ public class SalesInfoDTO {
 
     @JsonProperty("ram")
     private String ram;
-
+    
+    @JsonProperty("ramUnit")
+    private String ramUnit;
+   
+    @JsonProperty("storageUnit")
+    private String storageUnit;
+    
+    @JsonProperty("storageType")
+    private String storageType;
+ 
+    @JsonProperty("discountPercentage")
+    private String discountPercentage;
+ 
     @JsonProperty("storage")
     private String storage;
 
