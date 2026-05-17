@@ -14,5 +14,7 @@ public interface ILoginInfoDao {
 	public List<LoginActivity> searchSalesInfo(SearchCriteria criteria);
 	
 	public LoginActivity findLoginActivityByUsername(String username);
+	
+	public LoginActivity findLoginActivityByuserId(int userId);
 
 }

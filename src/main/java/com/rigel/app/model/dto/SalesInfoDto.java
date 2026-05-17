@@ -1,5 +1,7 @@
 package com.rigel.app.model.dto;
 
+import java.time.LocalDateTime;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.Column;
@@ -18,79 +20,80 @@ import lombok.Setter;
 @Getter
 public class SalesInfoDto {
 
-    @JsonProperty("id")
-    private String id;
+	@JsonProperty("id")
+	private String id;
 
+	private String itemCode;
 
-    private String itemCode;
-    
-    private String category;
+	private String category;
 
-    private String categoryType;
+	private String categoryType;
 
-    private String measureType;
+	private String measureType;
 
-    private String brand;
+	private String brand;
 
-    private String modelName;
+	private String modelName;
 
-    private String itemCondition;
+	private String itemCondition;
 
-    private String itemSource;
+	private String itemSource;
 
-    private String ram;
+	private String ram;
 
-    private String ramUnit;
+	private String ramUnit;
 
-    private String storage;
+	private String storage;
 
-    private String storageType;
+	private String storageType;
 
-    private String storageUnit;
+	private String storageUnit;
 
-    private Integer quantity;
+	private Integer quantity;
 
-    private Double initialPrice;
+	private Double initialPrice;
 
-    private Double sellingPrice;
-    
+	private Double sellingPrice;
+
 	private Double soldPrice;
 
-    private String description;
+	private String description;
 
-    private String itemColor;
+	private String itemColor;
 
-    private String image;
+	private String image;
 
-    private String processor;
+	private String processor;
 
-    private String operatingSystem;
+	private String operatingSystem;
 
-    private String screenSize;
+	private String screenSize;
 
-    private String itemGen;
-    
+	private String itemGen;
+
 	private String gstRate;
-	
+
 //	private double discount;
-	
+
 	private String discountType;
-	
+
 	private String serialNumber;
-    
-    private int ownerId;
-    
-    private String vendorName;
-    private String vendorGSTNumber;
-    
-    private boolean status; 
-    private String additionalDetails;
-    
-    private boolean returnStatus;
+
+	private int ownerId;
+
+	private String vendorName;
+	private String vendorGSTNumber;
+
+	private boolean status;
+	private String additionalDetails;
+
+	private boolean returnStatus;
 	private boolean replaceStatus;
 	private int replaceCount;
 	private int warrantyInMonth;
-    private String returnReason;
-
+	private String returnReason;
+	private String entryType;
+	private String serialNumberType;
+	private LocalDateTime createdAt;
 
 }

@@ -48,4 +48,13 @@ public class LoginInfoDaoImpl implements ILoginInfoDao {
 		}
 	}
 
+	@Override
+	public LoginActivity findLoginActivityByuserId(int userId) {
+		try {
+			return entityManager.createQuery("FROM LoginActivity WHERE userId = :userId",
+					LoginActivity.class).setParameter("userId", userId).getSingleResult();
+		} catch (Exception e) {
+			return null;
+		}
+	}
 }

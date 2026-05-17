@@ -16,12 +16,10 @@ import com.rigel.app.model.dto.SearchCriteria;
 import com.rigel.app.service.IInventoryService;
 import com.rigel.app.service.IItemsService;
 import com.rigel.app.util.AppUtill;
-import com.rigel.app.util.ExcelDirectSave;
 import com.rigel.app.validate.*;
 
 @Lazy
 @Service
-//@CacheConfig(cacheNames = "userCache", keyGenerator = "TransferKeyGenerator")
 public class ItemsServiceImpl implements IItemsService {
 
 	@Autowired
@@ -32,9 +30,9 @@ public class ItemsServiceImpl implements IItemsService {
 
 	@Autowired
 	ItemsUpdateValidation itemsUpdateValidation;
-
-//	@Autowired
-//	IInventoryService inventoryDao;
+	
+	@Autowired
+	private ExcelDirectSave directSave;
 
 	@Override
 	public Items saveItems(Items items, boolean isUpdate) {
@@ -89,7 +87,7 @@ public class ItemsServiceImpl implements IItemsService {
 	public List<Items> searchItems(SearchCriteria criteria) {
 		List<Items> items = itemsDao.searchItems(criteria);
 		if (criteria.isIsdownload() && items.size() > 0) {
-			ExcelDirectSave.exportItemsToExcel(items);
+			directSave.exportItemsToExcel(items);
 		}
 		return items;
 	}

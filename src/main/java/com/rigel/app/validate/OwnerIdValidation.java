@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import com.rigel.app.exception.ValidationException;
 import com.rigel.app.model.Inventory;
 import com.rigel.app.model.Items;
+import com.rigel.app.model.SalesInfo;
 import com.rigel.app.model.dto.SalesInfoDto;
 import com.rigel.app.model.dto.SearchCriteria;
 import com.rigel.app.service.IInventoryService;
@@ -25,6 +26,12 @@ public class OwnerIdValidation {
 			throw new ValidationException("Session Expired, Please Login agin then try....");
 		}
 	
+	}
+	
+	public void orderedCheckStockValidation(Inventory inventory , SalesInfo salesInfo) {
+	    if (inventory.getQuantity()<salesInfo.getQuantity()) {
+	        throw new ValidationException("This item is Out of Stock.");
+	    }
 	}
 	
 	public void orderedDateValidation(LocalDateTime orderDate, int warrantyPeriodInMonth) {

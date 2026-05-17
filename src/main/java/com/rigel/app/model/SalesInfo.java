@@ -134,9 +134,6 @@ public class SalesInfo implements Serializable{
 	@Column(name = "discount_type")
 	private String discountType;
 	
-	@Column(name = "serial_number")
-	private String serialNumber;
-
 	@Column(name = "created_at")
 	private LocalDateTime createdAt;
 
@@ -164,12 +161,27 @@ public class SalesInfo implements Serializable{
 	@Column(name = "return_reason")
     private String returnReason;
 	
+	@Column(name = "entry_type")
+    private String entryType;
+    
+    @Column(name = "serial_number_type")
+    private String serialNumberType;
+
+    @Column(name = "serial_number")
+    private String serialNumber;
+	
 	@Column(name = "additional_details")
 	private String additionalDetails;
 	
 	@ManyToOne(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
 	@JoinColumn(name="buyerInfo")
 	private BuyerInfo buyerInfo;
+	
+	@ManyToOne(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+	@JoinColumn(name="repaireDevice")
+	@JsonBackReference
+	private RepaireDevice repaireDevice;
+
 
 		
 }

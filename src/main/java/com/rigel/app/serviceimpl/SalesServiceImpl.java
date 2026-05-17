@@ -17,7 +17,6 @@ import com.rigel.app.model.SalesInfo;
 import com.rigel.app.model.dto.SearchCriteria;
 import com.rigel.app.service.IItemsService;
 import com.rigel.app.service.ISalesService;
-import com.rigel.app.util.ExcelDirectSave;
 import com.rigel.app.validate.OwnerIdValidation;
 
 @Lazy 
@@ -32,6 +31,9 @@ public class SalesServiceImpl implements ISalesService {
 	
 	@Autowired
 	OwnerIdValidation ownerIdValidation;
+
+	@Autowired
+	private ExcelDirectSave directSave;
 	
 	@Override
 	public List<SalesInfo> saveSalesInfo(List<SalesInfo> salesInfo) {
@@ -75,7 +77,8 @@ public class SalesServiceImpl implements ISalesService {
 		LocalDateTime orderedDate=salesInfo.getBuyerInfo().getCreatedAt();
 		ownerIdValidation.orderedDateValidation(orderedDate, salesInfo.getWarrantyInMonth());
 		Inventory inventory = inventoryDao.findInventoryByCode(salesInfo.getItemCode(), ownerId);
-		inventory.setQuantity(inventory.getQuantity()-1);
+		ownerIdValidation.orderedCheckStockValidation(inventory, salesInfo);
+		inventory.setQuantity(inventory.getQuantity()-salesInfo.getQuantity());
 		inventoryDao.updateInventory(inventory);
 		return salesDao.updateSalesInfo(salesInfo);
 	}
@@ -84,7 +87,7 @@ public class SalesServiceImpl implements ISalesService {
 	public List<SalesInfo> searchSalesInfo(SearchCriteria criteria) {
 		List<SalesInfo> sales=salesDao.searchSalesInfo(criteria);
 		if(criteria.isIsdownload()&&sales.size()>0){
-			ExcelDirectSave.exportSalesToExcel(sales);
+			directSave.exportSalesToExcel(sales);
 		}
 		return sales;
 	}

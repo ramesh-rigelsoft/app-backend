@@ -48,7 +48,7 @@ public class BuyerController {
 			response.put("data", data);
 			response.put("status", "CREATED");
 			response.put("code", "201");
-			response.put("message", "Your records has been created successfully.");
+			response.put("message", "Your records has been inserted successfully.");
 			return new ResponseEntity<>(response, HttpStatus.CREATED);
 		}
 	}

@@ -14,7 +14,7 @@ public interface IInventoryDao {
     
     public Inventory findById(String id);
 	
-	public int deleteInventory(String itemCode,int ownerId);
+	public int deleteInventory(String itemCode,int ownerId,String entryType);
 	
 	public int updateInventory(String itemCode,int qty,int ownerId);
 	

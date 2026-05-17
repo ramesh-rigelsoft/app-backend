@@ -67,7 +67,7 @@ public class BuyerInfoServiceImpl implements IBuyerInfoService {
 		salesInfoValidator.validate(sales,salesRequest.getUserId());
 		
         BuyerInfo buyer = objectMapper.convertValue(salesRequest.getBuyerInfoDto(),BuyerInfo.class);
-        String invoiceNumber=invoiceService.generateFyId(salesRequest.getUserId(), "INV","");
+        String invoiceNumber=invoiceService.generateInvoiceNumber(salesRequest.getUserId(), "INV","");
         String customberId=invoiceService.generateCustId(salesRequest.getUserId(), "CUST_ID","");
 	    buyer.setCreatedAt(LocalDateTime.now());
 	    buyer.setStatus(1);
@@ -104,7 +104,7 @@ public class BuyerInfoServiceImpl implements IBuyerInfoService {
 		    		int count=icount.getQuantity()-sal.getQuantity();
 		    		inventoryDao.updateInventory(sal.getItemCode(), count,sal.getOwnerId());
 		    	}else if(sal.getQuantity()==icount.getQuantity()){
-		    	  	inventoryDao.deleteInventory(sal.getItemCode(),sal.getOwnerId());
+		    	  	inventoryDao.deleteInventory(sal.getItemCode(),sal.getOwnerId(),sal.getEntryType());
 		  		}
 	    	}
 	    });

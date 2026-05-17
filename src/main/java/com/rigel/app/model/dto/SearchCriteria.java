@@ -61,6 +61,12 @@ public class SearchCriteria {
 	private String description;
 	private String itemQuentity;
 	
+	private String MobileNumber;
+	private String emailId;
+	private String CustomerName;
+	private String deviceModelName;
+	private String serialNumber;
+	private String status;
+		
 	private int userId;
-	
 }

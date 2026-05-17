@@ -15,4 +15,6 @@ public interface ISalesDao {
 	
 	public List<SalesInfo> searchSalesInfo(SearchCriteria criteria);
 	
+	public boolean deleteById(String id, int ownerId);
+	
 }

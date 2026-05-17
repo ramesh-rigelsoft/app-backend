@@ -74,6 +74,7 @@ public class SalesDaoImpl implements ISalesDao {
 
 	    return savedSales;
 	}
+	
 	@Override
 	public SalesInfo updateSalesInfo(SalesInfo salesInfo) {
 		try {
@@ -188,6 +189,21 @@ public class SalesDaoImpl implements ISalesDao {
 			query.setMaxResults(criteria.getMaxRecords());
 		}
 		return query.getResultList();
+	}
+	
+	@Override
+	public boolean deleteById(String deviceId, int ownerId) {
+
+	    String jpql = """
+	        DELETE FROM SalesInfo s
+	        WHERE s.repaireDevice.id = :id
+	        """;
+
+	    int deletedCount = entityManager.createQuery(jpql)
+	            .setParameter("id", deviceId)
+	            .executeUpdate();
+
+	    return deletedCount > 0;
 	}
 
 }

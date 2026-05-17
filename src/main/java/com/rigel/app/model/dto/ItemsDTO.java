@@ -57,7 +57,6 @@ public class ItemsDTO {
     private String screenSize;
     private String itemGen;
     private String gstRate;
-	private String serialNumber;
 	
 
     private String itemCondition;
@@ -70,5 +69,10 @@ public class ItemsDTO {
 	
     private String vendorName;
     private String vendorGSTNumber;
+    
+    private String entryType;
+    private String serialNumberType;
+    private Integer warrantyInMonth;
+	private String serialNumber;
 
 }

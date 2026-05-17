@@ -100,6 +100,10 @@ public class InventoryService implements IInventoryService {
 					exinventory.setUpdatedAt(LocalDateTime.now());
 					exinventory.setAdditionalDetails(inventory.getAdditionalDetails());
 					exinventory.setFingerPrint(fingerPrintUpdate);
+					exinventory.setSerialNumber(inventory.getSerialNumber());
+					exinventory.setSerialNumberType(inventory.getSerialNumberType());
+					exinventory.setWarrantyInMonth(inventory.getWarrantyInMonth());
+					exinventory.setEntryType(inventory.getEntryType());
 					return iInventoryDao.updateInventory(exinventory);
 				}	
 			}
@@ -155,8 +159,8 @@ public class InventoryService implements IInventoryService {
 	}
 
 	@Override
-	public int deleteInventory(String itemCode, int ownerId) {
-		return iInventoryDao.deleteInventory(itemCode, ownerId);
+	public int deleteInventory(String itemCode, int ownerId,String entryType) {
+		return iInventoryDao.deleteInventory(itemCode, ownerId,entryType);
 	}
 
 	@Override
@@ -208,6 +212,11 @@ public class InventoryService implements IInventoryService {
 		append(sb, inv.getScreenSize());
 		append(sb, inv.getItemGen());
 		append(sb, inv.getDescription());
+		
+		append(sb, inv.getSerialNumber());
+		append(sb, inv.getWarrantyInMonth());
+		append(sb, inv.getSerialNumberType());		
+		
 		return sha256(sb.toString());
 	}
 
@@ -236,4 +245,5 @@ public class InventoryService implements IInventoryService {
 			throw new RuntimeException("Error generating fingerprint", e);
 		}
 	}
+
 }

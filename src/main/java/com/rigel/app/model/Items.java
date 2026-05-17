@@ -74,9 +74,15 @@ public class Items implements Serializable {
 	
     private String vendorName;
     private String vendorGSTNumber;
+
+    private String entryType;
+    private String serialNumberType;
+    private Integer warrantyInMonth;
  	
     private int ownerId;
     private String additionalDetails;
+    
+
        
 
 }

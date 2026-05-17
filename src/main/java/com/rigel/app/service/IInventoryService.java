@@ -15,7 +15,7 @@ public interface IInventoryService {
 	
 	public Inventory updateInventory(Inventory inventory);
 
-	public int deleteInventory(String itemCode,int ownerId);
+	public int deleteInventory(String itemCode,int ownerId,String entryType);
 
 	public List<Inventory> searchInventory(SearchCriteria criteria);
 

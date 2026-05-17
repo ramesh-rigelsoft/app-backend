@@ -61,13 +61,10 @@ public class BuyerInfo implements Serializable{
 	@NotNull
 	private String paymentModes;
 	
-	@Transient
+
 	private String financeId;
-	@Transient
     private String emiTenure;
-	@Transient// months
     private double paidAmount;
-	@Transient
     private String imeiNumber;
 		
 //	@Pattern(regexp="^[a-zA-Z ]+$", message="Enter valid Name")

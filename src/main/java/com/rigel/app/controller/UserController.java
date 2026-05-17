@@ -193,7 +193,7 @@ public class UserController {
 				} else {
 					UploadFileUtlity.downloadImageFromApi("logo", user.getLogo(), Constaints.LOGO_PATH);
 					JsonNode userNode = mapper.valueToTree(user);
-					LoginActivity loginActivity1 = LoginActivity.builder().loginAt(LocalDateTime.now())
+					LoginActivity loginActivity1 = LoginActivity.builder().userId(user.getId()).loginAt(LocalDateTime.now())
 							.token(thirdPartyResponse.getData().getAccess_token()).emailId(user.getEmail_id())
 							.mobileNumber(user.getMobile_no()).userObject(json).secret(secret).build();
 					loginInfoService.saveLoginActivity(Arrays.asList(loginActivity1));

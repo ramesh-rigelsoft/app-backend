@@ -69,21 +69,62 @@ public class InventoryDaoImpl implements IInventoryDao {
 	public Inventory findById(String id) {
 	    return entityManager.find(Inventory.class, id);
 	}
-
+	
 	@Override
-	public int deleteInventory(String itemCode,int ownerId) {
-	    String hql = "update Inventory SET quantity = :quantity WHERE ownerId = :ownerId AND itemCode = :itemCode";
-	      try {
-		    return entityManager.createQuery(hql)
-		            .setParameter("quantity", 0)
-		            .setParameter("ownerId", ownerId)
-		            .setParameter("itemCode", itemCode)
-		            .executeUpdate();
-	      }catch(Exception e){
-	    	 e.printStackTrace();
-		    return 0;
-	     }
+	public int deleteInventory(String itemCode, int ownerId, String entryType) {
+
+	    String hql;
+
+	    // deviceId case
+	    if ("deviceId".equalsIgnoreCase(entryType)) {
+
+	        hql = """
+	            UPDATE Inventory 
+	            SET quantity = :quantity,
+	                status = false
+	            WHERE ownerId = :ownerId
+	            AND itemCode = :itemCode
+	        """;
+
+	    } else {
+
+	        // other entry types
+	        hql = """
+	            UPDATE Inventory 
+	            SET quantity = :quantity
+	            WHERE ownerId = :ownerId
+	            AND itemCode = :itemCode
+	        """;
+	    }
+
+	    try {
+
+	        return entityManager.createQuery(hql)
+	                .setParameter("quantity", 0)
+	                .setParameter("ownerId", ownerId)
+	                .setParameter("itemCode", itemCode)
+	                .executeUpdate();
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return 0;
+	    }
 	}
+
+//	@Override
+//	public int deleteInventory(String itemCode,int ownerId) {
+//	    String hql = "update Inventory SET quantity = :quantity WHERE ownerId = :ownerId AND itemCode = :itemCode";
+//	      try {
+//		    return entityManager.createQuery(hql)
+//		            .setParameter("quantity", 0)
+//		            .setParameter("ownerId", ownerId)
+//		            .setParameter("itemCode", itemCode)
+//		            .executeUpdate();
+//	      }catch(Exception e){
+//	    	 e.printStackTrace();
+//		    return 0;
+//	     }
+//	}
 	
 //	@Override
 //	public int deleteInventoryByItemCode(String itemCode, int ownerId) {
