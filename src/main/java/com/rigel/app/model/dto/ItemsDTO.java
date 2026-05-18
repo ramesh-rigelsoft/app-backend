@@ -25,6 +25,8 @@ public class ItemsDTO {
     private String id;
 
     private String itemCode;
+    private String vendorInvoiceNumber;
+    
     private String category;
     private String categoryType;
     private String itemType;
