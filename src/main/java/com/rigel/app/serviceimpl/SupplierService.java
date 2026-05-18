@@ -7,9 +7,10 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import com.rigel.app.dao.ISupplierDao;
-import com.rigel.app.model.Supplier;
+import com.rigel.app.model.Vendors;
+import com.rigel.app.model.dto.SearchCriteria;
 import com.rigel.app.model.dto.SupplierCreteria;
-import com.rigel.app.model.dto.SupplierDTO;
+import com.rigel.app.model.dto.VendorsDTO;
 import com.rigel.app.service.ISupplierService;
 
 @Lazy 
@@ -20,18 +21,23 @@ public class SupplierService implements ISupplierService {
 	ISupplierDao supplierDao;
 	
 	@Override
-	public Supplier saveSupplier(SupplierDTO dto) {
+	public Vendors saveSupplier(VendorsDTO dto) {
 		return supplierDao.saveSupplier(dto);
 	}
 
 	@Override
-	public Supplier updateSupplier(SupplierDTO expense) {
+	public Vendors updateSupplier(VendorsDTO expense) {
 		return supplierDao.updateSupplier(expense);
 	}
 
 	@Override
-	public List<Supplier> searchSupplier(SupplierCreteria creteria) {
+	public List<Vendors> searchSupplier(SupplierCreteria creteria) {
 		return supplierDao.searchSupplier(creteria);
+	}
+
+	@Override
+	public List<Vendors> searchVender(SearchCriteria criteria) {
+		return supplierDao.searchVender(criteria);
 	}
 
 }

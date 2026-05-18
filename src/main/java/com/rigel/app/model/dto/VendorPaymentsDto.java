@@ -1,4 +1,4 @@
-package com.rigel.app.model;
+package com.rigel.app.model.dto;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -13,8 +13,6 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
@@ -34,20 +32,25 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 
-@Getter
 @Setter
+@Getter
 @Entity
-@Table(name = "VENDORS_PAYMENTS")
-public class VendorPayments{
+@Table(name="VENDOR_PAYMENT")
+public class VendorPaymentsDto implements Serializable{
+
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 8660549112314714532L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)
 	@Column(length = 36, updatable = false, nullable = false)
 	private String id;
-
-	@Transient
-	private String vendorId;
 	
+	@NotNull
+	private String vendorId;
 	private String gstNumber;
 	private String vendorInvoiceNumber;
 	private double paidAmount;
@@ -55,10 +58,8 @@ public class VendorPayments{
 	private LocalDateTime updateAt;
 	private int ownerId;
 	
-	@ManyToOne(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
-	@JoinColumn(name="vendors")
-	@JsonBackReference
-	private Vendors vendors;
-    
+//	@OneToMany(mappedBy="buyerInfo", cascade=CascadeType.ALL, fetch=FetchType.LAZY)
+//	@JsonIgnore
+//	private Set<SalesInfo> salesInfo = new HashSet<>();
 		
 }

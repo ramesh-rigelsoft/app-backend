@@ -16,9 +16,9 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rigel.app.exception.BadGatewayRequest;
-import com.rigel.app.model.Supplier;
+import com.rigel.app.model.Vendors;
 import com.rigel.app.model.dto.SupplierCreteria;
-import com.rigel.app.model.dto.SupplierDTO;
+import com.rigel.app.model.dto.VendorsDTO;
 import com.rigel.app.service.ISupplierService;
 import com.rigel.app.util.StateUtil;
 
@@ -91,11 +91,11 @@ public class GSTNumberService {
 				throw new BadGatewayRequest("GST is not active. Current status: " + status);
 			}
 			status1 = status;
-			Supplier existingSupplier = supplierService.searchSupplier(
+			Vendors existingSupplier = supplierService.searchSupplier(
 					SupplierCreteria.builder().startIndex(0).maxRecords(1).userId(ownerId).gstNumber(gstin).build())
 					.stream().findFirst().orElse(null);
 			if (existingSupplier == null) {
-				SupplierDTO dto = SupplierDTO.builder().gstNumber(gstin).pinCode(extractPincode(principalPlace))
+				VendorsDTO dto = VendorsDTO.builder().gstNumber(gstin).pinCode(extractPincode(principalPlace))
 						.ownerId(ownerId).supplierName(legalName).address(principalPlace).status(status)
 						.state(stateName).stateCode(stateCode).build();
 				supplierService.saveSupplier(dto);
@@ -106,7 +106,7 @@ public class GSTNumberService {
 				existingSupplier.setState(stateName);
 				existingSupplier.setStateCode(stateCode);
 				existingSupplier.setAddress(principalPlace);
-				SupplierDTO supplierDto= mapper.convertValue(existingSupplier, SupplierDTO.class);
+				VendorsDTO supplierDto= mapper.convertValue(existingSupplier, VendorsDTO.class);
 				supplierService.saveSupplier(supplierDto);
 			}
 			System.out.println("GST Saved Successfully");

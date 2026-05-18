@@ -75,7 +75,8 @@ public class SecurityTokenConfig {
                         "/api/user/login/**",
                         "/api/user/view/**",
                         "/api/user/**",
-                        "/api/sales/**"
+                        "/api/sales/**",
+                        "/api/supplier/**"
                 ).permitAll()
 
                 .requestMatchers(HttpMethod.GET,

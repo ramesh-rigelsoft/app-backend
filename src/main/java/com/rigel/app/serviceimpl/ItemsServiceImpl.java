@@ -10,8 +10,10 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import com.rigel.app.dao.IItemsDao;
+import com.rigel.app.dao.ISupplierDao;
 import com.rigel.app.model.Inventory;
 import com.rigel.app.model.Items;
+import com.rigel.app.model.Vendors;
 import com.rigel.app.model.dto.SearchCriteria;
 import com.rigel.app.service.IInventoryService;
 import com.rigel.app.service.IItemsService;
@@ -33,10 +35,18 @@ public class ItemsServiceImpl implements IItemsService {
 	
 	@Autowired
 	private ExcelDirectSave directSave;
+	
+
+	@Autowired
+	ISupplierDao supplierDao;
 
 	@Override
 	public Items saveItems(Items items, boolean isUpdate) {
 
+
+		Vendors vendors=supplierDao.findById(items.getItemSource());
+		System.out.println("ddddddddddd--------"+vendors);
+		
 		String desc = AppUtill.replaceAllSpace(items.getDescription());
 		String brand = AppUtill.replaceAllSpace(items.getBrand());
 		String modelName = AppUtill.replaceAllSpace(items.getModelName());
@@ -57,6 +67,7 @@ public class ItemsServiceImpl implements IItemsService {
 		items.setCreatedAt(LocalDateTime.now());
 		items.setGstRate(gstRate);
 		items.setStatus(true);
+		items.setVendors(vendors);
 		entryInfoValidator.validate(items);
 		if (isUpdate) {
 //			System.out.println("itemId--"+items.getId());

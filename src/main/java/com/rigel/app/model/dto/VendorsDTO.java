@@ -15,7 +15,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class SupplierDTO {
+public class VendorsDTO {
 
     private String id;
 

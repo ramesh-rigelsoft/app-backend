@@ -17,14 +17,17 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rigel.app.exception.BadGatewayRequest;
 import com.rigel.app.model.Expense;
-import com.rigel.app.model.Supplier;
+import com.rigel.app.model.Vendors;
 import com.rigel.app.model.dto.ExpenseCreteria;
 import com.rigel.app.model.dto.ExpenseDTO;
+import com.rigel.app.model.dto.SearchCriteria;
 import com.rigel.app.model.dto.SupplierCreteria;
-import com.rigel.app.model.dto.SupplierDTO;
+import com.rigel.app.model.dto.VendorInvoiceResponse;
+import com.rigel.app.model.dto.VendorsDTO;
 import com.rigel.app.service.IExpenseService;
 import com.rigel.app.service.ISupplierService;
 import com.rigel.app.serviceimpl.GSTNumberService;
+import com.rigel.app.util.AppUtill;
 import com.rigel.app.util.RAUtility;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -44,7 +47,7 @@ public class SupplierController {
 	GSTNumberService gstNumberService;
 
 	@PostMapping("save")
-	public ResponseEntity<Map<String, Object>> save(@RequestBody(required = true) @Valid SupplierDTO dtoRequest,
+	public ResponseEntity<Map<String, Object>> save(@RequestBody(required = true) @Valid VendorsDTO dtoRequest,
 			BindingResult result, HttpServletRequest request) {
 		Map<String, Object> response = new HashMap<>();
 		Map<String, Object> data = new HashMap<>();
@@ -58,13 +61,13 @@ public class SupplierController {
 					.gstNumber(dtoRequest.getGstNumber()).build();
 
 			System.out.println("creteria---" + creteria.toString());
-			List<Supplier> suppliers = supplierService.searchSupplier(creteria);
+			List<Vendors> suppliers = supplierService.searchSupplier(creteria);
 			System.out.println("supplier-------" + suppliers.size());
 			System.out.println("dtoRequest=-----" + dtoRequest.toString());
 			if (dtoRequest.getId() == null && suppliers.size() > 0) {
 				throw new BadGatewayRequest("This vendor already existing with Us.");
 			} else {
-				Supplier supplierRes = supplierService.saveSupplier(dtoRequest);
+				Vendors supplierRes = supplierService.saveSupplier(dtoRequest);
 				data.put("supplier", supplierRes);
 				response.put("data", data);
 				response.put("status", "CREATED");
@@ -79,7 +82,7 @@ public class SupplierController {
 	public ResponseEntity<Map<String, Object>> search(@RequestBody(required = true) SupplierCreteria creteria) {
 		Map<String, Object> response = new HashMap<>();
 		Map<String, Object> data = new HashMap<>();
-		List<Supplier> supplierList = supplierService.searchSupplier(creteria);
+		List<Vendors> supplierList = supplierService.searchSupplier(creteria);
 		data.put("supplier", supplierList);
 		response.put("data", data);
 		response.put("status", "OK");
@@ -103,4 +106,20 @@ public class SupplierController {
 
 		return ResponseEntity.ok(response);
 	}
+	
+	@PostMapping("vendors")
+	public ResponseEntity<Map<String, Object>> getVenders(@RequestBody(required = true) SearchCriteria creteria) {
+		Map<String, Object> response = new HashMap<>();
+		Map<String, Object> data = new HashMap<>();
+		List<Vendors> supplierList = supplierService.searchVender(creteria);
+		List<VendorInvoiceResponse>  list=AppUtill.mapToInvoiceResponse(supplierList);
+		data.put("vendors", list);
+		response.put("data", data);
+		response.put("status", "OK");
+		response.put("code", "200");
+		response.put("message", "Your records has been fetch successfully.");
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	
+	
 }

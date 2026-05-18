@@ -7,9 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.rigel.app.dao.ISupplierDao;
-import com.rigel.app.model.Supplier;
+import com.rigel.app.model.Vendors;
+import com.rigel.app.model.dto.SearchCriteria;
 import com.rigel.app.model.dto.SupplierCreteria;
-import com.rigel.app.model.dto.SupplierDTO;
+import com.rigel.app.model.dto.VendorsDTO;
 
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
@@ -22,18 +23,18 @@ public class SupplierDao implements ISupplierDao {
 	private EntityManager entityManager;
 
 	@Override
-	public Supplier saveSupplier(SupplierDTO dto) {
+	public Vendors saveSupplier(VendorsDTO dto) {
 		return entityManager.merge(toSupplier(dto, ""));
 	}
 
 	@Override
-	public Supplier updateSupplier(SupplierDTO dto) {
+	public Vendors updateSupplier(VendorsDTO dto) {
 		return entityManager.merge(toSupplier(dto, "id"));
 	}
 
 	@Override
-	public List<Supplier> searchSupplier(SupplierCreteria criteria) {
-		StringBuilder queryBuilder = new StringBuilder("FROM Supplier s WHERE ");
+	public List<Vendors> searchSupplier(SupplierCreteria criteria) {
+		StringBuilder queryBuilder = new StringBuilder("FROM Vendors s WHERE ");
 		queryBuilder.append("s.ownerId = :ownerId ");
 		
 		if (criteria.getSupplierName() != null && !criteria.getSupplierName().isEmpty()) {
@@ -51,7 +52,7 @@ public class SupplierDao implements ISupplierDao {
 
 		queryBuilder.append(" ORDER BY s.createdAt DESC");
 
-		var query = entityManager.createQuery(queryBuilder.toString(), Supplier.class);
+		var query = entityManager.createQuery(queryBuilder.toString(), Vendors.class);
 			query.setParameter("ownerId",+ criteria.getUserId()); // partial match
 			
         if (criteria.getSupplierName() != null && !criteria.getSupplierName().isEmpty()) {
@@ -70,28 +71,63 @@ public class SupplierDao implements ISupplierDao {
 		query.setMaxResults(criteria.getMaxRecords());
 		return query.getResultList();
 	}
+	
+	@Override
+	public Vendors findById(String id) {
+	    return entityManager.find(Vendors.class, id);
+	}
 
-	public Supplier toSupplier(SupplierDTO dto, String id) {
+	public Vendors toSupplier(VendorsDTO dto, String id) {
 
 		if (dto == null) {
 			return null;
 		}
 
-		return Supplier.builder()
-				.id(dto.getId() == null ? null : dto.getId())
-				.supplierName(dto.getSupplierName())
-				.gstNumber(dto.getGstNumber())
-				.panNumber(dto.getPanNumber())
-				.email(dto.getEmail())
-				.phone(dto.getPhone())
-				.address(dto.getAddress())
-				.district(dto.getDistrict())
-				.pinCode(dto.getPinCode())
-				.state(dto.getState())
-				.stateCode(dto.getStateCode())
-				.createdAt(LocalDateTime.now())
-				.status("active")
-				.ownerId(dto.getOwnerId())
-				.build();
+		Vendors vendor = new Vendors();
+
+		vendor.setId(dto.getId() == null ? null : dto.getId());
+		vendor.setSupplierName(dto.getSupplierName());
+		vendor.setGstNumber(dto.getGstNumber());
+		vendor.setPanNumber(dto.getPanNumber());
+		vendor.setEmail(dto.getEmail());
+		vendor.setPhone(dto.getPhone());
+		vendor.setAddress(dto.getAddress());
+		vendor.setDistrict(dto.getDistrict());
+		vendor.setPinCode(dto.getPinCode());
+		vendor.setState(dto.getState());
+		vendor.setStateCode(dto.getStateCode());
+
+		vendor.setCreatedAt(LocalDateTime.now());
+		vendor.setStatus("active");
+		vendor.setOwnerId(dto.getOwnerId());
+
+		return vendor;
 	}
+
+	@Override
+	public List<Vendors> searchVender(SearchCriteria criteria) {
+
+	    String jpql =
+	        "SELECT DISTINCT s FROM Vendors s " +
+	        "INNER JOIN FETCH s.items " +
+	        "LEFT JOIN FETCH s.vendorPayments " +
+	        "WHERE s.ownerId = :ownerId ";
+
+	    if (criteria.getStatus() != null && !criteria.getStatus().isEmpty()) {
+	        jpql += " AND s.status = :status ";
+	    }
+
+	    jpql += " ORDER BY s.createdAt DESC ";
+
+	    var query = entityManager.createQuery(jpql, Vendors.class);
+
+	    query.setParameter("ownerId", criteria.getUserId());
+
+	    if (criteria.getStatus() != null && !criteria.getStatus().isEmpty()) {
+	        query.setParameter("status", criteria.getStatus());
+	    }
+
+	    return query.getResultList();
+	}
+
 }

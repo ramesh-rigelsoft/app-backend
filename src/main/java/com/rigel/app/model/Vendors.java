@@ -10,15 +10,19 @@ import lombok.Builder.Default;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
+//@Builder
 @Getter
 @Setter
 @Entity
-@Table(name = "SUPPLIER")
-public class Supplier implements Serializable {
+@Table(name = "VENDORS")
+//@ToString
+public class Vendors implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -69,5 +73,13 @@ public class Supplier implements Serializable {
 	private LocalDateTime createdAt;
 
 	private String additionalDetails;
+	
+	@OneToMany(mappedBy="vendors", cascade=CascadeType.PERSIST, fetch=FetchType.LAZY)
+	@JsonManagedReference
+	private Set<Items> items = new HashSet<>();
+	
+	@OneToMany(mappedBy="vendors", cascade=CascadeType.PERSIST, fetch=FetchType.LAZY)
+	@JsonManagedReference
+	private Set<VendorPayments> vendorPayments = new HashSet<>();
 
 }
