@@ -150,7 +150,7 @@ public class RepaireServiceController {
 			response.put("data", data);
 			response.put("status", "Success");
 			response.put("code", "200");
-			response.put("message", "Your records has been fetch successfully.");
+			response.put("message", "Your records has been updated successfully.");
 			return new ResponseEntity<>(response, HttpStatus.OK);
 		}
 	}
