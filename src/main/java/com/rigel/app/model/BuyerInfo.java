@@ -66,22 +66,15 @@ public class BuyerInfo implements Serializable{
     private String emiTenure;
     private double paidAmount;
     private String imeiNumber;
+    private String pendingPaymentStatus;
 		
-//	@Pattern(regexp="^[a-zA-Z ]+$", message="Enter valid Name")
 	private String buyerName;
-		
-//	@Email(message = "Enter valid emailId")
 	private String emailId;
-	
-//	@Pattern(regexp="^[6-9]\\d{9}$", message="Enter valid Mobile Number")
 	private String mobileNumber;
-		
-//	@Pattern(regexp = "^[0-9]{1,3}$",message="Enter valid contry code") 
 	private String countryCode;
 	
 	private String buyerAddress;
 	
-	// vender details
 	private String companyName;
 	
 	private String gstNumber;

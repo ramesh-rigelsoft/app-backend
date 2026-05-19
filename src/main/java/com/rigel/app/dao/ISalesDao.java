@@ -17,4 +17,8 @@ public interface ISalesDao {
 	
 	public boolean deleteById(String id, int ownerId);
 	
+	public int deleteBySalesId(String id, int ownerId);
+	
+	public List<SalesInfo> fetchSalesByRepaireDevice(String deviceId, int ownerId);
+	
 }

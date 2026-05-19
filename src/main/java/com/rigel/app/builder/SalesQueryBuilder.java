@@ -73,6 +73,13 @@ public class SalesQueryBuilder {
             base.append(" si.BRAND = ? ");
             params.add(criteria.getBrand());
         }
+        
+        // BRAND FILTER
+        if (!ObjectUtils.isEmpty(criteria.getPendingPaymentStatus())) {
+            addClause(base, params);
+            base.append(" bi.PendingPaymentStatus !=null OR  bi.PendingPaymentStatus = ?");
+            params.add(criteria.getPendingPaymentStatus());
+        }
 
         // DATE FILTER
         if (!ObjectUtils.isEmpty(criteria.getStartDate()) && !ObjectUtils.isEmpty(criteria.getEndDate())) {

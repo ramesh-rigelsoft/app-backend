@@ -50,6 +50,12 @@ public class SalesDaoImpl implements ISalesDao {
 	    }
 
 	    // SAVE / UPDATE BUYER
+	    double total = salesInfoList.stream()
+	            .mapToDouble(s -> s.getSoldPrice())
+	            .sum();
+	    if(buyerInfo.getPaidAmount()!=total) {
+	       buyerInfo.setPendingPaymentStatus("pending");
+	    }
 	    BuyerInfo savedBuyer = entityManager.merge(buyerInfo);
 
 	    // SET SAME BUYER INTO ALL SALES
@@ -195,15 +201,56 @@ public class SalesDaoImpl implements ISalesDao {
 	public boolean deleteById(String deviceId, int ownerId) {
 
 	    String jpql = """
-	        DELETE FROM SalesInfo s
+	        UPDATE SalesInfo s
+	        SET s.status = false
 	        WHERE s.repaireDevice.id = :id
+	        AND s.ownerId = :ownerId
 	        """;
 
-	    int deletedCount = entityManager.createQuery(jpql)
+	    int updatedCount = entityManager.createQuery(jpql)
 	            .setParameter("id", deviceId)
+	            .setParameter("ownerId", ownerId)
 	            .executeUpdate();
 
-	    return deletedCount > 0;
+	    return updatedCount > 0;
 	}
 
+	@Override
+	public int deleteBySalesId(String ids, int ownerId) {
+
+	    String jpql = """
+	        UPDATE SalesInfo s
+	        SET s.status = false
+	        WHERE s.id = :id
+	        AND s.ownerId = :ownerId
+	        """;
+
+	    int updatedCount = entityManager.createQuery(jpql)
+	            .setParameter("id", ids)
+	            .setParameter("ownerId", ownerId)
+	            .executeUpdate();
+
+	    return updatedCount;
+	}
+	
+	@Override
+	public List<SalesInfo> fetchSalesByRepaireDevice(String deviceId, int ownerId) {
+
+	    if (deviceId == null || deviceId.isBlank()) {
+	        return Collections.emptyList();
+	    }
+
+	    String jpql = """
+	        SELECT s
+	        FROM SalesInfo s
+	        WHERE s.repaireDevice.id = :deviceId
+	        AND s.ownerId = :ownerId
+	        AND s.status = true
+	        """;
+
+	    return entityManager.createQuery(jpql, SalesInfo.class)
+	            .setParameter("deviceId", deviceId)
+	            .setParameter("ownerId", ownerId)
+	            .getResultList();
+	}
 }

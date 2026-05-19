@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,13 +18,17 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.rigel.app.dao.ISalesDao;
 import com.rigel.app.exception.BadGatewayRequest;
+import com.rigel.app.model.Items;
 import com.rigel.app.model.RepaireDevice;
 import com.rigel.app.model.SalesInfo;
 import com.rigel.app.model.dto.RepaireDeviceDto;
 import com.rigel.app.model.dto.RepaireRequest;
+import com.rigel.app.model.dto.SalesInfoDto;
 import com.rigel.app.model.dto.SearchCriteria;
 import com.rigel.app.service.IRepaireServiceService;
+import com.rigel.app.service.ISalesService;
 import com.rigel.app.serviceimpl.BarcodeService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -41,6 +46,9 @@ public class RepaireServiceController {
 
 	@Autowired
 	ObjectMapper mapper;
+	
+	@Autowired
+	ISalesService salesService;
 
 	@PostMapping("save")
 	public ResponseEntity<Map<String, Object>> save(@RequestBody(required = true) @Valid RepaireRequest repaireRequest,
@@ -53,7 +61,8 @@ public class RepaireServiceController {
 		} else if (result.hasFieldErrors()) {
 			throw new BadGatewayRequest(result.getFieldError().getDefaultMessage());
 		} else {
-			Set<SalesInfo> sales = mapper.convertValue(repaireRequest.getRepaireDeviceDto().getItems(),new TypeReference<Set<SalesInfo>>(){});
+			Set<SalesInfoDto> salesItem = repaireRequest.getRepaireDeviceDto().getItems().stream().map(item -> { item.setId(null); return item; }).collect(Collectors.toSet());
+			Set<SalesInfo> sales = mapper.convertValue(salesItem,new TypeReference<Set<SalesInfo>>(){});
 			RepaireDevice electronicDevice = mapper.convertValue(repaireRequest.getRepaireDeviceDto(),RepaireDevice.class);
 			electronicDevice.setSalesInfo(sales);
 			RepaireDevice repaireDevice = repaireServiceService.saveRepair(electronicDevice);
@@ -117,7 +126,8 @@ public class RepaireServiceController {
     			repaireDevice=repaireServiceService.updateStatus(repaireDevice);
 			}else {
 				RepaireDeviceDto repaireDeviceDto=repaireRequest.getRepaireDeviceDto();
-				Set<SalesInfo> sales = mapper.convertValue(repaireRequest.getRepaireDeviceDto().getItems(),new TypeReference<Set<SalesInfo>>(){});
+				Set<SalesInfoDto> salesItem = repaireRequest.getRepaireDeviceDto().getItems().stream().map(item -> { item.setId(null); return item; }).collect(Collectors.toSet());
+				Set<SalesInfo> sales = mapper.convertValue(salesItem,new TypeReference<Set<SalesInfo>>(){});
 				repaireDevice.setCustomerName(repaireDeviceDto.getCustomerName());
 				repaireDevice.setMobileNumber(repaireDeviceDto.getMobileNumber());
 				repaireDevice.setDeviceModelName(repaireDeviceDto.getDeviceModelName());
@@ -144,5 +154,39 @@ public class RepaireServiceController {
 			return new ResponseEntity<>(response, HttpStatus.OK);
 		}
 	}
+	
+	@PostMapping("delete")
+	public ResponseEntity<Map<String, Object>> delete(
+	        @RequestBody @Valid List<SalesInfoDto> salesInfoDto,
+	        BindingResult result,
+	        HttpServletRequest request) {
 
+	    Map<String, Object> response = new HashMap<>();
+	    Map<String, Object> data = new HashMap<>();
+
+	    if (salesInfoDto == null || salesInfoDto.isEmpty()) {
+	        throw new BadGatewayRequest("Invalid Request");
+	    } else if (result.hasFieldErrors()) {
+	        throw new BadGatewayRequest(result.getFieldError().getDefaultMessage());
+	    } else {
+	        // Convert List<SalesInfoDto> → List<SalesInfo>
+	        List<SalesInfo> sales = mapper.convertValue(
+	                salesInfoDto,
+	                new com.fasterxml.jackson.core.type.TypeReference<List<SalesInfo>>() {}
+	        );
+
+	        // Call service method
+	        int deletedCount = salesService.deleteById(sales,
+	                sales.get(0).getOwnerId()
+	        );
+
+	        data.put("deletedCount", deletedCount);
+	        response.put("data", data);
+	        response.put("status", "Success");
+	        response.put("code", "200");
+	        response.put("message", "Your records have been deleted successfully.");
+
+	        return new ResponseEntity<>(response, HttpStatus.OK);
+	    }
+	}
 }

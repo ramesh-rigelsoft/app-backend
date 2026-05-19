@@ -17,4 +17,6 @@ public interface ISalesService {
     public SalesInfo replaceSalesInfo(String returnReason,String salesId,int ownerId);
 	
 	public List<SalesInfo> searchSalesInfo(SearchCriteria criteria);
+	
+	public int deleteById(List<SalesInfo> salesinfo,int ownerId);
 }

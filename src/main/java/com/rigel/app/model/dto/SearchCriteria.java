@@ -36,7 +36,10 @@ public class SearchCriteria {
 	private String startDate;
 	private String endDate;
 	
+
+	private String pendingPaymentStatus;
 	private String invoiceNumber;
+	private String repaireDeviceId;
     private Set<String> itemCodes;
     private String itemCode;
     private String category;

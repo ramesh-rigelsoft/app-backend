@@ -17,6 +17,7 @@ import com.rigel.app.model.SalesInfo;
 import com.rigel.app.model.dto.SearchCriteria;
 import com.rigel.app.service.IItemsService;
 import com.rigel.app.service.ISalesService;
+import com.rigel.app.validate.ItemsUpdateValidation;
 import com.rigel.app.validate.OwnerIdValidation;
 
 @Lazy 
@@ -34,6 +35,9 @@ public class SalesServiceImpl implements ISalesService {
 
 	@Autowired
 	private ExcelDirectSave directSave;
+	
+	@Autowired
+	private ItemsUpdateValidation itemsUpdateValidation;
 	
 	@Override
 	public List<SalesInfo> saveSalesInfo(List<SalesInfo> salesInfo) {
@@ -90,6 +94,13 @@ public class SalesServiceImpl implements ISalesService {
 			directSave.exportSalesToExcel(sales);
 		}
 		return sales;
+	}
+
+	@Override
+	public int deleteById(List<SalesInfo> salesinfo,int ownerId) {
+		List<String> ids=salesinfo.stream().map(s->s.getId()).toList();
+		itemsUpdateValidation.repaireDeleteItems(salesinfo);
+		return salesDao.deleteBySalesId(ids.get(0), ownerId);
 	}
 
 	

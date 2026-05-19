@@ -1,7 +1,6 @@
 package com.rigel.app.serviceimpl;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.stream.Collectors;
 import java.util.*;
 
@@ -18,6 +17,7 @@ import com.rigel.app.model.dto.RepaireDeviceDto;
 import com.rigel.app.model.dto.SalesInfoDto;
 import com.rigel.app.model.dto.SearchCriteria;
 import com.rigel.app.service.IRepaireServiceService;
+import com.rigel.app.validate.ItemsUpdateValidation;
 
 @Service
 public class RepaireServiceServiceImpl implements IRepaireServiceService {
@@ -33,24 +33,52 @@ public class RepaireServiceServiceImpl implements IRepaireServiceService {
 	
 	@Autowired
 	ObjectMapper mapper;
+	
+	@Autowired
+	com.rigel.app.validate.SalesInfoValidator salesInfoValidator;
+	
+	@Autowired
+	ItemsUpdateValidation itemsUpdateValidation;
 
 	@Override
-	public RepaireDevice saveRepair(RepaireDevice expaDevice) {
-		String invoiceNumber=invoiceGenerateService.generateInvoiceNumber(expaDevice.getOwnerId(), "INV","");
-		String custumberId=invoiceGenerateService.generateCustId(expaDevice.getOwnerId(), "CUST_ID","");
-	    expaDevice.setInvoiceNumber(invoiceNumber);
-		expaDevice.setCustumberId(custumberId);
-		expaDevice.setCreatedAt(LocalDateTime.now());
-		expaDevice.setStatus(true);
-		expaDevice.setUpdatedAt(LocalDateTime.now());	
-		return repaireServiceDao.saveRepair(expaDevice);
+	public RepaireDevice saveRepair(RepaireDevice repairDevice) {
+		 // NULL CHECK
+	    if (repairDevice == null) {
+	        throw new RuntimeException("Repair Device is required");
+	    }
+
+	    List<SalesInfo> salesList = new ArrayList<>(repairDevice.getSalesInfo());
+	    if (salesList == null || salesList.isEmpty()) {
+	        throw new RuntimeException("Sales Info is required");
+	    }
+	    salesInfoValidator.validateSalesInfo(salesList, repairDevice.getOwnerId());
+	    itemsUpdateValidation.repaireItemValidation(salesList);
+	    
+		String invoiceNumber=invoiceGenerateService.generateInvoiceNumber(repairDevice.getOwnerId(), "INV","");
+		String custumberId=invoiceGenerateService.generateCustId(repairDevice.getOwnerId(), "CUST_ID","");
+		repairDevice.setInvoiceNumber(invoiceNumber);
+		repairDevice.setCustumberId(custumberId);
+		repairDevice.setCreatedAt(LocalDateTime.now());
+		repairDevice.setStatus(true);
+		repairDevice.setUpdatedAt(LocalDateTime.now());	
+		
+		return repaireServiceDao.saveRepair(repairDevice);
 	}
 
 	@Override
 	public RepaireDevice updateRepaire(RepaireDevice repaireDevice) {
+		 List<SalesInfo> existingSales = salesDao.fetchSalesByRepaireDevice(repaireDevice.getId(),repaireDevice.getOwnerId());
+				
+		// Assume repaireDevice.getSalesInfo() returns a Set<SalesInfo>
+		Set<SalesInfo> salesInfoSet = repaireDevice.getSalesInfo();
 
-	    salesDao.deleteById(repaireDevice.getId(), repaireDevice.getOwnerId());
-	    return repaireServiceDao.saveRepair(repaireDevice);
+		// Convert Set to List
+		List<SalesInfo> salesInfoList = new ArrayList<>(salesInfoSet);
+		itemsUpdateValidation.repaireDeleteItems(existingSales);
+		salesDao.deleteById(repaireDevice.getId(), repaireDevice.getOwnerId());
+		salesInfoValidator.validateSalesInfo(salesInfoList, repaireDevice.getOwnerId());
+		itemsUpdateValidation.repaireItemValidation(salesInfoList);
+		return repaireServiceDao.saveRepair(repaireDevice);
 	}
 
 	@Override
@@ -62,5 +90,7 @@ public class RepaireServiceServiceImpl implements IRepaireServiceService {
 	public List<RepaireDevice> searchRepair(SearchCriteria expaDevice) {
 		return repaireServiceDao.searchRepair(expaDevice);
 	}
+	
+
 
 }

@@ -38,7 +38,8 @@ public class BuyerInfoDto {
 	    private String emiTenure;          // months
 	    private double paidAmount;
 	    private String imeiNumber;
-
+	    private String pendingPaymentStatus;
+		
 	    @JsonProperty("buyerName")
 	    private String buyerName;
 
