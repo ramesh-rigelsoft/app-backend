@@ -86,6 +86,9 @@ public class BuyerInfoDTO {
     private String emiTenure;
     private double paidAmount;
     private String imeiNumber;
+    private String restAmount;
+    private String restAmountDate;
+
 
     // 👇 Nested Sales DTO list
     @JsonProperty("salesInfo")

@@ -38,6 +38,7 @@ public class SearchCriteria {
 	
 
 	private String pendingPaymentStatus;
+	private boolean vendorType;
 	private String invoiceNumber;
 	private String repaireDeviceId;
     private Set<String> itemCodes;

@@ -133,6 +133,8 @@ public class SalesQueryBuilder {
 				bi.createdAt AS created_at,
 				bi.noteComment AS note_comment,
 				bi.ownerId AS owner_id,
+				bi.restAmountDate AS rest_amount_date,
+				bi.restAmount AS rest_amount,
 
 
                 si.ID AS sales_id,

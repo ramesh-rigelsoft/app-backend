@@ -1,6 +1,7 @@
 package com.rigel.app.model.dto;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -39,6 +40,9 @@ public class BuyerInfoDto {
 	    private double paidAmount;
 	    private String imeiNumber;
 	    private String pendingPaymentStatus;
+	    private String restAmount;
+	    private LocalDateTime restAmountDate;
+
 		
 	    @JsonProperty("buyerName")
 	    private String buyerName;

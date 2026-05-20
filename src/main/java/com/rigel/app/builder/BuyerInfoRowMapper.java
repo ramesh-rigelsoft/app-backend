@@ -43,6 +43,10 @@ public class BuyerInfoRowMapper implements ResultSetExtractor<List<BuyerInfoDTO>
                         .pinCode(rs.getString("pin_code"))
                         .state(rs.getString("state"))
                         .district(rs.getString("district"))
+                        .restAmount(rs.getString("rest_amount"))
+                        .restAmountDate(rs.getTimestamp("rest_amount_date")!= null
+                                ? rs.getTimestamp("rest_amount_date").toLocalDateTime().format(formatter)
+                                : null)
                         .companyAddress(rs.getString("company_address"))
                         .status(rs.getInt("buyer_status"))
                         .createdAt(
