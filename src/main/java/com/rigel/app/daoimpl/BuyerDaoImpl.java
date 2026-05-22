@@ -56,6 +56,16 @@ public class BuyerDaoImpl implements IBuyerDao {
 			return null;
 		}
 	}
+	
+	@Override
+	public int updateRestAmountAndDate(String id, String restAmount, LocalDateTime restAmountDate) {
+        String jpql = "UPDATE BuyerInfo b SET b.pendingPaymentStatus='Paid' b.restAmount = :restAmount, b.restAmountDate = :restAmountDate WHERE b.id = :id";
+        return entityManager.createQuery(jpql)
+                .setParameter("restAmount", restAmount)
+                .setParameter("restAmountDate", restAmountDate)
+                .setParameter("id", id)
+                .executeUpdate();
+	}
 
 	@Override
 	public int deleteBuyerInfo(List<Long> buyerId) {

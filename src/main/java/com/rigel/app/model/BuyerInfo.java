@@ -68,6 +68,7 @@ public class BuyerInfo implements Serializable{
     private String imeiNumber;
     private String pendingPaymentStatus;
     private String restAmount;
+    private double totalAmount;
     private LocalDateTime restAmountDate;
     	
 	private String buyerName;

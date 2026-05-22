@@ -39,6 +39,8 @@ public class BuyerInfoDto {
 	    private String emiTenure;          // months
 	    private double paidAmount;
 	    private String imeiNumber;
+        // months
+	    private double totalAmount;
 	    private String pendingPaymentStatus;
 	    private String restAmount;
 	    private LocalDateTime restAmountDate;
@@ -83,7 +85,7 @@ public class BuyerInfoDto {
 
 	    // optional
 	    @JsonProperty("ownerId")
-	    private String ownerId;
+	    private int ownerId;
 	    
 		private String noteComment;
 

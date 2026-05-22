@@ -65,12 +65,14 @@ public class BuyerInfoServiceImpl implements IBuyerInfoService {
 		);
 
 		salesInfoValidator.validate(sales,salesRequest.getUserId());
-		
+		double total = sales.stream().mapToDouble(SalesInfoDto::getSoldPrice).sum();
+
         BuyerInfo buyer = objectMapper.convertValue(salesRequest.getBuyerInfoDto(),BuyerInfo.class);
         String invoiceNumber=invoiceService.generateInvoiceNumber(salesRequest.getUserId(), "INV","");
         String customberId=invoiceService.generateCustId(salesRequest.getUserId(), "CUST_ID","");
 	    buyer.setCreatedAt(LocalDateTime.now());
 	    buyer.setStatus(1);
+	    buyer.setTotalAmount(total);
 	    buyer.setInvoiceNumber(invoiceNumber);
 	    buyer.setCountryCode("91");
 	    buyer.setOwnerId(salesRequest.getUserId());
@@ -120,10 +122,12 @@ public class BuyerInfoServiceImpl implements IBuyerInfoService {
 	}
 	
 	@Override
-	public SalesResponse updateBuyerInfo(SalesRequest salesRequest) {
+	public int updateBuyerInfo(SalesRequest salesRequest) {
 	
-		
-	    return null;
+		BuyerInfoDto buyerInfoDto=salesRequest.getBuyerInfoDto();
+		BuyerInfoDto buyerInfo = buyerDao.searchSalesInfoDto(SearchCriteria.builder().userId(buyerInfoDto.getOwnerId()).invoiceNumber(buyerInfoDto.getInvoiceNumber()).build()).stream().findFirst().orElse(null);
+		double restAmount=buyerInfo.getTotalAmount()-buyerInfo.getPaidAmount();
+		return buyerDao.updateRestAmountAndDate(buyerInfoDto.getId(),String.valueOf(restAmount),LocalDateTime.now());
 	}
 
 //	@Override

@@ -52,4 +52,25 @@ public class BuyerController {
 			return new ResponseEntity<>(response, HttpStatus.CREATED);
 		}
 	}
+	
+	@PostMapping("pay")
+	public ResponseEntity<Map<String, Object>> pay(@RequestBody(required = true) @Valid SalesRequest salesRequest,
+			BindingResult result, HttpServletRequest request) {
+		Map<String, Object> response = new HashMap<>();
+		Map<String, Object> data = new HashMap<>();
+
+		if (salesRequest == null) {
+			throw new BadGatewayRequest("Invalid Request");
+		} else if (result.hasFieldErrors()) {
+			throw new BadGatewayRequest(result.getFieldError().getDefaultMessage());
+		} else {
+			SalesResponse salesResponse = buyerInfoService.saveBuyerInfo(salesRequest);
+			data.put("buyer", salesResponse);
+			response.put("data", data);
+			response.put("status", "CREATED");
+			response.put("code", "201");
+			response.put("message", "Your records has been inserted successfully.");
+			return new ResponseEntity<>(response, HttpStatus.CREATED);
+		}
+	}
 }

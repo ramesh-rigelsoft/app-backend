@@ -100,8 +100,8 @@ public class SalesQueryBuilder {
 
         long limit = criteria.getLimit() != 0 ? criteria.getLimit() : 50;
         long offset = criteria.getOffset() != 0 ? criteria.getOffset() : 0;
-        params.add(limit);
-        params.add(offset);
+        params.add(criteria.getMaxRecords());
+        params.add(criteria.getStartIndex());
 
         // FINAL QUERY
         String finalQuery = """

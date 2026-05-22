@@ -1,5 +1,6 @@
 package com.rigel.app.dao;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.rigel.app.model.BuyerInfo;
@@ -18,5 +19,6 @@ public interface IBuyerDao {
 	
 	public List<BuyerInfo> searchBuyerInfo(SearchCriteria criteria);
 	public List<BuyerInfoDto> searchSalesInfoDto(SearchCriteria criteria);
+	public int updateRestAmountAndDate(String id, String restAmount, LocalDateTime restAmountDate);
 
 }

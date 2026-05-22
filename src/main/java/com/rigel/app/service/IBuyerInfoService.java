@@ -12,7 +12,7 @@ public interface IBuyerInfoService {
 
 	public SalesResponse saveBuyerInfo(SalesRequest salesRequest);
 
-	public SalesResponse updateBuyerInfo(SalesRequest salesRequest);
+	public int updateBuyerInfo(SalesRequest salesRequest);
 
 	public SalesResponse searchBuyerInfo(SearchCriteria criteria);
 
