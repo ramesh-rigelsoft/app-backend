@@ -19,4 +19,7 @@ public class Constaints {
 	public static final String CLEARED_PAYMENT_STATUS = "cleared";
 	public static final String PENDING_PAYMENT_STATUS = "pending";
 
+	public static final String GARBAGE_COLLECTED = "collected";
+	public static final String GARBAGE_RETURN = "returned";
+
 }

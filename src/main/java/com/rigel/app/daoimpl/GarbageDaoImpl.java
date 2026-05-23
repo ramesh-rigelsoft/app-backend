@@ -1,5 +1,7 @@
 package com.rigel.app.daoimpl;
 
+import java.time.LocalDateTime;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -18,6 +20,7 @@ public class GarbageDaoImpl implements IGarbageDao {
 
 	@Override
 	public GarbageItemsInfo saveGarbage(GarbageItemsInfo garbage) {
+		garbage.setCreatedAt(LocalDateTime.now());
 		return entityManager.merge(garbage);
 	}
 

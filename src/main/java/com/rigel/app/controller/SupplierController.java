@@ -120,6 +120,4 @@ public class SupplierController {
 		response.put("message", "Your records has been fetch successfully.");
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
-	
-	
 }

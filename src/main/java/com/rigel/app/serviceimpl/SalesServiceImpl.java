@@ -13,6 +13,7 @@ import com.rigel.app.dao.IGarbageDao;
 import com.rigel.app.dao.IInventoryDao;
 import com.rigel.app.dao.IItemsDao;
 import com.rigel.app.dao.ISalesDao;
+import com.rigel.app.dao.ISupplierDao;
 import com.rigel.app.model.GarbageItemsInfo;
 import com.rigel.app.model.Inventory;
 import com.rigel.app.model.Items;
@@ -21,6 +22,7 @@ import com.rigel.app.model.Vendors;
 import com.rigel.app.model.dto.SearchCriteria;
 import com.rigel.app.service.IItemsService;
 import com.rigel.app.service.ISalesService;
+import com.rigel.app.util.Constaints;
 import com.rigel.app.validate.ItemsUpdateValidation;
 import com.rigel.app.validate.OwnerIdValidation;
 
@@ -48,6 +50,10 @@ public class SalesServiceImpl implements ISalesService {
 	
 	@Autowired
 	private IGarbageDao garbageDao;
+	
+	@Autowired
+	private ISupplierDao supplierDao;
+	
 	
 	@Override
 	public List<SalesInfo> saveSalesInfo(List<SalesInfo> salesInfo) {
@@ -94,20 +100,24 @@ public class SalesServiceImpl implements ISalesService {
 		inventory.setQuantity(inventory.getQuantity()-salesInfo.getQuantity());
 		inventoryDao.updateInventory(inventory);
 		
-
 		GarbageItemsInfo garbage = objectMapper.convertValue(salesInfo, GarbageItemsInfo.class);
 		GarbageItemsInfo garbage2 = garbageDao.findGarbageByItemCode(garbage.getItemCode());
-		if(garbage2==null) {
-			Vendors vendors=new Vendors();
-			vendors.setId(salesInfo.getItemSource());
-			garbage.setVendors(vendors);
-			garbage.setId(null);
-			garbageDao.saveGarbage(garbage);
-		}else {
-			garbage2.setQuantity(garbage2.getQuantity()+1);
-			garbageDao.saveGarbage(garbage2);
+
+		if (garbage2 == null) {
+			Vendors vendor = supplierDao.findById(garbage.getItemSource());
+		    garbage.setVendors(vendor);
+		    garbage.setId(null);
+		    garbage.setGarbageStatus(Constaints.GARBAGE_COLLECTED);
+		    if (garbage.getQuantity() == null) {
+		        garbage.setQuantity(1);
+		    }
+		    garbageDao.saveGarbage(garbage);
+		} else {
+		    int qty = garbage2.getQuantity() == null ? 0 : garbage2.getQuantity();
+		    garbage2.setQuantity(qty + 1);
+		    garbage2.setGarbageStatus(Constaints.GARBAGE_COLLECTED);
+		    garbageDao.saveGarbage(garbage2);
 		}
-		
 		return salesDao.updateSalesInfo(salesInfo);
 	}
 	

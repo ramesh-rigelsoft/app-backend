@@ -16,12 +16,10 @@ import java.util.Set;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
-//@Builder
 @Getter
 @Setter
 @Entity
 @Table(name = "VENDORS")
-//@ToString
 public class Vendors implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -75,7 +73,8 @@ public class Vendors implements Serializable {
 	private String additionalDetails;
 	
 	@OneToMany(mappedBy="vendors", cascade=CascadeType.PERSIST, fetch=FetchType.LAZY)
-	@JsonManagedReference
+//	@JsonManagedReference
+	@JsonIgnore
 	private Set<Items> items = new HashSet<>();
 	
 	@OneToMany(mappedBy="vendors", cascade=CascadeType.PERSIST, fetch=FetchType.LAZY)

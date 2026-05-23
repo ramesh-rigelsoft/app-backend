@@ -71,6 +71,7 @@ public class SearchCriteria {
 	private String deviceModelName;
 	private String serialNumber;
 	private String status;
+	private String searchType;
 		
 	private int userId;
 }

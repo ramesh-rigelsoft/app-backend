@@ -34,6 +34,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 @Getter
 @Entity
 @Table(name="GARBAGE_ITEMS_INFO")
+@ToString
 public class GarbageItemsInfo implements Serializable{
 	
 	/**
@@ -97,7 +98,7 @@ public class GarbageItemsInfo implements Serializable{
 	@Column(name = "sold_price")
 	private Double soldPrice;
 
-	@Column(name = "description", length = 600)
+//	@Column(name = "description", length = 600)
 	private String description;
 
 	@Column(name = "item_color")
@@ -172,10 +173,13 @@ public class GarbageItemsInfo implements Serializable{
 	@Column(name = "garbageStatus")
 	private String garbageStatus;
 	
+	@Column(name = "updated_at")
+	private LocalDateTime updatedAt;
+
+	
 	@ManyToOne(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
 	@JoinColumn(name="vendors")
 	@JsonBackReference
 	private Vendors vendors;	
-	
-		
+			
 }

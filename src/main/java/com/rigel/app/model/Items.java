@@ -92,7 +92,7 @@ public class Items implements Serializable {
     
 	@ManyToOne(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
 	@JoinColumn(name="vendors")
-	@JsonBackReference
+//	@JsonBackReference
 	private Vendors vendors;
     
 
