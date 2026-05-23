@@ -64,13 +64,14 @@ public class BuyerController {
 		} else if (result.hasFieldErrors()) {
 			throw new BadGatewayRequest(result.getFieldError().getDefaultMessage());
 		} else {
-			SalesResponse salesResponse = buyerInfoService.saveBuyerInfo(salesRequest);
-			data.put("buyer", salesResponse);
+//			SalesResponse salesResponse = 
+					buyerInfoService.updateBuyerInfo(salesRequest);
+//			data.put("buyer", salesResponse);
 			response.put("data", data);
-			response.put("status", "CREATED");
-			response.put("code", "201");
-			response.put("message", "Your records has been inserted successfully.");
-			return new ResponseEntity<>(response, HttpStatus.CREATED);
+			response.put("status", "SUCCESS");
+			response.put("code", "200");
+			response.put("message", "Your records has been updated successfully.");
+			return new ResponseEntity<>(response, HttpStatus.OK);
 		}
 	}
 }

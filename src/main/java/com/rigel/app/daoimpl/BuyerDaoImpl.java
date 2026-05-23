@@ -152,7 +152,7 @@ public class BuyerDaoImpl implements IBuyerDao {
 	
 	@Override
 	public List<BuyerInfoDto> searchSalesInfoDto(SearchCriteria criteria) {
-
+System.out.println("invoice No---"+criteria.toString());
 	    Map<String, Object> params = new HashMap<>();
 
 	    /*
@@ -202,14 +202,22 @@ public class BuyerDaoImpl implements IBuyerDao {
 	        params.put("search",
 	                "%" + criteria.getSearchKeyword().toLowerCase().strip() + "%");
 	    }
+	    
+	    params.forEach((k, v) -> {
+	        System.out.println(k + " = " + v + 
+	            " | Type = " + (v != null ? v.getClass().getName() : "null"));
+	    });
+	    
 
-	    /*
+        /*
 	     * ⚠️ IMPORTANT: ORDER BY REMOVE KAR DO (H2 ISSUE FIX)
 	     */
 	    TypedQuery<String> buyerQuery =
 	            entityManager.createQuery(buyerJpql.toString(), String.class);
-
+	   
+		 
 	    params.forEach(buyerQuery::setParameter);
+	    System.out.println(params+"--ffffffffffffffff------------"+buyerJpql.toString());
 
 	    if (!criteria.isIsdownload()) {
 	        buyerQuery.setFirstResult(criteria.getStartIndex());
@@ -217,6 +225,9 @@ public class BuyerDaoImpl implements IBuyerDao {
 	    }
 
 	    List<String> buyerIds = buyerQuery.getResultList();
+	   
+	    System.out.println("Result Size = " + buyerIds.size());
+	    System.out.println("Result = " + buyerIds);
 
 	    if (buyerIds.isEmpty()) {
 	        return Collections.emptyList();
@@ -241,6 +252,7 @@ public class BuyerDaoImpl implements IBuyerDao {
 	            entityManager.createQuery(salesJpql, SalesInfo.class)
 	                    .setParameter("buyerIds", buyerIds)
 	                    .getResultList();
+
 
 	    /*
 	     * =========================================================
@@ -277,7 +289,6 @@ public class BuyerDaoImpl implements IBuyerDao {
 	        SalesInfoDto salesDto = mapper.convertValue(sales, SalesInfoDto.class);
 	        dto.getSalesInfo().add(salesDto);
 	    }
-
 	    return new ArrayList<>(dtoMap.values());
 	}
 }

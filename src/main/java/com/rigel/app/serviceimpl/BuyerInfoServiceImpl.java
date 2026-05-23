@@ -125,7 +125,7 @@ public class BuyerInfoServiceImpl implements IBuyerInfoService {
 	public int updateBuyerInfo(SalesRequest salesRequest) {
 	
 		BuyerInfoDto buyerInfoDto=salesRequest.getBuyerInfoDto();
-		BuyerInfoDto buyerInfo = buyerDao.searchSalesInfoDto(SearchCriteria.builder().userId(buyerInfoDto.getOwnerId()).invoiceNumber(buyerInfoDto.getInvoiceNumber()).build()).stream().findFirst().orElse(null);
+		BuyerInfoDto buyerInfo = buyerDao.searchSalesInfoDto(SearchCriteria.builder().userId(buyerInfoDto.getOwnerId()).isdownload(false).invoiceNumber(buyerInfoDto.getInvoiceNumber()).build()).stream().findFirst().orElse(null);
 		double restAmount=buyerInfo.getTotalAmount()-buyerInfo.getPaidAmount();
 		return buyerDao.updateRestAmountAndDate(buyerInfoDto.getId(),String.valueOf(restAmount),LocalDateTime.now());
 	}
