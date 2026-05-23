@@ -20,7 +20,7 @@ public class SalesQueryBuilder {
         StringBuilder base = new StringBuilder("""
             SELECT bi.ID
             FROM BUYER_INFO bi
-            INNER JOIN SALES_INFO si ON si.BUYERINFO = bi.ID
+            INNER JOIN SALES_INFO si ON si.BUYERINFO = bi.ID AND si.status=true 
         """);
 
         // OWNER FILTER (MANDATORY)
@@ -77,7 +77,7 @@ public class SalesQueryBuilder {
         // BRAND FILTER
         if (!ObjectUtils.isEmpty(criteria.getPendingPaymentStatus())) {
             addClause(base, params);
-            base.append(" bi.PendingPaymentStatus !=null OR  bi.PendingPaymentStatus = ?");
+            base.append(" bi.PendingPaymentStatus = ? ");
             params.add(criteria.getPendingPaymentStatus());
         }
 
@@ -135,7 +135,7 @@ public class SalesQueryBuilder {
 				bi.ownerId AS owner_id,
 				bi.restAmountDate AS rest_amount_date,
 				bi.restAmount AS rest_amount,
-
+               
 
                 si.ID AS sales_id,
 				si.item_code AS item_code,
@@ -177,7 +177,10 @@ public class SalesQueryBuilder {
 				si.entry_type AS entry_type,
 				si.serial_number_type AS serial_number_type,
 				si.serial_number AS serial_number,
-				si.additional_details AS additional_details
+				si.additional_details AS additional_details,
+				si.replace_count AS replace_count,
+				si.return_status AS return_status,
+				si.warranty_in_month AS warranty_in_month
 
             FROM BUYER_INFO bi
             INNER JOIN SALES_INFO si ON si.BUYERINFO = bi.ID

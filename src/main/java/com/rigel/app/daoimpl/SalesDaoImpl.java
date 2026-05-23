@@ -19,6 +19,7 @@ import com.rigel.app.model.SalesInfo;
 import com.rigel.app.model.dto.SearchCriteria;
 //import com.rigel.app.querybuilder.SalesQueryBuilder;
 import com.rigel.app.service.IInventoryService;
+import com.rigel.app.util.Constaints;
 import com.rigel.app.util.DateUtility;
 
 import jakarta.persistence.EntityManager;
@@ -54,7 +55,9 @@ public class SalesDaoImpl implements ISalesDao {
 	            .mapToDouble(s -> s.getSoldPrice())
 	            .sum();
 	    if(buyerInfo.getPaidAmount()!=total) {
-	       buyerInfo.setPendingPaymentStatus("pending");
+	       buyerInfo.setPendingPaymentStatus(Constaints.PENDING_PAYMENT_STATUS);
+	    }else {
+	    	buyerInfo.setPendingPaymentStatus(Constaints.CLEARED_PAYMENT_STATUS);
 	    }
 	    BuyerInfo savedBuyer = entityManager.merge(buyerInfo);
 
@@ -100,8 +103,6 @@ public class SalesDaoImpl implements ISalesDao {
 	        WHERE s.id = :id
 	        AND s.ownerId = :ownerId
 	        AND s.status = true
-	        AND s.replaceStatus = false
-	        AND s.returnStatus = false
 	    """;
 
 	    try {

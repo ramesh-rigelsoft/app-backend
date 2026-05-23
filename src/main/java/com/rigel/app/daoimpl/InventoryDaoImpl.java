@@ -143,9 +143,7 @@ public class InventoryDaoImpl implements IInventoryDao {
 	
 	@Override
 	public Inventory findInventoryByCode(String itemCode,int ownerId) {
-		System.out.println("itemCode---"+itemCode);
-		System.out.println("ownerId---"+ownerId);
-	    String hql = "FROM Inventory i WHERE i.itemCode = :itemCode AND i.ownerId = :ownerId ORDER BY i.createdAt DESC ";
+		String hql = "FROM Inventory i WHERE i.itemCode = :itemCode AND i.ownerId = :ownerId ORDER BY i.createdAt DESC ";
 
 	    return entityManager
 	            .createQuery(hql, Inventory.class)

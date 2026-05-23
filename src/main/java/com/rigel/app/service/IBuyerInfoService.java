@@ -16,6 +16,4 @@ public interface IBuyerInfoService {
 
 	public SalesResponse searchBuyerInfo(SearchCriteria criteria);
 
-	public List<BuyerInfoDto> searchSalesInfoDto(SearchCriteria criteria);
-
 }

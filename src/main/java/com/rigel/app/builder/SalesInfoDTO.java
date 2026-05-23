@@ -117,7 +117,16 @@ public class SalesInfoDTO {
 
     @JsonProperty("vendorGstNumber")
     private String vendorGstNumber;
+    
+    @JsonProperty("replaceCount")
+    private int replaceCount;
+    
+    @JsonProperty("returnStatus")
+    private boolean returnStatus;
 
+    @JsonProperty("warrantyInMonth")
+    private int warrantyInMonth;
+    
     @JsonProperty("additionalDetails")
     private String additionalDetails;
 }

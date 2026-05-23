@@ -84,7 +84,7 @@ public class SalesController {
 			response.put("data", data);
 			response.put("status", "Success");
 			response.put("code", "200");
-			response.put("message", "Your records has been returned successfully.");
+			response.put("message", "Your items has been returned successfully.");
 			return new ResponseEntity<>(response, HttpStatus.CREATED);
 		}
 	}
@@ -101,7 +101,7 @@ public class SalesController {
 			response.put("data", data);
 			response.put("status", "Success");
 			response.put("code", "200");
-			response.put("message", "Your records has been replaced successfully.");
+			response.put("message", "Your Items has been replaced successfully.");
 			return new ResponseEntity<>(response, HttpStatus.CREATED);
 		}
 	}
@@ -145,9 +145,9 @@ public class SalesController {
 	                totalAmount += (price * qty);
 	            }
 	        }
-
-	        double paidAmount = sale.getPaidAmount();
-	        double pendingAmount = totalAmount - paidAmount;
+            double restAmount=Double.parseDouble(String.valueOf(sale.getRestAmount()!=null?sale.getRestAmount():0));
+            double paidAmount = sale.getPaidAmount();
+	        double pendingAmount = totalAmount - paidAmount-restAmount;
 
 	        CustomerDTO dto = new CustomerDTO();
 	        dto.setInvoiceNumber(sale.getInvoiceNumber());
@@ -158,11 +158,13 @@ public class SalesController {
 	        dto.setTotalAmount(totalAmount);
 	        dto.setPaidAmount(paidAmount);
 	        dto.setPendingAmount(pendingAmount);
+	        dto.setPaymentModes(sale.getPaymentModes());
 
 	        dto.setRestAmount(sale.getRestAmount());
 	        dto.setRestAmountDate(sale.getRestAmountDate());
 	        
 	        dto.setPaymentStatus(pendingAmount > 0 ? "Pending" : "Paid");
+	        dto.setCreatedAt(sale.getCreatedAt());
 
 	        result.add(dto);
 	    }

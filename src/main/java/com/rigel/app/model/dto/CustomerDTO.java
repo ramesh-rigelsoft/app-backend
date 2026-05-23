@@ -22,4 +22,6 @@ public class CustomerDTO {
     private String restAmount;
     private String restAmountDate;
 	private String paymentStatus;
+	private String paymentModes;
+	private String createdAt;
 }

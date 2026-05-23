@@ -8,12 +8,16 @@ import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.rigel.app.dao.IGarbageDao;
 import com.rigel.app.dao.IInventoryDao;
 import com.rigel.app.dao.IItemsDao;
 import com.rigel.app.dao.ISalesDao;
+import com.rigel.app.model.GarbageItemsInfo;
 import com.rigel.app.model.Inventory;
 import com.rigel.app.model.Items;
 import com.rigel.app.model.SalesInfo;
+import com.rigel.app.model.Vendors;
 import com.rigel.app.model.dto.SearchCriteria;
 import com.rigel.app.service.IItemsService;
 import com.rigel.app.service.ISalesService;
@@ -39,6 +43,12 @@ public class SalesServiceImpl implements ISalesService {
 	@Autowired
 	private ItemsUpdateValidation itemsUpdateValidation;
 	
+	@Autowired
+	private ObjectMapper objectMapper;
+	
+	@Autowired
+	private IGarbageDao garbageDao;
+	
 	@Override
 	public List<SalesInfo> saveSalesInfo(List<SalesInfo> salesInfo) {
 		salesInfo.stream().forEach(s->{
@@ -58,11 +68,9 @@ public class SalesServiceImpl implements ISalesService {
 		ownerIdValidation.validate(ownerId);
 		SalesInfo salesInfo=salesDao.findById(salesId,ownerId);
 		if(salesInfo==null)return null;
+		ownerIdValidation.orderReturnValidation(salesInfo, 15);
 		salesInfo.setReturnStatus(true);
 		salesInfo.setReturnReason(returnReason);
-		
-		LocalDateTime orderedDate=salesInfo.getBuyerInfo().getCreatedAt();
-		ownerIdValidation.orderReturnValidation(orderedDate, 15);
 		
 		Inventory inventory = inventoryDao.findInventoryByCode(salesInfo.getItemCode(), ownerId);
 		inventory.setQuantity(inventory.getQuantity()+1);
@@ -75,15 +83,31 @@ public class SalesServiceImpl implements ISalesService {
 		ownerIdValidation.validate(ownerId);
 		SalesInfo salesInfo=salesDao.findById(salesId,ownerId);
 		if(salesInfo==null)return null;
+		ownerIdValidation.orderedDateValidation(salesInfo, salesInfo.getWarrantyInMonth());
+		
 		salesInfo.setReplaceCount(salesInfo.getReplaceCount()+1);
 		salesInfo.setReplaceStatus(true);
 		salesInfo.setReturnReason(returnReason);
-		LocalDateTime orderedDate=salesInfo.getBuyerInfo().getCreatedAt();
-		ownerIdValidation.orderedDateValidation(orderedDate, salesInfo.getWarrantyInMonth());
+		
 		Inventory inventory = inventoryDao.findInventoryByCode(salesInfo.getItemCode(), ownerId);
 		ownerIdValidation.orderedCheckStockValidation(inventory, salesInfo);
 		inventory.setQuantity(inventory.getQuantity()-salesInfo.getQuantity());
 		inventoryDao.updateInventory(inventory);
+		
+
+		GarbageItemsInfo garbage = objectMapper.convertValue(salesInfo, GarbageItemsInfo.class);
+		GarbageItemsInfo garbage2 = garbageDao.findGarbageByItemCode(garbage.getItemCode());
+		if(garbage2==null) {
+			Vendors vendors=new Vendors();
+			vendors.setId(salesInfo.getItemSource());
+			garbage.setVendors(vendors);
+			garbage.setId(null);
+			garbageDao.saveGarbage(garbage);
+		}else {
+			garbage2.setQuantity(garbage2.getQuantity()+1);
+			garbageDao.saveGarbage(garbage2);
+		}
+		
 		return salesDao.updateSalesInfo(salesInfo);
 	}
 	

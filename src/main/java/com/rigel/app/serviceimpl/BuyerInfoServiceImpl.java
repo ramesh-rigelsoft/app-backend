@@ -89,7 +89,6 @@ public class BuyerInfoServiceImpl implements IBuyerInfoService {
 	                sale.setDiscountType(DiscountType.PERCENTAGE.toString());
 	                sale.setBuyerInfo(buyer);
 	                sale.setOwnerId(salesRequest.getUserId());
-	                System.out.println("sale.toString()-------"+sale.toString());
 	                return sale;
 	            })
 	            .toList();
@@ -125,9 +124,9 @@ public class BuyerInfoServiceImpl implements IBuyerInfoService {
 	public int updateBuyerInfo(SalesRequest salesRequest) {
 	
 		BuyerInfoDto buyerInfoDto=salesRequest.getBuyerInfoDto();
-		BuyerInfoDto buyerInfo = buyerDao.searchSalesInfoDto(SearchCriteria.builder().userId(buyerInfoDto.getOwnerId()).isdownload(false).invoiceNumber(buyerInfoDto.getInvoiceNumber()).build()).stream().findFirst().orElse(null);
+		BuyerInfo buyerInfo = buyerDao.searchBuyerInfo(SearchCriteria.builder().userId(buyerInfoDto.getOwnerId()).isdownload(true).invoiceNumber(buyerInfoDto.getInvoiceNumber()).build()).stream().findFirst().orElse(null);
 		double restAmount=buyerInfo.getTotalAmount()-buyerInfo.getPaidAmount();
-		return buyerDao.updateRestAmountAndDate(buyerInfoDto.getId(),String.valueOf(restAmount),LocalDateTime.now());
+		return buyerDao.updateRestAmountAndDate(buyerInfo.getId(),String.valueOf(restAmount),LocalDateTime.now());
 	}
 
 //	@Override
@@ -137,33 +136,7 @@ public class BuyerInfoServiceImpl implements IBuyerInfoService {
 
 	@Override
 	public SalesResponse searchBuyerInfo(SearchCriteria criteria) {
-//		List<BuyerInfoDto> list = objectMapper.convertValue(
-//		        buyerDao.searchBuyerInfo(criteria),
-//		        new TypeReference<List<BuyerInfoDto>>() {}
-//		);
-//
-//		list = list.stream().map(d -> {
-//
-//		    Set<SalesInfoDto> salesList = objectMapper.convertValue(
-//		            salesDao.searchSalesInfo(criteria),
-//		            new TypeReference<Set<SalesInfoDto>>() {}
-//		    );
-//
-//		    d.setSalesInfo(salesList);
-//
-//		    return d;
-//
-//		}).toList();
-//	    
-//	    return SalesResponse.builder()
-//	            .buyerInfoDto(list)
-//	           .build();
 		return null;
-	}
-
-	@Override
-	public List<BuyerInfoDto> searchSalesInfoDto(SearchCriteria criteria) {
-		return buyerDao.searchSalesInfoDto(criteria);
 	}
 	
 }

@@ -15,10 +15,8 @@ public interface IBuyerDao {
 	
 	public int deleteBuyerInfo(List<Long> buyerId);
 	
-	
-	
 	public List<BuyerInfo> searchBuyerInfo(SearchCriteria criteria);
-	public List<BuyerInfoDto> searchSalesInfoDto(SearchCriteria criteria);
+	
 	public int updateRestAmountAndDate(String id, String restAmount, LocalDateTime restAmountDate);
 
 }

@@ -110,6 +110,9 @@ public class BuyerInfoRowMapper implements ResultSetExtractor<List<BuyerInfoDTO>
                         .vendorGstNumber(rs.getString("vendor_gst_number"))
                         .additionalDetails(rs.getString("additional_details"))
                         .discountType(rs.getString("discount_type"))
+                        .replaceCount(rs.getInt("replace_count"))
+                        .returnStatus(rs.getBoolean("return_status"))
+                        .warrantyInMonth(rs.getInt("warranty_in_month"))
 //                        .discountPercentage(rs.getString("discount_percentage"))
                         .build();
 

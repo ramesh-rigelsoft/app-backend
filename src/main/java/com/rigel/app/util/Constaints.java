@@ -16,5 +16,7 @@ public class Constaints {
 
 	public static final String SHOP_OWNER_CATEGORY = "Shop Service";
 	public static final String DOWNLOAD_FOLDER_NAME = "RigelEIMS";
+	public static final String CLEARED_PAYMENT_STATUS = "cleared";
+	public static final String PENDING_PAYMENT_STATUS = "pending";
 
 }

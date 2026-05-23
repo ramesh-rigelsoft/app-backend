@@ -81,5 +81,9 @@ public class Vendors implements Serializable {
 	@OneToMany(mappedBy="vendors", cascade=CascadeType.PERSIST, fetch=FetchType.LAZY)
 	@JsonManagedReference
 	private Set<VendorPayments> vendorPayments = new HashSet<>();
+	
+	@OneToMany(mappedBy="vendors", cascade=CascadeType.PERSIST, fetch=FetchType.LAZY)
+	@JsonManagedReference
+	private Set<GarbageItemsInfo> garbageItemInfo = new HashSet<>();
 
 }

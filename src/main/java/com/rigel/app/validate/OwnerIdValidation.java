@@ -34,8 +34,9 @@ public class OwnerIdValidation {
 	    }
 	}
 	
-	public void orderedDateValidation(LocalDateTime orderDate, int warrantyPeriodInMonth) {
-
+	public void orderedDateValidation(SalesInfo salesInfo, int warrantyPeriodInMonth) {
+		LocalDateTime orderDate=salesInfo.getBuyerInfo().getCreatedAt();
+		
 	    LocalDateTime warrantyEndDate = orderDate.plusMonths(warrantyPeriodInMonth);
 	    LocalDateTime currentDateTime = LocalDateTime.now();
 
@@ -44,10 +45,11 @@ public class OwnerIdValidation {
 	    }
 	}
 	
-	public void orderReturnValidation(LocalDateTime orderDate, int returnPeriodInDays) {
-
-	    if (returnPeriodInDays <= 0) {
-	        throw new ValidationException("Invalid return period");
+	public void orderReturnValidation(SalesInfo salesInfo, int returnPeriodInDays) {
+		System.out.println("salesInfo.isReturnStatus()------------"+salesInfo.isReturnStatus());
+		LocalDateTime orderDate=salesInfo.getBuyerInfo().getCreatedAt();
+		if (returnPeriodInDays <= 0) {
+	        throw new ValidationException("You can't Replace this Item.");
 	    }
 
 	    LocalDateTime returnEndDate = orderDate.plusDays(returnPeriodInDays);
@@ -56,5 +58,9 @@ public class OwnerIdValidation {
 	    if (currentDateTime.isAfter(returnEndDate)) {
 	        throw new ValidationException("Return period has expired for this item");
 	    }
+	    if(salesInfo.isReturnStatus()) {
+	        throw new ValidationException("This Item already returned");
+	    }
+	   
 	}
 }
