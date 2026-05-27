@@ -125,7 +125,7 @@ public class AppUtill {
 
 	        // 4. FINAL RESPONSE
 	        VendorInvoiceResponse res = new VendorInvoiceResponse();
-	        res.setVendorName(vendor.getSupplierName());
+	        res.setVendorName(vendor.getCompanyName());
 	        res.setId(vendor.getId());
 	        res.setGstNumber(vendor.getGstNumber());
 	        res.setInvoices(new ArrayList<>(invoiceMap.values()));

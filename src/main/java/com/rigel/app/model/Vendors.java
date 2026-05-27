@@ -29,9 +29,9 @@ public class Vendors implements Serializable {
 	@Column(length = 36, updatable = false, nullable = false)
 	private String id;
 
-	@NotBlank(message = "Supplier name is required")
+	@NotBlank(message = "company name is required")
 	@Column(nullable = false)
-	private String supplierName;
+	private String companyName;
 
 	@NotBlank(message = "GST Number is required")
 	@Column(nullable = false, unique = true)

@@ -96,12 +96,12 @@ public class GSTNumberService {
 					.stream().findFirst().orElse(null);
 			if (existingSupplier == null) {
 				VendorsDTO dto = VendorsDTO.builder().gstNumber(gstin).pinCode(extractPincode(principalPlace))
-						.ownerId(ownerId).supplierName(legalName).address(principalPlace).status(status)
+						.ownerId(ownerId).companyName(legalName).address(principalPlace).status(status)
 						.state(stateName).stateCode(stateCode).build();
 				supplierService.saveSupplier(dto);
 			} else {
 				existingSupplier.setPinCode(extractPincode(principalPlace));
-				existingSupplier.setSupplierName(legalName);
+				existingSupplier.setCompanyName(legalName);
 				existingSupplier.setStatus(status);
 				existingSupplier.setState(stateName);
 				existingSupplier.setStateCode(stateCode);
@@ -224,7 +224,7 @@ public class GSTNumberService {
 //            if (status == null || !"Active".equalsIgnoreCase(status)) {
 //                throw new BadGatewayRequest("GST is not active. Current status: " + status);
 //            }
-//            SupplierDTO supplierDTO=SupplierDTO.builder().gstNumber(gstin).ownerId(ownerId).supplierName(legalName).address(principalPlace).status(status).state(stateName).stateCode(stateCode).build();
+//            SupplierDTO supplierDTO=SupplierDTO.builder().gstNumber(gstin).ownerId(ownerId).companyName(legalName).address(principalPlace).status(status).state(stateName).stateCode(stateCode).build();
 //            System.out.println(supplierDTO.toString());
 //            supplierService.saveSupplier(supplierDTO);
 //     

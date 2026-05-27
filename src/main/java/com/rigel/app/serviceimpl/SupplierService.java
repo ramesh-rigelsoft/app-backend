@@ -4,12 +4,15 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import com.rigel.app.dao.ISupplierDao;
+import com.rigel.app.model.Items;
 import com.rigel.app.model.Vendors;
 import com.rigel.app.model.dto.SearchCriteria;
 import com.rigel.app.model.dto.SupplierCreteria;
+import com.rigel.app.model.dto.VendorPaymentResponseDTO;
 import com.rigel.app.model.dto.VendorsDTO;
 import com.rigel.app.service.ISupplierService;
 
@@ -38,6 +41,11 @@ public class SupplierService implements ISupplierService {
 	@Override
 	public List<Vendors> searchVender(SearchCriteria criteria) {
 		return supplierDao.searchVender(criteria);
+	}
+
+	@Override
+	public List<VendorPaymentResponseDTO> searchVenderPayment(SearchCriteria criteria){
+		return supplierDao.searchVenderPayment(criteria);
 	}
 
 }

@@ -18,7 +18,7 @@ public class SupplierCreteria {
 	private int startIndex;
     private int maxRecords;    
 	private String status;
-	private String supplierName;
+	private String companyName;
 	private String gstNumber;
 	private String pan;
 	private int userId;

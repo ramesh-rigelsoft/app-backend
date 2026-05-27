@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.apache.catalina.mapper.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -23,6 +24,7 @@ import com.rigel.app.model.dto.ExpenseDTO;
 import com.rigel.app.model.dto.SearchCriteria;
 import com.rigel.app.model.dto.SupplierCreteria;
 import com.rigel.app.model.dto.VendorInvoiceResponse;
+import com.rigel.app.model.dto.VendorPaymentResponseDTO;
 import com.rigel.app.model.dto.VendorsDTO;
 import com.rigel.app.service.IExpenseService;
 import com.rigel.app.service.ISupplierService;
@@ -108,6 +110,20 @@ public class SupplierController {
 	}
 	
 	@PostMapping("vendors")
+	public ResponseEntity<Map<String, Object>> getVendersLatest(@RequestBody(required = true) SearchCriteria creteria) {
+		Map<String, Object> response = new HashMap<>();
+		Map<String, Object> data = new HashMap<>();
+		List<VendorPaymentResponseDTO> supplierList = supplierService.searchVenderPayment(creteria);
+//		List<VendorPaymentResponseDTO> arrayList=supplierList.getContent().stream().toList();
+		data.put("vendors", supplierList);
+		response.put("data", data);
+		response.put("status", "OK");
+		response.put("code", "200");
+		response.put("message", "Your records has been fetch successfully.");
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	
+	@PostMapping("vendorss")
 	public ResponseEntity<Map<String, Object>> getVenders(@RequestBody(required = true) SearchCriteria creteria) {
 		Map<String, Object> response = new HashMap<>();
 		Map<String, Object> data = new HashMap<>();

@@ -47,6 +47,7 @@ public class SalesQueryBuilder {
                     OR LOWER(bi.COMPANYNAME) LIKE ?
                     OR LOWER(bi.GSTNUMBER) LIKE ?
                     OR LOWER(bi.PANNUMBER) LIKE ?
+                    OR LOWER(bi.PAYMENTMODES) LIKE ?
                     OR LOWER(si.BRAND) LIKE ?
                     OR LOWER(si.MODEL_NAME) LIKE ?
                     OR LOWER(si.ITEM_CODE) LIKE ?
@@ -55,7 +56,7 @@ public class SalesQueryBuilder {
             """);
 
             String search = "%" + criteria.getSearchKeyword().toLowerCase().trim() + "%";
-            for (int i = 0; i < 11; i++) {
+            for (int i = 0; i < 12; i++) {
                 params.add(search);
             }
         }

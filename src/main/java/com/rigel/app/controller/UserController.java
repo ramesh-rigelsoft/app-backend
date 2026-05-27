@@ -21,6 +21,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rigel.app.annotation.ApiSecured;
+import com.rigel.app.dao.ISupplierDao;
 import com.rigel.app.exception.BadGatewayRequest;
 import com.rigel.app.exception.TaskTitleException;
 import com.rigel.app.exception.TaskTitleNotFound;
@@ -30,6 +31,7 @@ import com.rigel.app.model.LoginRequest;
 import com.rigel.app.model.Mail;
 import com.rigel.app.model.ThirdPartyResponse;
 import com.rigel.app.model.User;
+import com.rigel.app.model.Vendors;
 import com.rigel.app.model.dto.*;
 import com.rigel.app.security.JwtTokenUtil;
 import com.rigel.app.security.JwtUser;
@@ -98,6 +100,12 @@ public class UserController {
 
 	@Autowired
 	private Environment environment;
+	
+	@Autowired
+	private ObjectMapper objectMapper;
+	
+	@Autowired
+	private ISupplierDao supplierDao;
 
 	@RequestMapping(value = "sendEmail", method = RequestMethod.POST)
 	public ResponseEntity<Map<String, Object>> sendEmail(@RequestBody(required = true) @Valid Mail mail,
@@ -197,9 +205,7 @@ public class UserController {
 							.token(thirdPartyResponse.getData().getAccess_token()).emailId(user.getEmail_id())
 							.mobileNumber(user.getMobile_no()).userObject(json).secret(secret).build();
 					loginInfoService.saveLoginActivity(Arrays.asList(loginActivity1));
-					User userSave=user;
-					userSave.setId(0);
-					userService.saveUser(user);
+					addvendor(user);
 				}
 				data.put("secret", secret);
 				data.put("user", thirdPartyResponse.getData().getUser());
@@ -217,6 +223,8 @@ public class UserController {
 				String obj = loginActivity.getUserObject();
 				// Read
 				user = mapper.readValue(obj, User.class);
+				System.out.println("user----------"+user.toString());
+			
 //				loginActivity.getUserObject()
 //				MyClass obj = mapper.readValue(userObject, MyClass.class);
 //				user = mapper.treeToValue(loginActivity.getUserObject(), User.class);
@@ -227,7 +235,7 @@ public class UserController {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-
+			
 			data2.put("access_token", loginActivity.getToken());
 			data2.put("user", user);
 			secret = RAUtility.generateMD5(data2.toString());
@@ -410,6 +418,27 @@ public class UserController {
 		} else {
 			throw new TaskTitleNotFound("Invalid Request");
 		}
+	}
+	
+	private void addvendor(User user) {
+		 Vendors venderData=supplierDao.searchSupplier(SupplierCreteria.builder().userId(user.getId()).pan(user.getPanNumber()).startIndex(0).maxRecords(1).build()).stream().findFirst().orElse(null);
+         if (venderData==null) {
+             VendorsDTO vendor = new VendorsDTO();
+             vendor.setCompanyName(user.getCompanyName());
+             vendor.setGstNumber(user.getGstNumber()==null?"GSTNo"+user.getId():user.getGstNumber());
+             vendor.setPanNumber(user.getPanNumber());
+             vendor.setPinCode(user.getPincode());
+             vendor.setEmail(user.getEmail_id());
+             vendor.setPhone(user.getMobile_no());
+             vendor.setAddress(user.getAddressLine1()==null?"Address":user.getAddressLine1());
+             vendor.setStatus("active");
+             vendor.setState("11");
+             vendor.setStateCode("11");
+             vendor.setOwnerId(user.getId());
+             vendor.setAdditionalDetails("System Default Vendor"); 
+             supplierDao.saveSupplier(vendor);
+         }
+
 	}
 
 }

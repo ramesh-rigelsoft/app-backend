@@ -168,8 +168,7 @@
 			<artifactId>barcodes</artifactId>
 			<version>7.2.5</version>
 		</dependency>
-		<!-- <dependency> <groupId>com.itextpdf</groupId>
-		<artifactId>itextpdf</artifactId> 
+		<!-- <dependency> <groupId>com.itextpdf</groupId> <artifactId>itextpdf</artifactId> 
 			<version>5.5.13.3</version> </dependency> -->
 		<dependency>
 			<groupId>org.modelmapper</groupId>
@@ -191,8 +190,7 @@
 			<artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>
 			<version>4.6.0</version>
 		</dependency>
-		<!--
-		https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-aop -->
+		<!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-aop -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-aop</artifactId>
@@ -215,10 +213,8 @@
 			<version>21</version>
 		</dependency>
 
-		<!-- Source:
-		https://mvnrepository.com/artifact/org.postgresql/postgresql -->
-		<!-- <dependency> <groupId>org.postgresql</groupId>
-		<artifactId>postgresql</artifactId> 
+		<!-- Source: https://mvnrepository.com/artifact/org.postgresql/postgresql -->
+		<!-- <dependency> <groupId>org.postgresql</groupId> <artifactId>postgresql</artifactId> 
 			<version>42.7.3</version> <scope>compile</scope> </dependency> -->
 
 		<dependency>
@@ -233,18 +229,17 @@
 			<version>5.2.5</version>
 		</dependency>
 		<dependency>
-		    <groupId>org.seleniumhq.selenium</groupId>
-		    <artifactId>selenium-java</artifactId>
-		    <version>4.23.0</version>
+			<groupId>org.seleniumhq.selenium</groupId>
+			<artifactId>selenium-java</artifactId>
+			<version>4.23.0</version>
 		</dependency>
 		<dependency>
-		    <groupId>io.github.bonigarcia</groupId>
-		    <artifactId>webdrivermanager</artifactId>
-		    <version>5.6.3</version>
+			<groupId>io.github.bonigarcia</groupId>
+			<artifactId>webdrivermanager</artifactId>
+			<version>5.6.3</version>
 		</dependency>
 
-		<!-- <dependency> <groupId>org.hsqldb</groupId>
-		<artifactId>hsqldb</artifactId> 
+		<!-- <dependency> <groupId>org.hsqldb</groupId> <artifactId>hsqldb</artifactId> 
 			<version>2.7.2</version> <scope>runtime</scope> </dependency> -->
 
 
@@ -262,14 +257,11 @@
 			<artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-		<!-- <dependency> <groupId>io.cucumber</groupId>
-		<artifactId>cucumber-java</artifactId> 
+		<!-- <dependency> <groupId>io.cucumber</groupId> <artifactId>cucumber-java</artifactId> 
 			<version>7.15.0</version> <scope>test</scope> </dependency> <dependency> 
-			<groupId>io.cucumber</groupId> <artifactId>cucumber-spring</artifactId>
-		<version>7.15.0</version> 
+			<groupId>io.cucumber</groupId> <artifactId>cucumber-spring</artifactId> <version>7.15.0</version> 
 			<scope>test</scope> </dependency> <dependency> <groupId>io.cucumber</groupId> 
-			<artifactId>cucumber-junit-platform-engine</artifactId>
-		<version>7.15.0</version> 
+			<artifactId>cucumber-junit-platform-engine</artifactId> <version>7.15.0</version> 
 			<scope>test</scope> </dependency> -->
 	</dependencies>
 	<profiles>
@@ -301,11 +293,55 @@
 	<build>
 		<finalName>app-backend</finalName>
 		<plugins>
+			<!-- Normal JAR -->
 			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>3.3.0</version>
+
+				<configuration>
+					<archive>
+						<manifest>
+							<addClasspath>true</addClasspath>
+							<classpathPrefix>lib/</classpathPrefix>
+
+							<!-- Apna main class -->
+							<mainClass>
+								com.rigel.app.TodoapptestApplication
+							</mainClass>
+
+						</manifest>
+					</archive>
+				</configuration>
 			</plugin>
+
+			<!-- Copy dependencies into lib folder -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>3.6.1</version>
+				<executions>
+					<execution>
+						<id>copy-dependencies</id>
+						<phase>package</phase>
+
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+
+						<configuration>
+							<outputDirectory>
+								${project.build.directory}/lib
+							</outputDirectory>
+						</configuration>
+
+					</execution>
+				</executions>
+			</plugin>
+
 		</plugins>
+		<!-- <plugin> <groupId>org.springframework.boot</groupId> <artifactId>spring-boot-maven-plugin</artifactId> 
+			</plugin> -->
 	</build>
 
 </project>
