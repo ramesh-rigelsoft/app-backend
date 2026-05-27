@@ -12,6 +12,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rigel.app.dao.IUserDao;
 import com.rigel.app.model.User;
 
@@ -23,10 +26,24 @@ public class UserDetailService implements UserDetailsService {
 	@Autowired
 	IUserDao userDao;
 	
+	@Autowired
+	ObjectMapper mapper;
+	
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-//		System.out.println("User name >>> "+username);
-		User user = userDao.findUserByEmailId(username);
+
+		String userObj = userDao.findLoginActivity(username).getUserObject();
+		User user=null;
+		try {
+			user = mapper.readValue(userObj, User.class);
+		} catch (JsonMappingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 //		System.out.println("User name >>> "+user.getId());
         if (user!= null) {
         	return new JwtUser(user.getId(), user.getEmail_id(),

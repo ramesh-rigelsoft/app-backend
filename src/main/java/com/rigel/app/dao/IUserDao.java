@@ -5,11 +5,13 @@ import com.rigel.app.model.User;
 
 public interface IUserDao {
 	
-    public User saveUser(User user);
+//    public User saveUser(User user);
+//	
+//	public User findUserById(int id);
+//	
+//	public User findUserByEmailId(String email);
 	
-	public User findUserById(int id);
-	
-	public User findUserByEmailId(String email);
+	public LoginActivity findLoginActivityByOwnerId(int ownerId);
 	
 	public LoginActivity findLoginActivity(String username);
 

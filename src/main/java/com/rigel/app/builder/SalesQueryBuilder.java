@@ -42,6 +42,7 @@ public class SalesQueryBuilder {
                 (
                     LOWER(bi.INVOICENUMBER) LIKE ?
                     OR LOWER(bi.BUYERNAME) LIKE ?
+                    OR LOWER(bi.CUSTUMBERID) LIKE ?
                     OR LOWER(bi.EMAILID) LIKE ?
                     OR LOWER(bi.MOBILENUMBER) LIKE ?
                     OR LOWER(bi.COMPANYNAME) LIKE ?
@@ -56,7 +57,7 @@ public class SalesQueryBuilder {
             """);
 
             String search = "%" + criteria.getSearchKeyword().toLowerCase().trim() + "%";
-            for (int i = 0; i < 12; i++) {
+            for (int i = 0; i < 13; i++) {
                 params.add(search);
             }
         }

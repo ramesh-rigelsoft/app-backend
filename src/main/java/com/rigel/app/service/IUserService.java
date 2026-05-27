@@ -9,13 +9,15 @@ import com.rigel.app.model.User;
 
 public interface IUserService {
 	
-	public User saveUser(User user);
+//	public User saveUser(User user);
+//	
+//	public User findUserById(int id);
+//	
+//	public User findUserByEmailId(String email);
+//	
+//	public Map<String,Object> sendEmailToAll(Mail emailDetails);
 	
-	public User findUserById(int id);
-	
-	public User findUserByEmailId(String email);
-	
-	public Map<String,Object> sendEmailToAll(Mail emailDetails);
+	public LoginActivity findLoginActivityByOwnerId(int ownerId);
 	
 	public LoginActivity findLoginActivity(String username);
 

@@ -36,7 +36,7 @@ import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/repaire/")
-public class RepaireServiceController {
+public class RepaireController {
 
 	@Autowired
 	IRepaireServiceService repaireServiceService;
@@ -126,7 +126,7 @@ public class RepaireServiceController {
     			repaireDevice=repaireServiceService.updateStatus(repaireDevice);
 			}else {
 				RepaireDeviceDto repaireDeviceDto=repaireRequest.getRepaireDeviceDto();
-				Set<SalesInfoDto> salesItem = repaireRequest.getRepaireDeviceDto().getItems().stream().map(item -> { item.setId(null); return item; }).collect(Collectors.toSet());
+				Set<SalesInfoDto> salesItem = repaireRequest.getRepaireDeviceDto().getItems();//.stream().map(item -> { item.setId(null); return item; }).collect(Collectors.toSet());
 				Set<SalesInfo> sales = mapper.convertValue(salesItem,new TypeReference<Set<SalesInfo>>(){});
 				repaireDevice.setCustomerName(repaireDeviceDto.getCustomerName());
 				repaireDevice.setMobileNumber(repaireDeviceDto.getMobileNumber());

@@ -18,27 +18,27 @@ public class UserDaoimpl implements IUserDao {
 	@Autowired
 	EntityManager entityManager;
 
-	@Override
-	public User saveUser(User user) {
-		return entityManager.merge(user);
-	}
-
-	@Override
-	public User findUserById(int id) {
-		return entityManager.find(User.class, id);
-	}
-
-	@Override
-	public User findUserByEmailId(String email) {
-		try {
-			User user=(User) entityManager.createQuery("from User where email_id='"+email+"'").getSingleResult();
-			return user;
-		} catch (NoResultException e) {
-			return null;
-		} catch (Exception e) {
-			return null;
-		}
-	}
+//	@Override
+//	public User saveUser(User user) {
+//		return entityManager.merge(user);
+//	}
+//
+//	@Override
+//	public User findUserById(int id) {
+//		return entityManager.find(User.class, id);
+//	}
+//
+//	@Override
+//	public User findUserByEmailId(String email) {
+//		try {
+//			User user=(User) entityManager.createQuery("from User where email_id='"+email+"'").getSingleResult();
+//			return user;
+//		} catch (NoResultException e) {
+//			return null;
+//		} catch (Exception e) {
+//			return null;
+//		}
+//	}
 
 //	@Override
 //	public LoginActivity findLoginActivity(String username) {
@@ -66,8 +66,37 @@ public class UserDaoimpl implements IUserDao {
 	        } else {
 	            // 🔹 username provided → filter by emailId
 	            login = (LoginActivity) entityManager
-	                    .createQuery("from LoginActivity WHERE emailIds = :email")
+	                    .createQuery("from LoginActivity WHERE emailId = :email")
 	                    .setParameter("email", username)
+	                    .getSingleResult();
+	        }
+
+	        return login;
+
+	    } catch (NoResultException e) {
+	        return null;
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return null;
+	    }
+	}
+	
+	@Override
+	public LoginActivity findLoginActivityByOwnerId(int ownerId) {
+	    try {
+	        LoginActivity login;
+
+	        if (ownerId == 0) {
+	            // 🔹 username null → first record
+	            login = (LoginActivity) entityManager
+	                    .createQuery("from LoginActivity")
+	                    .setMaxResults(1)   // first record only
+	                    .getSingleResult();
+	        } else {
+	            // 🔹 username provided → filter by emailId
+	            login = (LoginActivity) entityManager
+	                    .createQuery("from LoginActivity WHERE userId = :userId")
+	                    .setParameter("userId", ownerId)
 	                    .getSingleResult();
 	        }
 

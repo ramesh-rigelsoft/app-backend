@@ -75,9 +75,14 @@ public class RepaireServiceServiceImpl implements IRepaireServiceService {
 		// Convert Set to List
 		List<SalesInfo> salesInfoList = new ArrayList<>(salesInfoSet);
 		itemsUpdateValidation.repaireDeleteItems(existingSales);
+		
+		
 		salesDao.deleteById(repaireDevice.getId(), repaireDevice.getOwnerId());
+		
 		salesInfoValidator.validateSalesInfo(salesInfoList, repaireDevice.getOwnerId());
+		
 		itemsUpdateValidation.repaireItemValidation(salesInfoList);
+		
 		return repaireServiceDao.saveRepair(repaireDevice);
 	}
 

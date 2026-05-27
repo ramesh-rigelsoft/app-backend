@@ -107,23 +107,23 @@ public class UserController {
 	@Autowired
 	private ISupplierDao supplierDao;
 
-	@RequestMapping(value = "sendEmail", method = RequestMethod.POST)
-	public ResponseEntity<Map<String, Object>> sendEmail(@RequestBody(required = true) @Valid Mail mail,
-			BindingResult result, HttpServletRequest request) {
-		Map<String, Object> response = new HashMap<>();
-		if (mail == null) {
-			throw new BadGatewayRequest("Invalid Request");
-		} else if (result.hasFieldErrors()) {
-			throw new BadGatewayRequest(result.getFieldError().getDefaultMessage());
-		} else {
-			Map<String, Object> data = userService.sendEmailToAll(mail);
-			response.put("data", data);
-			response.put("status", "OK");
-			response.put("code", "200");
-			response.put("message", "Your account has been created successfully.");
-			return new ResponseEntity<>(response, HttpStatus.OK);
-		}
-	}
+//	@RequestMapping(value = "sendEmail", method = RequestMethod.POST)
+//	public ResponseEntity<Map<String, Object>> sendEmail(@RequestBody(required = true) @Valid Mail mail,
+//			BindingResult result, HttpServletRequest request) {
+//		Map<String, Object> response = new HashMap<>();
+//		if (mail == null) {
+//			throw new BadGatewayRequest("Invalid Request");
+//		} else if (result.hasFieldErrors()) {
+//			throw new BadGatewayRequest(result.getFieldError().getDefaultMessage());
+//		} else {
+//			Map<String, Object> data = userService.sendEmailToAll(mail);
+//			response.put("data", data);
+//			response.put("status", "OK");
+//			response.put("code", "200");
+//			response.put("message", "Your account has been created successfully.");
+//			return new ResponseEntity<>(response, HttpStatus.OK);
+//		}
+//	}
 
 	@PostMapping(value = "signup", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<Map<String, Object>> signup(@ModelAttribute @Valid UserDto userDtoReq, BindingResult result,
