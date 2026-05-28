@@ -134,7 +134,7 @@ public class SalesServiceImpl implements ISalesService {
 	public int deleteById(List<SalesInfo> salesinfo,int ownerId) {
 		List<String> ids=salesinfo.stream().map(s->s.getId()).toList();
 		itemsUpdateValidation.repaireDeleteItems(salesinfo);
-		return salesDao.deleteBySalesId(ids.get(0), ownerId);
+		return salesDao.permantalyDeleteBySalesId(ids.get(0), ownerId);
 	}
 
 	

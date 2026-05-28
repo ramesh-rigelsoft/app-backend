@@ -233,7 +233,22 @@ public class SalesDaoImpl implements ISalesDao {
 
 	    return updatedCount;
 	}
-	
+	@Override
+	public int permantalyDeleteBySalesId(String id, int ownerId) {
+
+	    String jpql = """
+	        DELETE FROM SalesInfo s
+	        WHERE s.id = :id
+	        AND s.ownerId = :ownerId
+	        """;
+
+	    int deletedCount = entityManager.createQuery(jpql)
+	            .setParameter("id", id)
+	            .setParameter("ownerId", ownerId)
+	            .executeUpdate();
+
+	    return deletedCount;
+	}
 	@Override
 	public List<SalesInfo> fetchSalesByRepaireDevice(String deviceId, int ownerId) {
 

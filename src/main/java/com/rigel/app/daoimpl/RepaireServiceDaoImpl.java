@@ -144,7 +144,7 @@ public class RepaireServiceDaoImpl implements IRepaireServiceDao {
 	        SELECT DISTINCT r
 	        FROM RepaireDevice r
 	        LEFT JOIN FETCH r.salesInfo s
-	        WHERE r.id IN :ids
+	        WHERE r.id IN :ids AND s.status=true 
 	        ORDER BY r.createdAt DESC
 	    """, RepaireDevice.class)
 	    .setParameter("ids", ids)

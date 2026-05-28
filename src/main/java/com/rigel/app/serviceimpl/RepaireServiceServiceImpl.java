@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.quartz.LocalDataSourceJobStore;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rigel.app.dao.IRepaireServiceDao;
 import com.rigel.app.dao.ISalesDao;
@@ -66,23 +67,41 @@ public class RepaireServiceServiceImpl implements IRepaireServiceService {
 	}
 
 	@Override
-	public RepaireDevice updateRepaire(RepaireDevice repaireDevice) {
-		 List<SalesInfo> existingSales = salesDao.fetchSalesByRepaireDevice(repaireDevice.getId(),repaireDevice.getOwnerId());
+	public RepaireDevice updateRepaire(RepaireDeviceDto repaireDeviceDto) {
+		 String repairId=repaireDeviceDto.getId();
+		 int ownerId=repaireDeviceDto.getOwnerId();
+		 List<SalesInfo> existingSales = salesDao.fetchSalesByRepaireDevice(repairId,ownerId);
 				
 		// Assume repaireDevice.getSalesInfo() returns a Set<SalesInfo>
-		Set<SalesInfo> salesInfoSet = repaireDevice.getSalesInfo();
-
+		Set<SalesInfoDto> salesInfoSet = repaireDeviceDto.getItems();
+		
 		// Convert Set to List
-		List<SalesInfo> salesInfoList = new ArrayList<>(salesInfoSet);
+		List<SalesInfoDto> salesInfoList = new ArrayList<>(salesInfoSet);
 		itemsUpdateValidation.repaireDeleteItems(existingSales);
 		
+		salesInfoValidator.validateUpdateSalesInfo(salesInfoList, repaireDeviceDto.getOwnerId());
 		
-		salesDao.deleteById(repaireDevice.getId(), repaireDevice.getOwnerId());
+		itemsUpdateValidation.repaireUpdateItemValidation(salesInfoList);
 		
-		salesInfoValidator.validateSalesInfo(salesInfoList, repaireDevice.getOwnerId());
-		
-		itemsUpdateValidation.repaireItemValidation(salesInfoList);
-		
+		SearchCriteria criteria=SearchCriteria.builder().id(repaireDeviceDto.getId()).userId(repaireDeviceDto.getOwnerId()).startIndex(0).maxRecords(10).build();
+		RepaireDevice repaireDevice=repaireServiceDao.searchRepair(criteria).get(0);
+	    Set<SalesInfo> sales = mapper.convertValue(salesInfoSet,new TypeReference<Set<SalesInfo>>(){});
+		repaireDevice.setCustomerName(repaireDeviceDto.getCustomerName());
+		repaireDevice.setMobileNumber(repaireDeviceDto.getMobileNumber());
+		repaireDevice.setDeviceModelName(repaireDeviceDto.getDeviceModelName());
+		repaireDevice.setCategory(repaireDeviceDto.getCategory());
+		repaireDevice.setCategoryType(repaireDeviceDto.getCategoryType());
+		repaireDevice.setDeliveryDate(repaireDeviceDto.getDeliveryDate());
+		repaireDevice.setSerialNumber(repaireDeviceDto.getSerialNumber());
+		repaireDevice.setDeviceStatus(repaireDeviceDto.getDeviceStatus());
+		repaireDevice.setDefectDescription(repaireDeviceDto.getDefectDescription());
+		repaireDevice.setDeviceLockType(repaireDeviceDto.getDeviceLockType());
+		repaireDevice.setDevicePassword(repaireDeviceDto.getDevicePassword());
+		repaireDevice.setTotalAmount(repaireDeviceDto.getTotalAmount());
+		repaireDevice.setAdvanceAmount(repaireDeviceDto.getAdvanceAmount());
+		repaireDevice.setPendingAmount(repaireDeviceDto.getPendingAmount());
+		repaireDevice.setUpdatedAt(LocalDateTime.now());
+		repaireDevice.setSalesInfo(sales);
 		return repaireServiceDao.saveRepair(repaireDevice);
 	}
 

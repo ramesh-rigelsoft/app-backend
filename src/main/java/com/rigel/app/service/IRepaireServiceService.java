@@ -11,7 +11,7 @@ public interface IRepaireServiceService {
 	
 	public RepaireDevice saveRepair(RepaireDevice expaDevice);
 
-	public RepaireDevice updateRepaire(RepaireDevice reqDevice);
+	public RepaireDevice updateRepaire(RepaireDeviceDto reqDevice);
 
 	public List<RepaireDevice> searchRepair(SearchCriteria expaDevice);
 	public RepaireDevice updateStatus(RepaireDevice repaireDevice);

@@ -11,6 +11,7 @@ import com.rigel.app.exception.ValidationException;
 import com.rigel.app.model.Inventory;
 import com.rigel.app.model.Items;
 import com.rigel.app.model.SalesInfo;
+import com.rigel.app.model.dto.SalesInfoDto;
 import com.rigel.app.model.dto.SearchCriteria;
 import com.rigel.app.service.IInventoryService;
 import com.rigel.app.service.IItemsService;
@@ -49,6 +50,32 @@ public class ItemsUpdateValidation {
 		}
 
 	}
+	public void repaireUpdateItemValidation(List<SalesInfoDto> sales) {
+		sales.forEach(salesInfo -> {
+
+			if (salesInfo.getItemCode() == null||salesInfo.getOwnerId()==0) {
+				throw new ValidationException("Session Expired, Please Login agin then try....");
+			}
+			Inventory inventory = inventoryDao
+					.searchInventory(SearchCriteria.builder().userId(salesInfo.getOwnerId()).startIndex(0)
+							.maxRecords(10).itemCode(salesInfo.getItemCode()).build())
+					.stream().findFirst().orElse(null);
+            System.out.println("update-2");
+			if (inventory.getQuantity() > salesInfo.getQuantity()) {
+				int updatedQty = inventory.getQuantity() - salesInfo.getQuantity();
+				inventory.setQuantity(updatedQty);
+				inventoryDao.updateInventory(inventory);
+			} else if (inventory.getQuantity() == salesInfo.getQuantity()) {
+				int updatedQty = inventory.getQuantity() - salesInfo.getQuantity();
+				inventory.setQuantity(updatedQty);
+				inventory.setStatus(false);
+				inventoryDao.updateInventory(inventory);
+			} else {
+				throw new ValidationException("This items has been sold.");
+			}
+
+		});
+	}
 
 	public void repaireItemValidation(List<SalesInfo> sales) {
 		sales.forEach(salesInfo -> {
@@ -71,7 +98,7 @@ public class ItemsUpdateValidation {
 				inventory.setStatus(false);
 				inventoryDao.updateInventory(inventory);
 			} else {
-				throw new ValidationException("This items has been sold so you can not be delete or update.");
+				throw new ValidationException("This items has been sold.");
 			}
 
 		});
