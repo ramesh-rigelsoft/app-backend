@@ -59,6 +59,10 @@ public class RepaireDevice implements Serializable {
 
 	@Column(length = 500)
 	private String defectDescription;
+	
+	@Column(name = "lvstatus")
+	private boolean lvstatus;
+
 
 	// LOCK DETAILS
 	private String deviceLockType;

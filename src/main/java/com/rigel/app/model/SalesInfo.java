@@ -91,6 +91,10 @@ public class SalesInfo implements Serializable{
 
 	@Column(name = "quantity")
 	private Integer quantity;
+	
+	@Column(name = "lvstatus")
+	private boolean lvstatus;
+
 
 	@Column(name = "initial_price")
 	private Double initialPrice;

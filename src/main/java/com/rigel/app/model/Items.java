@@ -76,6 +76,9 @@ public class Items implements Serializable {
 	
 	@Column(name = "created_at")
 	private LocalDateTime createdAt;
+	@Column(name = "lvstatus")
+	private boolean lvstatus;
+
  
 	@Column(name = "updated_at")
 	private LocalDateTime updatedAt;

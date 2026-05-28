@@ -55,6 +55,10 @@ public class VendorPayments{
 	private LocalDateTime updateAt;
 	private int ownerId;
 	
+	@Column(name = "lvstatus")
+	private boolean lvstatus;
+
+	
 	@ManyToOne(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
 	@JoinColumn(name="vendors")
 	@JsonBackReference

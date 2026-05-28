@@ -39,6 +39,9 @@ public class FySequence {
     @Column(name = "seqName")
     private String seqName;
     
+    @Column(name = "lvstatus")
+    private boolean lvstatus;
+    
    
     @Column(name = "userid")
     private int userId;

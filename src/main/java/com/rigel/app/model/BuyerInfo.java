@@ -84,6 +84,8 @@ public class BuyerInfo implements Serializable{
 	
 	private String panNumber;
 	
+	private boolean lvstatus;
+	
 	private String pinCode;
 	
 	private String state;

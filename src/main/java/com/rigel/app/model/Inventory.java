@@ -64,6 +64,9 @@ public class Inventory implements Serializable {
     private Integer quantity;
     private String image;
     
+	@Column(name = "lvstatus")
+	private boolean lvstatus;
+    
     @Column(name = "created_at")
 	private LocalDateTime createdAt;
 

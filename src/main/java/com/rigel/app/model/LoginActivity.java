@@ -39,6 +39,10 @@ public class LoginActivity implements Serializable {
     private String token;  // JSON string में store करें
     
     private String secret;
+    
+	@Column(name = "lvstatus")
+	private boolean lvstatus;
+
 
 //    @Column(name = "user_object", columnDefinition = "text")
     @Column(columnDefinition = "CLOB")

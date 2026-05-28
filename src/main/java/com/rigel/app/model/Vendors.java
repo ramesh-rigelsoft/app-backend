@@ -69,6 +69,10 @@ public class Vendors implements Serializable {
 	private int ownerId; // optional if multi-user system
 
 	private LocalDateTime createdAt;
+	
+	@Column(name = "lvstatus")
+	private boolean lvstatus;
+
 
 	private String additionalDetails;
 	

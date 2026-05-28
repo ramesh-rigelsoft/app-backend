@@ -100,6 +100,9 @@ public class GarbageItemsInfo implements Serializable{
 
 //	@Column(name = "description", length = 600)
 	private String description;
+	
+	@Column(name = "lvstatus")
+	private boolean lvstatus;
 
 	@Column(name = "item_color")
 	private String itemColor;

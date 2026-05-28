@@ -40,6 +40,10 @@ public class Invoice {
     
     @Column(name = "last_number")
     private long lastNumber;
+    
+	@Column(name = "lvstatus")
+	private boolean lvstatus;
+
 
     @Column(name = "fy")
     private String fy;
