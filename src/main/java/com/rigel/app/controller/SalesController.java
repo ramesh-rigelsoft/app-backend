@@ -1,5 +1,6 @@
 package com.rigel.app.controller;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,6 +28,7 @@ import com.rigel.app.model.dto.SalesResponse;
 import com.rigel.app.model.dto.SearchCriteria;
 import com.rigel.app.service.IBuyerInfoService;
 import com.rigel.app.service.ISalesService;
+import com.rigel.app.serviceimpl.ExcelDirectSave;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -41,6 +43,9 @@ public class SalesController {
 
 	@Autowired
 	IBuyerInfoService buyerService;
+	
+	@Autowired
+	ExcelDirectSave excelDirectSave;
 	
 	@Autowired
 	com.rigel.app.serviceimpl.BuyerCommonService buyerCommonService;
@@ -63,7 +68,14 @@ public class SalesController {
 				List<CustomerDTO> cust=mapSalesToInvoices(salesResponse);
 				data.put("sales", cust);		
 			}
-		   
+		   if(searchCriteria.isIsdownload()) {
+			   try {
+				excelDirectSave.exportBuyerSalesExcel(salesResponse);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		   }
 			response.put("data", data);
 			response.put("status", "SUCCESS");
 			response.put("code", "200");

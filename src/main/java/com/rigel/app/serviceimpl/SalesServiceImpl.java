@@ -124,9 +124,9 @@ public class SalesServiceImpl implements ISalesService {
 	@Override
 	public List<SalesInfo> searchSalesInfo(SearchCriteria criteria) {
 		List<SalesInfo> sales=salesDao.searchSalesInfo(criteria);
-		if(criteria.isIsdownload()&&sales.size()>0){
-			directSave.exportSalesToExcel(sales);
-		}
+//		if(criteria.isIsdownload()&&sales.size()>0){
+//			directSave.exportSalesToExcel(sales);
+//		}
 		return sales;
 	}
 

@@ -1,6 +1,7 @@
 
 package com.rigel.app.serviceimpl;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -14,6 +15,7 @@ import com.rigel.app.dao.ISupplierDao;
 import com.rigel.app.model.Inventory;
 import com.rigel.app.model.Items;
 import com.rigel.app.model.Vendors;
+import com.rigel.app.model.dto.ItemsDashboardResponse;
 import com.rigel.app.model.dto.SearchCriteria;
 import com.rigel.app.service.IInventoryService;
 import com.rigel.app.service.IItemsService;
@@ -98,7 +100,13 @@ public class ItemsServiceImpl implements IItemsService {
 	public List<Items> searchItems(SearchCriteria criteria) {
 		List<Items> items = itemsDao.searchItems(criteria);
 		if (criteria.isIsdownload() && items.size() > 0) {
-			directSave.exportItemsToExcel(items);
+			ItemsDashboardResponse itemsDashboardResponse=itemsDao.fetchItemReportData(criteria);
+			try {
+				directSave.exportItemsDashboardExcel(itemsDashboardResponse);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		return items;
 	}
