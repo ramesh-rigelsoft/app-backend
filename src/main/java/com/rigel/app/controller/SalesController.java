@@ -17,11 +17,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.rigel.app.builder.BuyerInfoDTO;
 import com.rigel.app.builder.SalesInfoDTO;
+import com.rigel.app.dao.ISalesDao;
 import com.rigel.app.exception.BadGatewayRequest;
 import com.rigel.app.model.BuyerInfo;
 import com.rigel.app.model.SalesInfo;
 import com.rigel.app.model.dto.BuyerInfoDto;
 import com.rigel.app.model.dto.CustomerDTO;
+import com.rigel.app.model.dto.ReportSummaryDTO;
 import com.rigel.app.model.dto.RequrnReplaceRequest;
 import com.rigel.app.model.dto.SalesRequest;
 import com.rigel.app.model.dto.SalesResponse;
@@ -48,6 +50,9 @@ public class SalesController {
 	ExcelDirectSave excelDirectSave;
 	
 	@Autowired
+	ISalesDao salesDao;
+	
+	@Autowired
 	com.rigel.app.serviceimpl.BuyerCommonService buyerCommonService;
 	
 	@PostMapping("search")
@@ -70,7 +75,8 @@ public class SalesController {
 			}
 		   if(searchCriteria.isIsdownload()) {
 			   try {
-				excelDirectSave.exportBuyerSalesExcel(salesResponse);
+				   ReportSummaryDTO summary=salesDao.getReportSummary(searchCriteria);
+				   excelDirectSave.exportReportSummaryExcel(summary);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

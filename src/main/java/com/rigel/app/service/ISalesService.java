@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.rigel.app.model.Items;
 import com.rigel.app.model.SalesInfo;
+import com.rigel.app.model.dto.ReportSummaryDTO;
 import com.rigel.app.model.dto.SearchCriteria;
 
 public interface ISalesService {
@@ -19,4 +20,6 @@ public interface ISalesService {
 	public List<SalesInfo> searchSalesInfo(SearchCriteria criteria);
 	
 	public int deleteById(List<SalesInfo> salesinfo,int ownerId);
+	
+	public ReportSummaryDTO getReportSummary(SearchCriteria criteria);
 }

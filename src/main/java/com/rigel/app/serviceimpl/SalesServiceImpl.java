@@ -19,6 +19,7 @@ import com.rigel.app.model.Inventory;
 import com.rigel.app.model.Items;
 import com.rigel.app.model.SalesInfo;
 import com.rigel.app.model.Vendors;
+import com.rigel.app.model.dto.ReportSummaryDTO;
 import com.rigel.app.model.dto.SearchCriteria;
 import com.rigel.app.service.IItemsService;
 import com.rigel.app.service.ISalesService;
@@ -135,6 +136,11 @@ public class SalesServiceImpl implements ISalesService {
 		List<String> ids=salesinfo.stream().map(s->s.getId()).toList();
 		itemsUpdateValidation.repaireDeleteItems(salesinfo);
 		return salesDao.permantalyDeleteBySalesId(ids.get(0), ownerId);
+	}
+
+	@Override
+	public ReportSummaryDTO getReportSummary(SearchCriteria criteria) {
+		return salesDao.getReportSummary(criteria);
 	}
 
 	

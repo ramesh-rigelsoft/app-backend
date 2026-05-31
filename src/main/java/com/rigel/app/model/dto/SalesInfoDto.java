@@ -3,6 +3,7 @@ package com.rigel.app.model.dto;
 import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.rigel.app.model.BuyerInfo;
 
 import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
@@ -12,7 +13,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -95,5 +95,6 @@ public class SalesInfoDto {
 	private String entryType;
 	private String serialNumberType;
 	private LocalDateTime createdAt;
+	private BuyerInfo buyerInfo;
 
 }

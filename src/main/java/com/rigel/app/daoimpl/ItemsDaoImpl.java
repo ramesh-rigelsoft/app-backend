@@ -179,45 +179,32 @@ public class ItemsDaoImpl implements IItemsDao {
 	    int ownerId = criteria.getUserId();
 
 	    // =====================================================
-	    // DASHBOARD SUMMARY (with filters)
+	    // COMMON FILTER BUILDER
 	    // =====================================================
 
-	    StringBuilder summaryJpql = new StringBuilder("""
-	        SELECT
-	            COALESCE(SUM(i.sellingPrice),0),
-	            COUNT(i.id),
-	            COUNT(DISTINCT i.vendorName)
-	        FROM Items i
-	        WHERE i.ownerId = :ownerId
-	    """);
+	    StringBuilder filter = new StringBuilder(" WHERE i.ownerId = :ownerId ");
+	    filter.append(" AND i.vendorName IS NOT NULL ");
+	    filter.append(" AND TRIM(i.vendorName) <> '' ");
+	    filter.append(" AND i.vendorInvoiceNumber IS NOT NULL ");
+	    filter.append(" AND TRIM(i.vendorInvoiceNumber) <> '' ");
 
-	    Map<String, Object> params = new HashMap<>();
-	    params.put("ownerId", ownerId);
+	    LocalDateTime start = null;
+	    LocalDateTime end = null;
+	    String search = null;
 
-	    // =========================
-	    // DATE FILTER
-	    // =========================
 	    if (criteria.getStartDate() != null && criteria.getEndDate() != null) {
+	        start = DateUtility.parseToDateTimes(criteria.getStartDate(), false);
+	        end = DateUtility.parseToDateTimes(criteria.getEndDate(), true);
 
-	        LocalDateTime start =
-	                DateUtility.parseToDateTimes(criteria.getStartDate(), false);
-
-	        LocalDateTime end =
-	                DateUtility.parseToDateTimes(criteria.getEndDate(), true);
-
-	        summaryJpql.append(" AND i.createdAt BETWEEN :startDate AND :endDate ");
-
-	        params.put("startDate", start);
-	        params.put("endDate", end);
+	        filter.append(" AND i.createdAt BETWEEN :startDate AND :endDate ");
 	    }
 
-	    // =========================
-	    // KEYWORD FILTER
-	    // =========================
-	    if (criteria.getSearchKeyword() != null
-	            && !criteria.getSearchKeyword().trim().isEmpty()) {
+	    if (criteria.getSearchKeyword() != null &&
+	            !criteria.getSearchKeyword().trim().isEmpty()) {
 
-	        summaryJpql.append("""
+	        search = "%" + criteria.getSearchKeyword().toLowerCase().trim() + "%";
+
+	        filter.append("""
 	            AND (
 	                LOWER(i.itemCode) LIKE :search
 	                OR LOWER(i.modelName) LIKE :search
@@ -229,75 +216,67 @@ public class ItemsDaoImpl implements IItemsDao {
 	                OR LOWER(i.itemCondition) LIKE :search
 	            )
 	        """);
-
-	        params.put(
-	                "search",
-	                "%" + criteria.getSearchKeyword().toLowerCase().trim() + "%"
-	        );
 	    }
-
-	    Object[] summary;
-
-	    TypedQuery<Object[]> query1 =
-	            entityManager.createQuery(summaryJpql.toString(), Object[].class);
-
-	    // mandatory
-	    query1.setParameter("ownerId", ownerId);
-
-	    // date filter (optional)
-	    if (params.get("startDate") != null && params.get("endDate") != null) {
-	        query1.setParameter("startDate", params.get("startDate"));
-	        query1.setParameter("endDate", params.get("endDate"));
-	    }
-
-	    // search filter (ONLY if exists)
-	    if (criteria.getSearchKeyword() != null
-	            && !criteria.getSearchKeyword().trim().isEmpty()) {
-
-	        query1.setParameter("search", params.get("search"));
-	    }
-
-	    summary = query1.getSingleResult();
-	    
-
-	    double totalPurchase =
-	            summary[0] != null ? ((Number) summary[0]).doubleValue() : 0;
-
-	    long totalItems =
-	            summary[1] != null ? ((Number) summary[1]).longValue() : 0;
-
-	    long totalVendors =
-	            summary[2] != null ? ((Number) summary[2]).longValue() : 0;
 
 	    // =====================================================
-	    // VENDOR PERFORMANCE (same as before)
+	    // SUMMARY QUERY
 	    // =====================================================
 
-	    List<Object[]> rows = entityManager
-	            .createQuery("""
-	                SELECT
-	                    i.vendorName,
-	                    i.vendorInvoiceNumber,
-	                    COUNT(i.id),
-	                    COALESCE(SUM(i.sellingPrice),0)
-	                FROM Items i
-	                WHERE i.ownerId = :ownerId
-	                GROUP BY i.vendorName,
-	                         i.vendorInvoiceNumber
-	                ORDER BY i.vendorName ASC
-	            """, Object[].class)
-	            .setParameter("ownerId", ownerId)
-	            .getResultList();
+	    TypedQuery<Object[]> summaryQuery = entityManager.createQuery(
+	            "SELECT COALESCE(SUM(i.sellingPrice),0), " +
+	                    "COUNT(i.id), " +
+	                    "COUNT(DISTINCT i.vendorName) " +
+	                    "FROM Items i " + filter,
+	            Object[].class
+	    );
+
+	    summaryQuery.setParameter("ownerId", ownerId);
+
+	    if (start != null && end != null) {
+	        summaryQuery.setParameter("startDate", start);
+	        summaryQuery.setParameter("endDate", end);
+	    }
+
+	    if (search != null) {
+	        summaryQuery.setParameter("search", search);
+	    }
+
+	    Object[] summary = summaryQuery.getSingleResult();
+
+	    double totalPurchase = ((Number) summary[0]).doubleValue();
+	    long totalItems = ((Number) summary[1]).longValue();
+	    long totalVendors = ((Number) summary[2]).longValue();
+
+	    // =====================================================
+	    // VENDOR PERFORMANCE (FIXED - NO NULL / EMPTY)
+	    // =====================================================
+
+	    List<Object[]> rows = entityManager.createQuery("""
+	        SELECT i.vendorName,
+	               i.vendorInvoiceNumber,
+	               COUNT(i.id),
+	               COALESCE(SUM(i.sellingPrice),0)
+	        FROM Items i
+	        WHERE i.ownerId = :ownerId
+	          AND i.vendorName IS NOT NULL
+	          AND TRIM(i.vendorName) <> ''
+	          AND i.vendorInvoiceNumber IS NOT NULL
+	          AND TRIM(i.vendorInvoiceNumber) <> ''
+	        GROUP BY i.vendorName, i.vendorInvoiceNumber
+	        ORDER BY i.vendorName ASC
+	    """, Object[].class)
+	    .setParameter("ownerId", ownerId)
+	    .getResultList();
 
 	    Map<String, VendorPerformanceDTO> vendorMap = new LinkedHashMap<>();
 
 	    for (Object[] r : rows) {
 
-	        String vendor = r[0] != null ? r[0].toString() : "UNKNOWN";
-	        String invoice = r[1] != null ? r[1].toString() : "N/A";
+	        String vendor = r[0].toString().trim();
+	        String invoice = r[1].toString().trim();
 
-	        long itemCount = r[2] != null ? ((Number) r[2]).longValue() : 0;
-	        double amount = r[3] != null ? ((Number) r[3]).doubleValue() : 0;
+	        long itemCount = ((Number) r[2]).longValue();
+	        double amount = ((Number) r[3]).doubleValue();
 
 	        VendorPerformanceDTO dto = vendorMap.computeIfAbsent(
 	                vendor,
@@ -319,52 +298,26 @@ public class ItemsDaoImpl implements IItemsDao {
 	    }
 
 	    // =====================================================
-	    // ITEM LIST (FILTERED)
+	    // ITEM LIST (NO PAGINATION)
 	    // =====================================================
 
-	    StringBuilder itemJpql = new StringBuilder("""
-	        SELECT i
-	        FROM Items i
-	        WHERE i.ownerId = :ownerId
-	    """);
+	    TypedQuery<Items> itemQuery = entityManager.createQuery(
+	            "SELECT i FROM Items i " + filter + " ORDER BY i.createdAt DESC",
+	            Items.class
+	    );
 
-	    if (criteria.getStartDate() != null && criteria.getEndDate() != null) {
-	        itemJpql.append(" AND i.createdAt BETWEEN :startDate AND :endDate ");
+	    itemQuery.setParameter("ownerId", ownerId);
+
+	    if (start != null && end != null) {
+	        itemQuery.setParameter("startDate", start);
+	        itemQuery.setParameter("endDate", end);
 	    }
 
-	    if (criteria.getSearchKeyword() != null
-	            && !criteria.getSearchKeyword().trim().isEmpty()) {
-
-	        itemJpql.append("""
-	            AND (
-	                LOWER(i.itemCode) LIKE :search
-	                OR LOWER(i.modelName) LIKE :search
-	                OR LOWER(i.brand) LIKE :search
-	                OR LOWER(i.categoryType) LIKE :search
-	                OR LOWER(i.description) LIKE :search
-	                OR LOWER(i.vendorName) LIKE :search
-	                OR LOWER(i.vendorGSTNumber) LIKE :search
-	                OR LOWER(i.itemCondition) LIKE :search
-	            )
-	        """);
+	    if (search != null) {
+	        itemQuery.setParameter("search", search);
 	    }
 
-	    TypedQuery<Items> query =
-	            entityManager.createQuery(itemJpql.toString(), Items.class);
-
-	    query.setParameter("ownerId", ownerId);
-
-	    if (criteria.getStartDate() != null && criteria.getEndDate() != null) {
-	        query.setParameter("startDate", params.get("startDate"));
-	        query.setParameter("endDate", params.get("endDate"));
-	    }
-
-	    if (criteria.getSearchKeyword() != null
-	            && !criteria.getSearchKeyword().trim().isEmpty()) {
-	        query.setParameter("search", params.get("search"));
-	    }
-
-	    List<Items> items = query.getResultList();
+	    List<Items> items = itemQuery.getResultList();
 
 	    // =====================================================
 	    // FINAL RESPONSE

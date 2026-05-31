@@ -3,6 +3,7 @@ package com.rigel.app.dao;
 import java.util.List;
 
 import com.rigel.app.model.SalesInfo;
+import com.rigel.app.model.dto.ReportSummaryDTO;
 import com.rigel.app.model.dto.SearchCriteria;
 
 public interface ISalesDao {
@@ -22,5 +23,7 @@ public interface ISalesDao {
 	public int deleteBySalesId(String id, int ownerId);
 	
 	public List<SalesInfo> fetchSalesByRepaireDevice(String deviceId, int ownerId);
+	
+	public ReportSummaryDTO getReportSummary(SearchCriteria criteria);
 	
 }
