@@ -346,7 +346,7 @@ public class ExcelDirectSave {
 	            setCell(row, col++, s.getState(), dataStyle);
 	            setCell(row, col++, s.getPaymentModes(), dataStyle);
 	            setCell(row, col++, s.getPaidAmount(), dataStyle);
-	            setCell(row, col++, s.getPendingAmount(), dataStyle);
+	            setCell(row, col++, s.getBorrowAmount(), dataStyle);
 
 	            // -------- SALES --------
 	            setCell(row, col++, s.getItemCode(), dataStyle);

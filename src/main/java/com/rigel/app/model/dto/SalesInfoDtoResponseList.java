@@ -1,4 +1,5 @@
 package com.rigel.app.model.dto;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import lombok.AllArgsConstructor;
@@ -29,8 +30,9 @@ public class SalesInfoDtoResponseList {
     private String state;
 
     private String paymentModes;
-    private double paidAmount;
-    private String pendingAmount;
+    private BigDecimal paidAmount;
+    private BigDecimal totalAmount;
+    private BigDecimal borrowAmount;
     
 
     // ================= SALES INFO (ONLY REPORT RELEVANT) =================

@@ -1,10 +1,10 @@
 package com.rigel.app.model;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -15,30 +15,16 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
-import lombok.Builder.Default;
-
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 
-//@Builder
-//@NoArgsConstructor
-//@AllArgsConstructor
+
 @Setter
 @Getter
 @Entity
 @Table(name="BUYER_INFO")
-//@ToString
 public class BuyerInfo implements Serializable{
 	
 	/**
@@ -64,12 +50,16 @@ public class BuyerInfo implements Serializable{
 
 	private String financeId;
     private String emiTenure;
-    private double paidAmount;
+    private BigDecimal paidAmount;
     private String imeiNumber;
     private String pendingPaymentStatus;
-    private String restAmount;
-    private double totalAmount;
-    private LocalDateTime restAmountDate;
+    private BigDecimal totalAmount;
+    private BigDecimal borrowAmount;
+    
+    @Column(columnDefinition = "CLOB")
+    private String transactionBorrow; 
+    
+    private LocalDateTime lastTransactionDate;
     	
 	private String buyerName;
 	private String emailId;

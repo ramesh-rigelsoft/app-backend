@@ -1,6 +1,7 @@
 package com.rigel.app.controller;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,6 +16,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rigel.app.builder.BuyerInfoDTO;
 import com.rigel.app.builder.SalesInfoDTO;
 import com.rigel.app.dao.ISalesDao;
@@ -28,6 +32,7 @@ import com.rigel.app.model.dto.RequrnReplaceRequest;
 import com.rigel.app.model.dto.SalesRequest;
 import com.rigel.app.model.dto.SalesResponse;
 import com.rigel.app.model.dto.SearchCriteria;
+import com.rigel.app.model.dto.TransactionBorrow;
 import com.rigel.app.service.IBuyerInfoService;
 import com.rigel.app.service.ISalesService;
 import com.rigel.app.serviceimpl.ExcelDirectSave;
@@ -54,6 +59,9 @@ public class SalesController {
 	
 	@Autowired
 	com.rigel.app.serviceimpl.BuyerCommonService buyerCommonService;
+	
+	@Autowired
+	private ObjectMapper objectMapper;
 	
 	@PostMapping("search")
 	public ResponseEntity<Map<String, Object>> save(@RequestBody(required = true) SearchCriteria searchCriteria) {
@@ -151,21 +159,34 @@ public class SalesController {
 	    List<CustomerDTO> result = new ArrayList<>();
 
 	    for (BuyerInfoDTO sale : salesList) {
+	    	
+	    	BigDecimal totalAmount = BigDecimal.ZERO;
 
-	        double totalAmount = 0.0;
+	    	if (sale.getSalesInfo() != null) {
+	    	    for (SalesInfoDTO item : sale.getSalesInfo()) {
+	    	        BigDecimal price = BigDecimal.valueOf(item.getSoldPrice() != null ? item.getSoldPrice() : 0.0);
+	    	        BigDecimal qty = BigDecimal.valueOf(item.getQuantity() != null ? item.getQuantity() : 0.0);
+	    	        totalAmount = totalAmount.add(price.multiply(qty));
+	    	    }
+	    	}
 
-	        if (sale.getSalesInfo() != null) {
-	            for (SalesInfoDTO item : sale.getSalesInfo()) {
 
-	                double price = item.getSoldPrice() != null ? item.getSoldPrice() : 0.0;
-	                double qty = item.getQuantity() != null ? item.getQuantity() : 0.0;
-
-	                totalAmount += (price * qty);
-	            }
-	        }
-            double restAmount=Double.parseDouble(String.valueOf(sale.getRestAmount()!=null?sale.getRestAmount():0));
-            double paidAmount = sale.getPaidAmount();
-	        double pendingAmount = totalAmount - paidAmount-restAmount;
+            BigDecimal borrowAmount=sale.getBorrowAmount();
+            BigDecimal paidAmount = sale.getPaidAmount();
+	        List<TransactionBorrow> transactionBorrow=null;
+			try {
+				transactionBorrow =
+					    objectMapper.readValue(
+					        sale.getTransactionBorrow(),
+					        new com.fasterxml.jackson.core.type.TypeReference<List<TransactionBorrow>>() {}
+					    );
+			} catch (JsonMappingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (JsonProcessingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 
 	        CustomerDTO dto = new CustomerDTO();
 	        dto.setInvoiceNumber(sale.getInvoiceNumber());
@@ -175,15 +196,12 @@ public class SalesController {
 
 	        dto.setTotalAmount(totalAmount);
 	        dto.setPaidAmount(paidAmount);
-	        dto.setPendingAmount(pendingAmount);
+	        dto.setBorrowAmount(borrowAmount);
 	        dto.setPaymentModes(sale.getPaymentModes());
 
-	        dto.setRestAmount(sale.getRestAmount());
-	        dto.setRestAmountDate(sale.getRestAmountDate());
-	        
-	        dto.setPaymentStatus(pendingAmount > 0 ? "Pending" : "Paid");
-	        dto.setCreatedAt(sale.getCreatedAt());
-
+	        dto.setLastTranactionDate(sale.getLastTransactionDate());
+	        dto.setTransactionBorrow(transactionBorrow);
+	        dto.setPaymentStatus(borrowAmount.compareTo(BigDecimal.ZERO) > 0 ? "Pending" : "Paid");dto.setCreatedAt(sale.getCreatedAt());
 	        result.add(dto);
 	    }
 

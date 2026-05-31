@@ -1,5 +1,6 @@
 package com.rigel.app.dao;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -17,6 +18,6 @@ public interface IBuyerDao {
 	
 	public List<BuyerInfo> searchBuyerInfo(SearchCriteria criteria);
 	
-	public int updateRestAmountAndDate(String id, String restAmount, LocalDateTime restAmountDate);
+	public int updateRestAmountAndDate(String id,BigDecimal paidAmount, String status, BigDecimal borrowAmount, String transactionBorrow);
 
 }

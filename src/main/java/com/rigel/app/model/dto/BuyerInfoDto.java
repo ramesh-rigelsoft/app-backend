@@ -1,19 +1,17 @@
 package com.rigel.app.model.dto;
 
-import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.validation.constraints.NotNull;
-
-import java.util.Set;
 
 
 @Builder
@@ -37,13 +35,14 @@ public class BuyerInfoDto {
 	    
 		private String financeId;
 	    private String emiTenure;          // months
-	    private double paidAmount;
+	    private BigDecimal paidAmount;
 	    private String imeiNumber;
         // months
-	    private double totalAmount;
+	    private BigDecimal totalAmount;
 	    private String pendingPaymentStatus;
-	    private String restAmount;
-	    private LocalDateTime restAmountDate;
+	    private BigDecimal borrowAmount;
+	    private List<TransactionBorrow> transactionBorrow; 
+	    private LocalDateTime lastTransactionDate;
 
 		
 	    @JsonProperty("buyerName")

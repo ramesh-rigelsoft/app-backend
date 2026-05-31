@@ -1,5 +1,6 @@
 package com.rigel.app.builder;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -84,12 +85,16 @@ public class BuyerInfoDTO {
     
 	private String financeId;
     private String emiTenure;
-    private double paidAmount;
+    private BigDecimal paidAmount;
     private String imeiNumber;
-    private String restAmount;
-    private String restAmountDate;
+    private BigDecimal totalAmount; 
+    private BigDecimal borrowAmount;
+    private String transactionBorrow; 
+    private String lastTransactionDate;
+   
     private String replaceCount;
 
+    
     // 👇 Nested Sales DTO list
     @JsonProperty("salesInfo")
     private List<SalesInfoDTO> salesInfo;

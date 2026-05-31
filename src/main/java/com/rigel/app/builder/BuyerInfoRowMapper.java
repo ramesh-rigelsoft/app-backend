@@ -43,10 +43,11 @@ public class BuyerInfoRowMapper implements ResultSetExtractor<List<BuyerInfoDTO>
                         .pinCode(rs.getString("pin_code"))
                         .state(rs.getString("state"))
                         .district(rs.getString("district"))
-                        .restAmount(rs.getString("rest_amount"))
-                        .restAmountDate(rs.getTimestamp("rest_amount_date")!= null
-                                ? rs.getTimestamp("rest_amount_date").toLocalDateTime().format(formatter)
-                                : null)
+                        .borrowAmount(rs.getBigDecimal("borrow_amount"))
+                        .totalAmount(rs.getBigDecimal("total_amount"))
+                        .paidAmount(rs.getBigDecimal("paid_amount"))
+                        .lastTransactionDate(rs.getTimestamp("last_transaction_date").toLocalDateTime().format(formatter))
+                        .transactionBorrow(rs.getString("transaction_borrow"))
                         .companyAddress(rs.getString("company_address"))
                         .status(rs.getInt("buyer_status"))
                         .createdAt(
@@ -61,7 +62,6 @@ public class BuyerInfoRowMapper implements ResultSetExtractor<List<BuyerInfoDTO>
                         .financeId(rs.getString("finance_id"))
                         .imeiNumber(rs.getString("imei_number"))
                         .emiTenure(rs.getString("emi_tenure"))
-                        .paidAmount(rs.getDouble("paid_amount"))
                         .build();
 
                 map.put(buyerId, buyer);

@@ -56,12 +56,18 @@ public class SalesDaoImpl implements ISalesDao {
 		}
 
 		// SAVE / UPDATE BUYER
-		double total = salesInfoList.stream().mapToDouble(s -> s.getSoldPrice()).sum();
-		if (buyerInfo.getPaidAmount() != total) {
-			buyerInfo.setPendingPaymentStatus(Constaints.PENDING_PAYMENT_STATUS);
+		BigDecimal total = salesInfoList.stream()
+		        .map(s -> BigDecimal.valueOf(s.getSoldPrice()))
+		        .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+		BigDecimal paidAmount = buyerInfo.getPaidAmount();
+
+		if (paidAmount.compareTo(total) != 0) {
+		    buyerInfo.setPendingPaymentStatus(Constaints.PENDING_PAYMENT_STATUS);
 		} else {
-			buyerInfo.setPendingPaymentStatus(Constaints.CLEARED_PAYMENT_STATUS);
+		    buyerInfo.setPendingPaymentStatus(Constaints.CLEARED_PAYMENT_STATUS);
 		}
+		
 		BuyerInfo savedBuyer = entityManager.merge(buyerInfo);
 
 		// SET SAME BUYER INTO ALL SALES
@@ -338,7 +344,7 @@ public class SalesDaoImpl implements ISalesDao {
 			        s.total_selling_price,
 			        s.total_sold_price,
 			        b.total_paid_amount,
-			        b.total_rest_amount
+			        b.total_borrow_amount
 			    FROM
 			    (
 			        SELECT
@@ -355,13 +361,7 @@ public class SalesDaoImpl implements ISalesDao {
 			    (
 			        SELECT
 			            COALESCE(SUM(PAIDAMOUNT),0) AS total_paid_amount,
-			            COALESCE(
-			                SUM(
-			                    CAST(
-			                        COALESCE(NULLIF(RESTAMOUNT,''),'0')
-			                    AS DOUBLE)
-			                ),0
-			            ) AS total_rest_amount
+			            COALESCE(SUM(borrowAmount),0) AS total_borrow_amount
 			        FROM buyer_info
 			        WHERE id IN (
 			            SELECT DISTINCT buyerInfo
@@ -389,15 +389,10 @@ public class SalesDaoImpl implements ISalesDao {
 			BigDecimal totalSoldPrice =
 			        BigDecimal.valueOf(((Number) result[3]).doubleValue());
 
-			BigDecimal totalPaid =
+			BigDecimal totalPaidAmount =
 			        BigDecimal.valueOf(((Number) result[4]).doubleValue());
 
-			BigDecimal totalRest =
-			        BigDecimal.valueOf(((Number) result[5]).doubleValue());
-
-			BigDecimal totalPaidAmount = totalPaid.add(totalRest);
-
-			BigDecimal pending = totalSoldPrice.subtract(totalPaidAmount);
+			BigDecimal pending = BigDecimal.valueOf(((Number) result[5]).doubleValue());
 
 		// =========================================================
 		// FINAL TOTAL PAID AMOUNT
@@ -431,27 +426,25 @@ public class SalesDaoImpl implements ISalesDao {
 		List<SalesInfoDtoResponseList> salesList = salesEntities.stream().map((SalesInfo s) -> {
 
 			BuyerInfo b = s.getBuyerInfo();
+			BigDecimal paidAmount = b != null ? b.getPaidAmount() : BigDecimal.ZERO;
+			BigDecimal borrowAmount = b != null ? b.getBorrowAmount() : BigDecimal.ZERO;
+			BigDecimal totalAmount = b != null ? b.getTotalAmount() : BigDecimal.ZERO;
 
-			double paidAmount = b != null ? b.getPaidAmount() : 0.0;
-
-			double restAmount = 0.0;
-
-			if (b != null && b.getRestAmount() != null && !b.getRestAmount().isBlank()) {
-
-				restAmount = Double.parseDouble(b.getRestAmount());
-			}
+//			double borrowAmount = 0.0;
+//			borrowAmount = b.getBorrowAmount();
 
 			// =========================
 			// totalPaidAmount = paid + rest
 			// =========================
-			double totalPaidAmountRow = paidAmount + restAmount;
+//			double totalPaidAmountRow = paidAmount;
 
 			double soldPrice = s.getSoldPrice() != null ? s.getSoldPrice() : 0.0;
 
 			// =========================
 			// pending = sold - totalPaidAmount
 			// =========================
-			double pendingAmount = soldPrice - totalPaidAmountRow;
+
+//			double pendingAmount = borrowAmount;//soldPrice - totalPaidAmountRow;
 
 			return SalesInfoDtoResponseList.builder()
 
@@ -475,15 +468,13 @@ public class SalesDaoImpl implements ISalesDao {
 					.paymentModes(b != null ? b.getPaymentModes() : null)
 
 					// ================= PAYMENT =================
+					
 					.paidAmount(paidAmount)
-
-//					.restAmount(restAmount)
-
-//					.totalPaidAmount(totalPaidAmountRow)
-
-//					.pendingAmount(pendingAmount)
-
+                    .totalAmount(totalAmount)
+					.borrowAmount(borrowAmount)
+					
 					// ================= SALES =================
+					
 					.itemCode(s.getItemCode())
                     
 					.categoryType(s.getCategoryType())

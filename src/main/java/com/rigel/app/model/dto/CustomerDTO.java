@@ -1,5 +1,6 @@
 package com.rigel.app.model.dto;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,14 +15,14 @@ public class CustomerDTO {
 	private String mobileNo;
 	private String customerId;
 
-	private double totalAmount;
-	private double paidAmount;
-	private double pendingAmount;
+	private BigDecimal totalAmount;
+	private BigDecimal paidAmount;
+	private BigDecimal borrowAmount;
+//    private double paidBorrowAmount;
 
-
-    private String restAmount;
-    private String restAmountDate;
+    private String lastTranactionDate;
 	private String paymentStatus;
 	private String paymentModes;
 	private String createdAt;
+	private List<TransactionBorrow> transactionBorrow;
 }

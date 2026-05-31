@@ -1,5 +1,6 @@
 package com.rigel.app.daoimpl;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -58,12 +59,15 @@ public class BuyerDaoImpl implements IBuyerDao {
 	}
 	
 	@Override
-	public int updateRestAmountAndDate(String id, String restAmount, LocalDateTime restAmountDate) {
+	public int updateRestAmountAndDate(String id,BigDecimal paidAmount,String pendingPaymentStatus, BigDecimal borrowAmount,String transactionBorrow) {
 		System.out.println("id---------"+id);
-        String jpql = "UPDATE BuyerInfo SET pendingPaymentStatus='Cleared', restAmount = :restAmount, restAmountDate = :restAmountDate WHERE id = :id";
+        String jpql = "UPDATE BuyerInfo SET paidAmount=:paidAmount, pendingPaymentStatus=:pendingPaymentStatus,transactionBorrow = :transactionBorrow, borrowAmount = :borrowAmount, lastTransactionDate = :lastTransactionDate WHERE id = :id";
         return entityManager.createQuery(jpql)
-                .setParameter("restAmount", restAmount)
-                .setParameter("restAmountDate", restAmountDate)
+        		.setParameter("paidAmount", paidAmount)
+        		.setParameter("pendingPaymentStatus", pendingPaymentStatus)
+                .setParameter("transactionBorrow", transactionBorrow)
+                .setParameter("borrowAmount", borrowAmount)
+                .setParameter("lastTransactionDate", LocalDateTime.now())
                 .setParameter("id", id)
                 .executeUpdate();
 	}

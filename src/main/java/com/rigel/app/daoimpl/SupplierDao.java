@@ -1,5 +1,6 @@
 package com.rigel.app.daoimpl;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -234,16 +235,16 @@ public class SupplierDao implements ISupplierDao {
 	    .setParameter("invoiceNumbers", invoiceNumbers)
 	    .getResultList();
 
-	    Map<String, Double> totalMap = new HashMap<>();
+	    Map<String, BigDecimal> totalMap = new HashMap<>();
 
 	    for (Object[] row : totalResults) {
 
 	        String invoiceNumber = (String) row[0];
 
-	        Double totalAmount =
-	            row[1] != null
-	                ? ((Number) row[1]).doubleValue()
-	                : 0.0;
+	        BigDecimal totalAmount =
+	        	    row[1] != null
+	        	        ? new BigDecimal(((Number) row[1]).toString())
+	        	        : BigDecimal.ZERO;
 
 	        totalMap.put(invoiceNumber, totalAmount);
 	    }
@@ -264,17 +265,16 @@ public class SupplierDao implements ISupplierDao {
 	    .setParameter("invoiceNumbers", invoiceNumbers)
 	    .getResultList();
 
-	    Map<String, Double> paidMap = new HashMap<>();
+	    Map<String, BigDecimal> paidMap = new HashMap<>();
 
 	    for (Object[] row : paidResults) {
 
 	        String invoiceNumber = (String) row[0];
 
-	        Double paidAmount =
-	            row[1] != null
-	                ? ((Number) row[1]).doubleValue()
-	                : 0.0;
-
+	        BigDecimal paidAmount =
+	        	    row[1] != null
+	        	        ? new BigDecimal(((Number) row[1]).toString())
+	        	        : BigDecimal.ZERO;
 	        paidMap.put(invoiceNumber, paidAmount);
 	    }
 
@@ -303,12 +303,14 @@ public class SupplierDao implements ISupplierDao {
 	        tx.setDate(payment.getCreatedAt());
 
 	        tx.setAmount(
-	            payment.getPaidAmount() != 0.0
-	                ? payment.getPaidAmount()
-	                : 0.0
-	        );
+	        	    payment.getPaidAmount() != null
+	        	        ? payment.getPaidAmount()
+	        	        : BigDecimal.ZERO
+	        	);
 
 	        tx.setStatus("paid");
+	        tx.setComments(payment.getComments());
+	        tx.setPaymentModes(payment.getPaymentModes());
 
 	        transactionMap
 	            .computeIfAbsent(invoiceNumber, k -> new ArrayList<>())
@@ -372,17 +374,16 @@ public class SupplierDao implements ISupplierDao {
 	            continue;
 	        }
 
-	        double totalAmount =
-	            totalMap.getOrDefault(invoiceNumber, 0.0);
+	        BigDecimal totalAmount =
+	            totalMap.getOrDefault(invoiceNumber, BigDecimal.ZERO);
 
-	        double paidAmount =
-	            paidMap.getOrDefault(invoiceNumber, 0.0);
+	        BigDecimal paidAmount =
+	            paidMap.getOrDefault(invoiceNumber, BigDecimal.ZERO);
 
-	        double pendingAmount =
-	            totalAmount - paidAmount;
+	        BigDecimal pendingAmount = totalAmount.subtract(paidAmount);
 
-	        if (pendingAmount < 0) {
-	            pendingAmount = 0;
+	        if (pendingAmount.compareTo(BigDecimal.ZERO) < 0) {
+	            pendingAmount = BigDecimal.ZERO;
 	        }
 
 	        InvoicePaymentDTO invoiceDTO =

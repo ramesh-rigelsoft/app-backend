@@ -99,7 +99,7 @@ public class DashboardDaoImpl implements IDashboardDao {
 				.createQuery("SELECT e FROM Inventory e " + "WHERE e.status=true AND e.ownerId = :ownerId ",
 						Inventory.class)
 				.setParameter("ownerId", ownerId).getResultList();
-		System.out.println("inventory-------------"+inventory.size());
+		
 
 		List<Expense> expense = entityManager
 				.createQuery("SELECT e FROM Expense e " + "WHERE e.status=true AND e.ownerId = :ownerId "

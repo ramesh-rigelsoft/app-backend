@@ -123,17 +123,17 @@ public class SupplierController {
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 	
-	@PostMapping("vendorss")
-	public ResponseEntity<Map<String, Object>> getVenders(@RequestBody(required = true) SearchCriteria creteria) {
-		Map<String, Object> response = new HashMap<>();
-		Map<String, Object> data = new HashMap<>();
-		List<Vendors> supplierList = supplierService.searchVender(creteria);
-		List<VendorInvoiceResponse>  list=AppUtill.mapToInvoiceResponse(supplierList);
-		data.put("vendors", list);
-		response.put("data", data);
-		response.put("status", "OK");
-		response.put("code", "200");
-		response.put("message", "Your records has been fetch successfully.");
-		return new ResponseEntity<>(response, HttpStatus.OK);
-	}
+//	@PostMapping("vendorss")
+//	public ResponseEntity<Map<String, Object>> getVenders(@RequestBody(required = true) SearchCriteria creteria) {
+//		Map<String, Object> response = new HashMap<>();
+//		Map<String, Object> data = new HashMap<>();
+//		List<Vendors> supplierList = supplierService.searchVender(creteria);
+//		List<VendorInvoiceResponse>  list=AppUtill.mapToInvoiceResponse(supplierList);
+//		data.put("vendors", list);
+//		response.put("data", data);
+//		response.put("status", "OK");
+//		response.put("code", "200");
+//		response.put("message", "Your records has been fetch successfully.");
+//		return new ResponseEntity<>(response, HttpStatus.OK);
+//	}
 }

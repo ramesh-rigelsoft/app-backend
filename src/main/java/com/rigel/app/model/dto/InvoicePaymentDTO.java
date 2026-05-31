@@ -1,4 +1,5 @@
 package com.rigel.app.model.dto;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,11 +20,11 @@ public class InvoicePaymentDTO {
 
     private String invoiceNumber;
 
-    private Double totalAmount = 0.0;
+    private BigDecimal totalAmount;
 
-    private Double paidAmount = 0.0;
+    private BigDecimal paidAmount;
 
-    private Double pendingAmount = 0.0;
+    private BigDecimal pendingAmount;
 
     private List<TransactionDTO> transactions =
             new ArrayList<>();

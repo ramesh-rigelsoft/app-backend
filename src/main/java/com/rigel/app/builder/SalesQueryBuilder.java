@@ -135,9 +135,11 @@ public class SalesQueryBuilder {
 				bi.createdAt AS created_at,
 				bi.noteComment AS note_comment,
 				bi.ownerId AS owner_id,
-				bi.restAmountDate AS rest_amount_date,
-				bi.restAmount AS rest_amount,
-               
+				bi.lastTransactionDate AS last_transaction_date,
+				bi.borrowAmount AS borrow_amount,
+				bi.totalAmount AS total_amount,
+				bi.paidAmount AS paid_amount,
+				bi.transactionBorrow AS transaction_borrow,               
 
                 si.ID AS sales_id,
 				si.item_code AS item_code,

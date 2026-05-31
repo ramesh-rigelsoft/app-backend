@@ -1,6 +1,7 @@
 package com.rigel.app.model;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -38,6 +39,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 @Setter
 @Entity
 @Table(name = "VENDORS_PAYMENTS")
+@ToString
 public class VendorPayments{
 
 	@Id
@@ -50,14 +52,13 @@ public class VendorPayments{
 	
 	private String gstNumber;
 	private String vendorInvoiceNumber;
-	private double paidAmount;
+	private BigDecimal paidAmount;
 	private LocalDateTime createdAt;
 	private LocalDateTime updateAt;
 	private int ownerId;
 	
-	@Column(name = "lvstatus")
-	private boolean lvstatus;
-
+	private String paymentModes;
+	private String comments;
 	
 	@ManyToOne(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
 	@JoinColumn(name="vendors")

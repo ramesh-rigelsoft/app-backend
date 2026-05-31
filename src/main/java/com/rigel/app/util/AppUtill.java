@@ -65,76 +65,76 @@ public class AppUtill {
     }
 	
 	
-	public static List<VendorInvoiceResponse> mapToInvoiceResponse(List<Vendors> supplierList) {
-
-	    List<VendorInvoiceResponse> responseList = new ArrayList<>();
-
-	    for (Vendors vendor : supplierList) {
-
-	        Map<String, InvoiceDTO> invoiceMap = new HashMap<>();
-
-	        // 1. ITEMS → TOTAL
-	        for (Items item : vendor.getItems()) {
-
-	            String invoiceNo = item.getVendorInvoiceNumber();
-
-	            double itemTotal = item.getQuantity() * item.getSellingPrice();
-
-	            InvoiceDTO invoice = invoiceMap.getOrDefault(invoiceNo, new InvoiceDTO());
-
-	            invoice.setInvoiceNumber(invoiceNo);
-	            invoice.setTotalAmount(
-	                invoice.getTotalAmount() + itemTotal
-	            );
-
-	            invoiceMap.put(invoiceNo, invoice);
-	        }
-
-	        // 2. PAYMENTS → PAID + TRANSACTIONS
-	        for (VendorPayments pay : vendor.getVendorPayments()) {
-
-	            String invoiceNo = pay.getVendorInvoiceNumber();
-
-	            InvoiceDTO invoice = invoiceMap.get(invoiceNo);
-
-	            if (invoice != null) {
-
-	                invoice.setPaidAmount(
-	                    invoice.getPaidAmount() + pay.getPaidAmount()
-	                );
-
-	                if (invoice.getTransactions() == null) {
-	                    invoice.setTransactions(new ArrayList<>());
-	                }
-
-	                TransactionDTO tx = new TransactionDTO();
-	                tx.setDate(pay.getCreatedAt());
-	                tx.setAmount(pay.getPaidAmount());
-	                tx.setStatus("PAID");
-
-	                invoice.getTransactions().add(tx);
-	            }
-	        }
-
-	        // 3. PENDING CALCULATION
-	        for (InvoiceDTO inv : invoiceMap.values()) {
-	            inv.setPendingAmount(
-	                inv.getTotalAmount() - inv.getPaidAmount()
-	            );
-	        }
-
-	        // 4. FINAL RESPONSE
-	        VendorInvoiceResponse res = new VendorInvoiceResponse();
-	        res.setVendorName(vendor.getCompanyName());
-	        res.setId(vendor.getId());
-	        res.setGstNumber(vendor.getGstNumber());
-	        res.setInvoices(new ArrayList<>(invoiceMap.values()));
-
-	        responseList.add(res);
-	    }
-
-	    return responseList;
-	}
+//	public static List<VendorInvoiceResponse> mapToInvoiceResponse(List<Vendors> supplierList) {
+//
+//	    List<VendorInvoiceResponse> responseList = new ArrayList<>();
+//
+//	    for (Vendors vendor : supplierList) {
+//
+//	        Map<String, InvoiceDTO> invoiceMap = new HashMap<>();
+//
+//	        // 1. ITEMS → TOTAL
+//	        for (Items item : vendor.getItems()) {
+//
+//	            String invoiceNo = item.getVendorInvoiceNumber();
+//
+//	            double itemTotal = item.getQuantity() * item.getSellingPrice();
+//
+//	            InvoiceDTO invoice = invoiceMap.getOrDefault(invoiceNo, new InvoiceDTO());
+//
+//	            invoice.setInvoiceNumber(invoiceNo);
+//	            invoice.setTotalAmount(
+//	                invoice.getTotalAmount() + itemTotal
+//	            );
+//
+//	            invoiceMap.put(invoiceNo, invoice);
+//	        }
+//
+//	        // 2. PAYMENTS → PAID + TRANSACTIONS
+//	        for (VendorPayments pay : vendor.getVendorPayments()) {
+//
+//	            String invoiceNo = pay.getVendorInvoiceNumber();
+//
+//	            InvoiceDTO invoice = invoiceMap.get(invoiceNo);
+//
+//	            if (invoice != null) {
+//
+//	                invoice.setPaidAmount(
+//	                    invoice.getPaidAmount() + pay.getPaidAmount()
+//	                );
+//
+//	                if (invoice.getTransactions() == null) {
+//	                    invoice.setTransactions(new ArrayList<>());
+//	                }
+//
+//	                TransactionDTO tx = new TransactionDTO();
+//	                tx.setDate(pay.getCreatedAt());
+//	                tx.setAmount(pay.getPaidAmount());
+//	                tx.setStatus("PAID");
+//
+//	                invoice.getTransactions().add(tx);
+//	            }
+//	        }
+//
+//	        // 3. PENDING CALCULATION
+//	        for (InvoiceDTO inv : invoiceMap.values()) {
+//	            inv.setPendingAmount(
+//	                inv.getTotalAmount() - inv.getPaidAmount()
+//	            );
+//	        }
+//
+//	        // 4. FINAL RESPONSE
+//	        VendorInvoiceResponse res = new VendorInvoiceResponse();
+//	        res.setVendorName(vendor.getCompanyName());
+//	        res.setId(vendor.getId());
+//	        res.setGstNumber(vendor.getGstNumber());
+//	        res.setInvoices(new ArrayList<>(invoiceMap.values()));
+//
+//	        responseList.add(res);
+//	    }
+//
+//	    return responseList;
+//	}
 	
 	
 }

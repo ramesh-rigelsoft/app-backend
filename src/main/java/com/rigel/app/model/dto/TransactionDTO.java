@@ -1,5 +1,6 @@
 package com.rigel.app.model.dto;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import lombok.Getter;
@@ -10,8 +11,10 @@ import lombok.Setter;
 public class TransactionDTO {
 
     private LocalDateTime date;
-    private double amount;
+    private BigDecimal amount;
     private String status;
+    private String comments;
+    private String paymentModes;
 
     // getters & setters
 }
