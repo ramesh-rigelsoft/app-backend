@@ -1,5 +1,6 @@
 package com.rigel.app.model.dto;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -16,7 +17,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ItemsDashboardResponse {
 
-    private double totalPurchase;
+    private BigDecimal totalPurchase;
 
     private long totalItems;
 

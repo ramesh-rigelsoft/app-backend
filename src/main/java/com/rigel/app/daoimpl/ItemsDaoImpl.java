@@ -1,5 +1,6 @@
 package com.rigel.app.daoimpl;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -243,7 +244,7 @@ public class ItemsDaoImpl implements IItemsDao {
 
 	    Object[] summary = summaryQuery.getSingleResult();
 
-	    double totalPurchase = ((Number) summary[0]).doubleValue();
+	    BigDecimal totalPurchase = new BigDecimal(String.valueOf(summary[0]));
 	    long totalItems = ((Number) summary[1]).longValue();
 	    long totalVendors = ((Number) summary[2]).longValue();
 
@@ -276,7 +277,8 @@ public class ItemsDaoImpl implements IItemsDao {
 	        String invoice = r[1].toString().trim();
 
 	        long itemCount = ((Number) r[2]).longValue();
-	        double amount = ((Number) r[3]).doubleValue();
+//	        double amount = ((Number) r[3]).doubleValue();
+	        BigDecimal amount = new BigDecimal(String.valueOf(r[3]));
 
 	        VendorPerformanceDTO dto = vendorMap.computeIfAbsent(
 	                vendor,
@@ -286,7 +288,7 @@ public class ItemsDaoImpl implements IItemsDao {
 	                        .build()
 	        );
 
-	        dto.setTotalAmount(dto.getTotalAmount() + amount);
+	        dto.setTotalAmount(dto.getTotalAmount().add(amount));
 
 	        dto.getInvoices().add(
 	                VendorInvoiceDTO.builder()

@@ -1,5 +1,7 @@
 package com.rigel.app.model.dto;
 
+import java.math.BigDecimal;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -28,6 +30,5 @@ public class VendorInvoiceDTO {
     // Invoice Wise Total Amount
     // =========================================================
 
-    @Builder.Default
-    private double amount = 0;
+    private BigDecimal amount;
 }

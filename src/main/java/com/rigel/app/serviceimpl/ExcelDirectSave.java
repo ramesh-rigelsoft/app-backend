@@ -89,7 +89,7 @@ public class ExcelDirectSave {
 		// =========================================================
 		Row s1 = sheet.createRow(rowNum++);
 		s1.createCell(0).setCellValue("TOTAL PURCHASE");
-		s1.createCell(1).setCellValue(response.getTotalPurchase());
+		s1.createCell(1).setCellValue("Rs"+response.getTotalPurchase());
 
 		Row s2 = sheet.createRow(rowNum++);
 		s2.createCell(0).setCellValue("TOTAL ITEMS");
@@ -111,7 +111,7 @@ public class ExcelDirectSave {
 
 			Row vr = sheet.createRow(rowNum++);
 			vr.createCell(0).setCellValue(v.getVendorName());
-			vr.createCell(1).setCellValue(v.getTotalAmount());
+			vr.createCell(1).setCellValue("Rs "+v.getTotalAmount());
 
 			for (VendorInvoiceDTO inv : v.getInvoices()) {
 
@@ -119,7 +119,7 @@ public class ExcelDirectSave {
 				ir.createCell(1).setCellValue("Invoice");
 				ir.createCell(2).setCellValue(inv.getInvoiceNumber());
 				ir.createCell(3).setCellValue(inv.getItemCount());
-				ir.createCell(4).setCellValue(inv.getAmount());
+				ir.createCell(4).setCellValue("Rs "+inv.getAmount());
 			}
 
 			rowNum++;

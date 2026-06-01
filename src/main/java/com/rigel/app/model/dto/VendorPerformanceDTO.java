@@ -1,5 +1,6 @@
 package com.rigel.app.model.dto;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,15 +25,13 @@ public class VendorPerformanceDTO {
     // Total Vendor Purchase Amount
     // =========================================================
 
-    @Builder.Default
-    private double totalAmount = 0;
+    private BigDecimal totalAmount;
 
     // =========================================================
     // Total Item Count
     // =========================================================
 
-    @Builder.Default
-    private long totalItems = 0;
+    private long totalItems;
 
     // =========================================================
     // Invoice Wise Data
