@@ -1,18 +1,8 @@
 package com.rigel.app.validate;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import com.rigel.app.exception.ValidationException;
-import com.rigel.app.model.Inventory;
 import com.rigel.app.model.Items;
-import com.rigel.app.model.dto.SalesInfoDto;
-import com.rigel.app.model.dto.SearchCriteria;
-import com.rigel.app.service.IInventoryService;
-import com.rigel.app.util.Constaints;
 
 @Service
 public class EntryInfoValidator {
@@ -26,6 +16,11 @@ public class EntryInfoValidator {
 		// ❌ Empty owner Id
 		if (items.getOwnerId() == 0) {
 			throw new ValidationException("Session Expired, Please Login agin then try....");
+		}
+		
+		// ❌ Empty invoice number
+		if (!items.getCategory().equalsIgnoreCase("Shop Service")&&(items.getVendorInvoiceNumber() == null || items.getVendorInvoiceNumber().isBlank())) {
+			throw new ValidationException("Please enter the invoice number.");
 		}
 	
 	}
