@@ -288,7 +288,8 @@ public class ItemsDaoImpl implements IItemsDao {
 	                        .build()
 	        );
 
-	        dto.setTotalAmount(dto.getTotalAmount().add(amount));
+//	        dto.setTotalAmount(dto.getTotalAmount().add(amount));
+	        dto.setTotalAmount(amount);
 
 	        dto.getInvoices().add(
 	                VendorInvoiceDTO.builder()

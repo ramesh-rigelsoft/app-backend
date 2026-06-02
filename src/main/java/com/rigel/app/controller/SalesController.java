@@ -67,7 +67,11 @@ public class SalesController {
 	public ResponseEntity<Map<String, Object>> save(@RequestBody(required = true) SearchCriteria searchCriteria) {
 		Map<String, Object> response = new HashMap<>();
 		Map<String, Object> data = new HashMap<>();
-
+//		try {
+//		    Thread.sleep(10000); // 10 seconds
+//		} catch (InterruptedException e) {
+//		    e.printStackTrace();
+//		}
 		if (searchCriteria == null) {
 			throw new BadGatewayRequest("Invalid Request");
 		} else {
