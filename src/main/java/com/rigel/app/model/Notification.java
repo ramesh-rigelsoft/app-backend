@@ -39,6 +39,8 @@ public class Notification implements Serializable{
 	private String id;
 	
 	private String notificationType;
+	private String type;
+	private String time;
 	private String description;
 	private boolean status;	
 	private boolean seenStatus;	

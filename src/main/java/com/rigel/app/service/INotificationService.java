@@ -10,6 +10,8 @@ public interface INotificationService {
 	public Notification saveNotification(Notification notification);
 	public List<Notification> findNotification(SearchCriteria search);
 	public int notificationCount(SearchCriteria search);
+	public int unSeenNotificationCount(SearchCriteria search);
+	public int notificationUpdate(SearchCriteria search);
 
 
 }

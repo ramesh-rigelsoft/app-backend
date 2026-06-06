@@ -38,5 +38,14 @@ public class NotificationServiceImpl implements INotificationService {
 	public int notificationCount(SearchCriteria search) {
 		return notificationDao.notificationCount(search);
 	}
+	@Override
+	public int unSeenNotificationCount(SearchCriteria search) {
+		return notificationDao.unSeenNotificationCount(search);
+	}
+
+	@Override
+	public int notificationUpdate(SearchCriteria search) {
+		return notificationDao.notificationUpdate(search);
+	}
 
 }

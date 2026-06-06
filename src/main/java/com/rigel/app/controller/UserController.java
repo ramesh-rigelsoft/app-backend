@@ -199,7 +199,7 @@ public class UserController {
 				try {
 					json = mapper.writeValueAsString(user);
 				} catch (JsonProcessingException e) {
-					// TODO Auto-generated catch block
+					saveLoginNotification(user.getId(),login.getUsername(),Constaints.NOTIFICATION_TYPE_F);
 					e.printStackTrace();
 				}
 
@@ -216,7 +216,7 @@ public class UserController {
 					loginInfoService.saveLoginActivity(Arrays.asList(loginActivity1));
 					addvendor(user);
 				}
-				saveLoginNotification(login.getUsername());
+				saveLoginNotification(user.getId(),login.getUsername(),Constaints.NOTIFICATION_TYPE_S);
 				data.put("secret", secret);
 				data.put("user", thirdPartyResponse.getData().getUser());
 				data.put("token", thirdPartyResponse.getData().getAccess_token());
@@ -227,25 +227,42 @@ public class UserController {
 				return new ResponseEntity<>(response, HttpStatus.OK);
 			}
 		} else {
+			
 			User user = null;
 			try {
+				
+				
 				String obj = loginActivity.getUserObject();
 				// Read
 				user = mapper.readValue(obj, User.class);
+				System.out.println("--------------"+User.PASSWORD_ENCODER.matches(login.getPassword(), user.getPassword()));
+				if(!User.PASSWORD_ENCODER.matches(login.getPassword(), user.getPassword())) {
+					saveLoginNotification(user.getId(),login.getUsername(),Constaints.NOTIFICATION_TYPE_F);
+					throw new TaskTitleNotFound("Wrong Password.");
+				}
+					
+				
 				System.out.println("user----------"+user.toString());
 			
 //				loginActivity.getUserObject()
 //				MyClass obj = mapper.readValue(userObject, MyClass.class);
 //				user = mapper.treeToValue(loginActivity.getUserObject(), User.class);
 			} catch (JsonProcessingException e) {
+				saveLoginNotification(user.getId(),login.getUsername(),Constaints.NOTIFICATION_TYPE_F);
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+				 throw new RuntimeException(e); // 🔥 FIX
 			} catch (IllegalArgumentException e) {
 				// TODO Auto-generated catch block
+				saveLoginNotification(user.getId(),login.getUsername(),Constaints.NOTIFICATION_TYPE_F);
 				e.printStackTrace();
+				 throw e;
+			}catch (Exception e) {
+				saveLoginNotification(user.getId(),login.getUsername(),Constaints.NOTIFICATION_TYPE_F);
+				 throw e;
 			}
 			
-			saveLoginNotification(login.getUsername());
+			saveLoginNotification(user.getId(),login.getUsername(),Constaints.NOTIFICATION_TYPE_S);
 			data2.put("access_token", loginActivity.getToken());
 			data2.put("user", user);
 			secret = RAUtility.generateMD5(data2.toString());
@@ -258,7 +275,6 @@ public class UserController {
 			response.put("code", "200");
 			response.put("message", "Your account has been logined successfully.");
 			return new ResponseEntity<>(response, HttpStatus.OK);
-
 		}
 	}
 
@@ -451,13 +467,13 @@ public class UserController {
 
 	}
 	
-	public void saveLoginNotification(String username) {
+	public void saveLoginNotification(int ownerId,String username,String type) {
 	    try {
 	        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm a");
 
 	        Notification notification = new Notification();
 	        notification.setNotificationType(Constaints.NOTIFICATION_TYPE_LOGIN);
-
+	        notification.setOwnerId(ownerId);
 	        String desc = String.format(
 	                "Login Alert: %s logged in at %s",
 	                username,
@@ -465,6 +481,7 @@ public class UserController {
 	        );
 
 	        notification.setDescription(desc);
+	        notification.setType(type);
 
 	        notificationService.saveNotification(notification);
 
