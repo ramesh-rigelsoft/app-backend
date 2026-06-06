@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rigel.app.dao.IBuyerDao;
 import com.rigel.app.dao.IInventoryDao;
 import com.rigel.app.dao.ISalesDao;
+import com.rigel.app.exception.ValidationException;
 import com.rigel.app.model.BuyerInfo;
 import com.rigel.app.model.Inventory;
 import com.rigel.app.model.SalesInfo;
@@ -55,6 +56,10 @@ public class BuyerInfoServiceImpl implements IBuyerInfoService {
 
 	@Override
 	public SalesResponse saveBuyerInfo(SalesRequest salesRequest) {
+		
+		if (salesRequest.getUserId() < 1) {
+			throw new ValidationException("Session Expired, Please Login again then try....");
+		}
 
 		List<SalesInfoDto> sales = objectMapper.convertValue(salesRequest.getBuyerInfoDto().getSalesInfo(),
 				new TypeReference<List<SalesInfoDto>>() {
@@ -71,8 +76,6 @@ public class BuyerInfoServiceImpl implements IBuyerInfoService {
 		String customberId = invoiceService.generateCustId(salesRequest.getUserId(), "CUST_ID", "");
 
 		BigDecimal paidAmount = buyer.getPaidAmount();
-		System.out.println("ffffffff---------"+paidAmount);
-		System.out.println("ffffffff---------"+buyer.getTotalAmount());
 		String transObject = null;
 		try {
 			List<TransactionBorrow> transactionBorrow = new ArrayList<>();
@@ -136,6 +139,10 @@ public class BuyerInfoServiceImpl implements IBuyerInfoService {
 
 	@Override
 	public int updateBuyerInfo(SalesRequest salesRequest) {
+		
+		if (salesRequest.getUserId() < 1) {
+			throw new ValidationException("Session Expired, Please Login again then try....");
+		}
 
 		BuyerInfoDto buyerInfoDto = salesRequest.getBuyerInfoDto();
 		BuyerInfo buyerInfo = buyerDao.searchBuyerInfo(SearchCriteria.builder().userId(buyerInfoDto.getOwnerId())

@@ -12,6 +12,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rigel.app.dao.IRepaireServiceDao;
 import com.rigel.app.dao.ISalesDao;
+import com.rigel.app.exception.ValidationException;
 import com.rigel.app.model.*;
 import com.rigel.app.model.dto.ExpenseCreteria;
 import com.rigel.app.model.dto.RepaireDeviceDto;
@@ -43,10 +44,15 @@ public class RepaireServiceServiceImpl implements IRepaireServiceService {
 
 	@Override
 	public RepaireDevice saveRepair(RepaireDevice repairDevice) {
+		
 		 // NULL CHECK
 	    if (repairDevice == null) {
 	        throw new RuntimeException("Repair Device is required");
 	    }
+	    
+	    if (repairDevice.getOwnerId() < 1) {
+			throw new ValidationException("Session Expired, Please Login again then try....");
+		}
 
 	    List<SalesInfo> salesList = new ArrayList<>(repairDevice.getSalesInfo());
 	    if (salesList == null || salesList.isEmpty()) {
@@ -68,6 +74,9 @@ public class RepaireServiceServiceImpl implements IRepaireServiceService {
 
 	@Override
 	public RepaireDevice updateRepaire(RepaireDeviceDto repaireDeviceDto) {
+		if (repaireDeviceDto.getOwnerId() < 1) {
+			throw new ValidationException("Session Expired, Please Login again then try....");
+		}
 		 String repairId=repaireDeviceDto.getId();
 		 int ownerId=repaireDeviceDto.getOwnerId();
 		 List<SalesInfo> existingSales = salesDao.fetchSalesByRepaireDevice(repairId,ownerId);
@@ -107,6 +116,9 @@ public class RepaireServiceServiceImpl implements IRepaireServiceService {
 
 	@Override
 	public RepaireDevice updateStatus(RepaireDevice repaireDevice) {
+		if (repaireDevice.getOwnerId() < 1) {
+			throw new ValidationException("Session Expired, Please Login again then try....");
+		}
 	    return repaireServiceDao.updateRepaire(repaireDevice);
 	}
 

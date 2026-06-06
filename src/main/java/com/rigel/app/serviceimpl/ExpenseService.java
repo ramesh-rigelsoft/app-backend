@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import com.rigel.app.dao.IExpenseDao;
+import com.rigel.app.exception.ValidationException;
 import com.rigel.app.model.Expense;
 import com.rigel.app.model.dto.ExpenseCreteria;
 import com.rigel.app.model.dto.ExpenseDTO;
@@ -26,11 +27,17 @@ public class ExpenseService implements IExpenseService{
 
 	@Override
 	public Expense saveExpense(ExpenseDTO dto) {
+		if (dto.getOwnerId() < 1) {
+			throw new ValidationException("Session Expired, Please Login again then try....");
+		}
 		return expenseDao.saveExpense(convertToEntity(dto));
 	}
 
 	@Override
 	public Expense updateExpense(Expense expense) {
+		if (expense.getOwnerId() < 1) {
+			throw new ValidationException("Session Expired, Please Login again then try....");
+		}
 		return expenseDao.updateExpense(expense);
 	}
 

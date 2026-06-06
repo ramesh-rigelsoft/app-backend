@@ -105,6 +105,10 @@ public class ItemsUpdateValidation {
 	}
 	public void repaireDeleteItems(List<SalesInfo> sales) {
 		sales.forEach(salesInfo -> {
+			
+			if (salesInfo.getOwnerId() < 1) {
+				throw new ValidationException("Session Expired, Please Login again then try....");
+			}
 
 			if (salesInfo.getItemCode() == null) {
 				throw new ValidationException("Item can not be update or delete at this time.");

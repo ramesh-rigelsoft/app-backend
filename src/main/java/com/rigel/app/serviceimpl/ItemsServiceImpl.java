@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import com.rigel.app.dao.IItemsDao;
 import com.rigel.app.dao.ISupplierDao;
+import com.rigel.app.exception.ValidationException;
 import com.rigel.app.model.Inventory;
 import com.rigel.app.model.Items;
 import com.rigel.app.model.Vendors;
@@ -45,9 +46,10 @@ public class ItemsServiceImpl implements IItemsService {
 	@Override
 	public Items saveItems(Items items, boolean isUpdate) {
 
-
+		if (items.getOwnerId() < 1) {
+			throw new ValidationException("Session Expired, Please Login again then try....");
+		}
 		Vendors vendors=supplierDao.findById(items.getItemSource());
-		System.out.println("ddddddddddd--------"+vendors);
 		
 		String desc = AppUtill.replaceAllSpace(items.getDescription());
 		String brand = AppUtill.replaceAllSpace(items.getBrand());

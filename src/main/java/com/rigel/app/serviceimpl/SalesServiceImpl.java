@@ -14,6 +14,7 @@ import com.rigel.app.dao.IInventoryDao;
 import com.rigel.app.dao.IItemsDao;
 import com.rigel.app.dao.ISalesDao;
 import com.rigel.app.dao.ISupplierDao;
+import com.rigel.app.exception.ValidationException;
 import com.rigel.app.model.GarbageItemsInfo;
 import com.rigel.app.model.Inventory;
 import com.rigel.app.model.Items;
@@ -133,6 +134,9 @@ public class SalesServiceImpl implements ISalesService {
 
 	@Override
 	public int deleteById(List<SalesInfo> salesinfo,int ownerId) {
+		if (ownerId < 1) {
+			throw new ValidationException("Session Expired, Please Login again then try....");
+		}
 		List<String> ids=salesinfo.stream().map(s->s.getId()).toList();
 		itemsUpdateValidation.repaireDeleteItems(salesinfo);
 		return salesDao.permantalyDeleteBySalesId(ids.get(0), ownerId);

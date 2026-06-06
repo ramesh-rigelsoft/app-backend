@@ -42,8 +42,13 @@ public class SalesInfoValidator {
 		for (int i = 0; i < salesList.size(); i++) {
 
 			SalesInfoDto salesInfo = salesList.get(i);
+			if (salesInfo.getOwnerId() < 1) {
+				throw new ValidationException("Session Expired, Please Login again then try....");
+			}
+			
 			String code = salesInfo.getItemCode() == null ? "" : salesInfo.getItemCode().trim();
 
+			
 			// ❌ Empty itemCode
 			if (code.isEmpty()) {
 				throw new ValidationException("Item code is required at row " + (i + 1));
@@ -102,6 +107,11 @@ public class SalesInfoValidator {
 		for (int i = 0; i < salesList.size(); i++) {
 
 			SalesInfoDto salesInfo = salesList.get(i);
+			
+			if (salesInfo.getOwnerId() < 1) {
+				throw new ValidationException("Session Expired, Please Login again then try....");
+			}
+			
 			String code = salesInfo.getItemCode() == null ? "" : salesInfo.getItemCode().trim();
 
 			// ❌ Empty itemCode
@@ -163,6 +173,11 @@ public class SalesInfoValidator {
 		for (int i = 0; i < salesList.size(); i++) {
 
 			SalesInfo salesInfo = salesList.get(i);
+			
+			if (salesInfo.getOwnerId() < 1) {
+				throw new ValidationException("Session Expired, Please Login again then try....");
+			}
+			
 			String code = salesInfo.getItemCode() == null ? "" : salesInfo.getItemCode().trim();
 
 			// ❌ Empty itemCode

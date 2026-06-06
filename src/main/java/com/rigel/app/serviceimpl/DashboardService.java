@@ -15,6 +15,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import com.rigel.app.dao.IDashboardDao;
+import com.rigel.app.exception.ValidationException;
 import com.rigel.app.model.Inventory;
 import com.rigel.app.model.SalesInfo;
 import com.rigel.app.model.dto.DashboardRequest;
@@ -30,6 +31,9 @@ public class DashboardService implements IDashboardService {
 	
 	@Override
 	public Map<String, Object> viewDashboard(DashboardRequest dashboardRequest) {
+		if (dashboardRequest.getUserId() < 1) {
+			throw new ValidationException("Session Expired, Please Login again then try....");
+		}
 		return dashboardDao.viewDashboard(dashboardRequest);
 	}
 }

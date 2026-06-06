@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import com.rigel.app.dao.ISupplierDao;
+import com.rigel.app.exception.ValidationException;
 import com.rigel.app.model.Items;
 import com.rigel.app.model.Vendors;
 import com.rigel.app.model.dto.SearchCriteria;
@@ -25,11 +26,17 @@ public class SupplierService implements ISupplierService {
 	
 	@Override
 	public Vendors saveSupplier(VendorsDTO dto) {
+		if (dto.getOwnerId() < 1) {
+			throw new ValidationException("Session Expired, Please Login again then try....");
+		}
 		return supplierDao.saveSupplier(dto);
 	}
 
 	@Override
 	public Vendors updateSupplier(VendorsDTO expense) {
+		if (expense.getOwnerId() < 1) {
+			throw new ValidationException("Session Expired, Please Login again then try....");
+		}
 		return supplierDao.updateSupplier(expense);
 	}
 
