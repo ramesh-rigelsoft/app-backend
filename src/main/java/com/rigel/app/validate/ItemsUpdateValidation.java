@@ -80,7 +80,7 @@ public class ItemsUpdateValidation {
 	public void repaireItemValidation(List<SalesInfo> sales) {
 		sales.forEach(salesInfo -> {
 
-			if (salesInfo.getItemCode() == null||salesInfo.getOwnerId()==0) {
+			if (salesInfo.getItemCode() == null||salesInfo.getOwnerId() < 1) {
 				throw new ValidationException("Session Expired, Please Login agin then try....");
 			}
 			Inventory inventory = inventoryDao

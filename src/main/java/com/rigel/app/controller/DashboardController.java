@@ -44,7 +44,6 @@ public class DashboardController {
 	    if (result.hasErrors()) {
 
 	        Map<String, String> errors = new HashMap<>();
-
 	        result.getFieldErrors().forEach(error ->
 	                errors.put(error.getField(), error.getDefaultMessage())
 	        );

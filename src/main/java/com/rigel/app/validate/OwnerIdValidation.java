@@ -22,7 +22,7 @@ public class OwnerIdValidation {
 	public void validate(int ownerId) {
 
 		// ❌ Empty owner Id
-		if (ownerId == 0) {
+		if (ownerId < 1) {
 			throw new ValidationException("Session Expired, Please Login agin then try....");
 		}
 	

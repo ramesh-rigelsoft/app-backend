@@ -14,7 +14,7 @@ public class EntryInfoValidator {
 		}
 
 		// ❌ Empty owner Id
-		if (items.getOwnerId() == 0) {
+		if (items.getOwnerId() < 1) {
 			throw new ValidationException("Session Expired, Please Login agin then try....");
 		}
 		
