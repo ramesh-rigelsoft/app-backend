@@ -22,6 +22,7 @@ public class Constaints {
 	public static final String GARBAGE_COLLECTED = "collected";
 	public static final String GARBAGE_RETURN = "returned";
 	
+	public static final String NOTIFICATION_TYPE_LOGIN = "Login";
 	public static final String NOTIFICATION_TYPE_LOWSTOCK = "LowStock";
 	public static final String NOTIFICATION_TYPE_LOW_SALES = "LowSales";
 	public static final String NOTIFICATION_TYPE_FAST_SALES = "FastSales";

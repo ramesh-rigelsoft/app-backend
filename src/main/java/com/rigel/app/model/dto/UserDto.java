@@ -78,6 +78,8 @@ public class UserDto {
     private String companyType; // Pvt Ltd, LLP, Proprietor, etc.
     private Integer companyEmployeeCount;
     // ================= RELATION =================
+    
+    private int ownerId;
 
     private MultipartFile logo;
     

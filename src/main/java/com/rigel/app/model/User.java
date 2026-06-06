@@ -96,6 +96,8 @@ public class User implements Serializable{
     private String macAddress;
     
     private String additionalDetails;
+    
+    private int ownerId;
 
     
 	public static PasswordEncoder getPasswordEncoder() {

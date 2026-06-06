@@ -2,6 +2,7 @@ package com.rigel.app.controller;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -29,6 +30,7 @@ import com.rigel.app.model.LoginActivity;
 import com.rigel.app.model.LoginDetails;
 import com.rigel.app.model.LoginRequest;
 import com.rigel.app.model.Mail;
+import com.rigel.app.model.Notification;
 import com.rigel.app.model.ThirdPartyResponse;
 import com.rigel.app.model.User;
 import com.rigel.app.model.Vendors;
@@ -36,6 +38,7 @@ import com.rigel.app.model.dto.*;
 import com.rigel.app.security.JwtTokenUtil;
 import com.rigel.app.security.JwtUser;
 import com.rigel.app.service.ILoginInfoService;
+import com.rigel.app.service.INotificationService;
 import com.rigel.app.service.IUserLogOutIn;
 import com.rigel.app.service.IUserService;
 import com.rigel.app.serviceimpl.LoginInfoService;
@@ -106,6 +109,9 @@ public class UserController {
 	
 	@Autowired
 	private ISupplierDao supplierDao;
+	
+	@Autowired
+	private INotificationService notificationService;
 
 //	@RequestMapping(value = "sendEmail", method = RequestMethod.POST)
 //	public ResponseEntity<Map<String, Object>> sendEmail(@RequestBody(required = true) @Valid Mail mail,
@@ -177,8 +183,11 @@ public class UserController {
 		Map<String, Object> data2 = new HashMap<>();
 		String secret = null;
 		LoginActivity loginActivity = loginInfoService.findLoginActivityByUsername(login.getUsername());
-//		System.out.println((jwtTokenUtil.isTokenExpired(loginActivity != null ? loginActivity.getToken() : null)) + "------------" + loginActivity);
-		if (loginActivity == null || (loginActivity != null	&& jwtTokenUtil.isTokenExpired(loginActivity != null ? loginActivity.getToken() : null))) {
+//		System.out.println("------------" + loginActivity.getToken());
+		if (loginActivity == null || (loginActivity != null&&loginActivity.getToken()!=null&& jwtTokenUtil.isTokenExpired(loginActivity.getToken())||(loginActivity != null&&loginActivity.getToken()==null)))
+		 {
+			System.out.println("secret----" + secret);
+			
 			ThirdPartyResponse thirdPartyResponse = RAUtility.loginPost(login.toString());
 			if (thirdPartyResponse == null) {
 				throw new TaskTitleNotFound("Email id not existing with us.");
@@ -200,13 +209,14 @@ public class UserController {
 					loginInfoService.updateLoginActivity(loginActivity);
 				} else {
 					UploadFileUtlity.downloadImageFromApi("logo", user.getLogo(), Constaints.LOGO_PATH);
-					JsonNode userNode = mapper.valueToTree(user);
+//					JsonNode userNode = mapper.valueToTree(user);
 					LoginActivity loginActivity1 = LoginActivity.builder().userId(user.getId()).loginAt(LocalDateTime.now())
 							.token(thirdPartyResponse.getData().getAccess_token()).emailId(user.getEmail_id())
 							.mobileNumber(user.getMobile_no()).userObject(json).secret(secret).build();
 					loginInfoService.saveLoginActivity(Arrays.asList(loginActivity1));
 					addvendor(user);
 				}
+				saveLoginNotification(login.getUsername());
 				data.put("secret", secret);
 				data.put("user", thirdPartyResponse.getData().getUser());
 				data.put("token", thirdPartyResponse.getData().getAccess_token());
@@ -218,7 +228,6 @@ public class UserController {
 			}
 		} else {
 			User user = null;
-			System.out.println("loginActivity.getUserObject()----" + loginActivity.getUserObject());
 			try {
 				String obj = loginActivity.getUserObject();
 				// Read
@@ -236,6 +245,7 @@ public class UserController {
 				e.printStackTrace();
 			}
 			
+			saveLoginNotification(login.getUsername());
 			data2.put("access_token", loginActivity.getToken());
 			data2.put("user", user);
 			secret = RAUtility.generateMD5(data2.toString());
@@ -439,6 +449,28 @@ public class UserController {
              supplierDao.saveSupplier(vendor);
          }
 
+	}
+	
+	public void saveLoginNotification(String username) {
+	    try {
+	        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm a");
+
+	        Notification notification = new Notification();
+	        notification.setNotificationType(Constaints.NOTIFICATION_TYPE_LOGIN);
+
+	        String desc = String.format(
+	                "Login Alert: %s logged in at %s",
+	                username,
+	                LocalDateTime.now().format(formatter)
+	        );
+
+	        notification.setDescription(desc);
+
+	        notificationService.saveNotification(notification);
+
+	    } catch (Exception e) {
+	        e.printStackTrace(); // better than empty catch
+	    }
 	}
 
 }
