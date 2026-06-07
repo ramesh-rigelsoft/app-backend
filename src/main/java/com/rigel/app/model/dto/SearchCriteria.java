@@ -42,6 +42,7 @@ public class SearchCriteria {
 	private String invoiceNumber;
 	private String repaireDeviceId;
     private Set<String> itemCodes;
+    private Set<String> ids;
     private String itemCode;
     private String category;
 	private String categoryType;

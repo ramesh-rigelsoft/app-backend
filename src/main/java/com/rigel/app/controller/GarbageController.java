@@ -81,22 +81,22 @@ public class GarbageController {
 
 	    Map<String, Object> response = new HashMap<>();
 
-	    if (criteria == null || criteria.getItemCodes() == null || criteria.getItemCodes().isEmpty()) {
+	    if (criteria == null || criteria.getIds() == null || criteria.getIds().isEmpty()) {
 	        response.put("status", "FAILED");
 	        response.put("code", "400");
-	        response.put("message", "itemCodes list is required");
+	        response.put("message", "items list is required");
 	        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 	    }
 
-	    Set<String> itemCodes = criteria.getItemCodes();
+	    Set<String> ids = criteria.getIds();
 	    List<GarbageItemsInfo> items = new ArrayList<>();
-	    itemCodes.forEach(code -> {
-	        GarbageItemsInfo item = garbageService.findGarbageByItemCode(code);
+	    ids.forEach(id -> {
+	        GarbageItemsInfo item = garbageService.findGarbageById(id);
 	        if (item != null) {
 	            item.setGarbageStatus(Constaints.GARBAGE_RETURN);
 	            item.setUpdatedAt(LocalDateTime.now());
 	            items.add(item);
-	            garbageService.saveGarbage(item);
+	            garbageService.updateGarbage(item);
 	        }
 	    });
 	    
@@ -122,10 +122,14 @@ public class GarbageController {
 	    criteria.setMaxRecords(1);
 	    Inventory inventory = inventoryService.searchInventory(criteria).stream().findFirst().orElse(null);
 	    garbageValidator.validate(criteria,inventory);
+	    Vendors vendors=supplierService.searchSupplier(SupplierCreteria.builder().userId(criteria.getUserId()).startIndex(0).maxRecords(1).gstNumber(inventory.getVendorGSTNumber()).build()).stream().findFirst().orElse(null);
 	    GarbageItemsInfo garbageItemsInfo=objMapper.convertValue(inventory, GarbageItemsInfo.class);
 	    garbageItemsInfo.setId(null);
 	    garbageItemsInfo.setGarbageStatus(Constaints.GARBAGE_COLLECTED);
 	    garbageItemsInfo.setCreatedAt(LocalDateTime.now());
+	    garbageItemsInfo.setQuantity(criteria.getQuantity());
+	    garbageItemsInfo.setVendors(vendors);
+	    
 	    garbageService.saveGarbage(garbageItemsInfo);
 	    
 	    response.put("status", "OK");

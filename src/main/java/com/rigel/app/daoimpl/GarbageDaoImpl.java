@@ -26,6 +26,7 @@ public class GarbageDaoImpl implements IGarbageDao {
 
 	@Override
 	public GarbageItemsInfo updateGarbage(GarbageItemsInfo garbage) {
+		garbage.setUpdatedAt(LocalDateTime.now());
 		return entityManager.merge(garbage);
 	}
 
@@ -45,4 +46,19 @@ public class GarbageDaoImpl implements IGarbageDao {
 	    }
 	}
 
+	@Override
+	public GarbageItemsInfo findGarbageById(String id) {
+
+	    String jpql =
+	        "SELECT g FROM GarbageItemsInfo g WHERE g.id = :id";
+
+	    try {
+	        return entityManager.createQuery(jpql, GarbageItemsInfo.class)
+	                .setParameter("id", id)
+	                .getSingleResult();
+
+	    } catch (Exception e) {
+	        return null;
+	    }
+	}
 }

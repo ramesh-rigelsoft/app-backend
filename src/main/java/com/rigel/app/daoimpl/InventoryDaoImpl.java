@@ -321,5 +321,19 @@ public class InventoryDaoImpl implements IInventoryDao {
 	    query.setMaxResults(criteria.getMaxRecords());	    
 	    return query.getResultList();
 	}
+	
+//	@Override
+//	public List<Inventory> searchNotificationInventory(SearchCriteria criteria) {
+//
+//	    StringBuilder jpql = new StringBuilder("SELECT i FROM Inventory i ");
+//	    
+//	    jpql.append(" ORDER BY i.createdAt,i.updatedAt DESC ");
+//		   
+//	    TypedQuery<Inventory> query = entityManager.createQuery(jpql.toString(), Inventory.class);
+//	    query.setFirstResult(criteria.getStartIndex());
+//	    query.setMaxResults(criteria.getMaxRecords());	    
+//	    return query.getResultList();
+//	}
+	
 
 }

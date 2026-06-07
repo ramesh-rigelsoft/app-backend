@@ -25,12 +25,15 @@ public class Constaints {
 	public static final String NOTIFICATION_TYPE_S = "Success";
 	public static final String NOTIFICATION_TYPE_F = "Failed";
 	
-	public static final String NOTIFICATION_TYPE_LOGIN = "Login";
-	public static final String NOTIFICATION_TYPE_LOWSTOCK = "LowStock";
-	public static final String NOTIFICATION_TYPE_LOW_SALES = "LowSales";
-	public static final String NOTIFICATION_TYPE_FAST_SALES = "FastSales";
-	public static final String NOTIFICATION_TYPE_TODAY_TOTAL_SALES = "TotalSalesToday";
-	public static final String NOTIFICATION_TYPE_TODAY_TOTAL_ENTRY = "TotalEntryToday";
+	public static final String NOTIFICATION_TYPE_LOGIN = "LOGIN";
+	public static final String NOTIFICATION_TYPE_LOWS_TOCK = "LOW_STOCK";
+	public static final String NOTIFICATION_TYPE_OUT_OF_TOCK = "LOW_OF_STOCK";
+	public static final String NOTIFICATION_TYPE_NO_SALES = "NO_SALES";
+	public static final String NOTIFICATION_TYPE_DEAD_STOCK = "DEAD_STOCK";
+	public static final String NOTIFICATION_TYPE_SLOW_MOVING = "SLOW_MOVING";
+	public static final String NOTIFICATION_TYPE_FAST_MOVING = "FAST_MOVING";
+	public static final String NOTIFICATION_TYPE_TODAY_TOTAL_SALES = "TODAY_TOTAL_SALES";
+	public static final String NOTIFICATION_TYPE_TODAY_TOTAL_ENTRY = "TODAY_TOTAL_ENTRY";
 	
 
 }

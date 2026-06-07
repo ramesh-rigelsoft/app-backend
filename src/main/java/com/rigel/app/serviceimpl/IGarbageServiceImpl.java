@@ -35,4 +35,8 @@ public class IGarbageServiceImpl implements IGarbageService {
 		return garbageDao.findGarbageByItemCode(itemCode);
 	}
 
+	@Override
+	public GarbageItemsInfo findGarbageById(String id) {
+		return garbageDao.findGarbageById(id);
+	}
 }

@@ -7,6 +7,7 @@ public interface IGarbageService {
 	public GarbageItemsInfo saveGarbage(GarbageItemsInfo garbage);
 	public GarbageItemsInfo updateGarbage(GarbageItemsInfo garbage);
 	public GarbageItemsInfo findGarbageByItemCode(String itemCode);
+	public GarbageItemsInfo findGarbageById(String id);
 
 
 }
