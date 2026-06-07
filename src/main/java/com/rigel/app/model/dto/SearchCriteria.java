@@ -53,7 +53,7 @@ public class SearchCriteria {
 	private String ramUnit;
 	private String storage;
 	private String storageUnit;
-	private String quantity;
+	private Integer quantity;
 	private String initialPrice;
 	private String sellingPrice;
 	private String processor;

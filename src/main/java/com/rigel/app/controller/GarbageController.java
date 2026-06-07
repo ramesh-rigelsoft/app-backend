@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rigel.app.exception.BadGatewayRequest;
 import com.rigel.app.model.Expense;
 import com.rigel.app.model.GarbageItemsInfo;
+import com.rigel.app.model.Inventory;
 import com.rigel.app.model.Vendors;
 import com.rigel.app.model.dto.ExpenseCreteria;
 import com.rigel.app.model.dto.ExpenseDTO;
@@ -30,11 +31,13 @@ import com.rigel.app.model.dto.VendorInvoiceResponse;
 import com.rigel.app.model.dto.VendorsDTO;
 import com.rigel.app.service.IExpenseService;
 import com.rigel.app.service.IGarbageService;
+import com.rigel.app.service.IInventoryService;
 import com.rigel.app.service.ISupplierService;
 import com.rigel.app.serviceimpl.GSTNumberService;
 import com.rigel.app.util.AppUtill;
 import com.rigel.app.util.Constaints;
 import com.rigel.app.util.RAUtility;
+import com.rigel.app.validate.GarbageValidator;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -51,6 +54,13 @@ public class GarbageController {
 
 	@Autowired
 	IGarbageService garbageService;
+	
+	@Autowired
+	IInventoryService inventoryService;
+	
+	@Autowired
+	GarbageValidator garbageValidator;
+	
 
 	
 	@PostMapping("list")
@@ -93,6 +103,33 @@ public class GarbageController {
 	    response.put("status", "OK");
 	    response.put("code", "200");
 	    response.put("updatedCount", items.size());
+	    response.put("message", "Your records have been updated successfully.");
+	    return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	
+	@PostMapping("save")
+	public ResponseEntity<Map<String, Object>> saveGarbage(@RequestBody SearchCriteria criteria) {
+
+	    Map<String, Object> response = new HashMap<>();
+
+	    if (criteria == null || criteria.getItemCode() == null || criteria.getItemCode().isEmpty()) {
+	        response.put("status", "FAILED");
+	        response.put("code", "400");
+	        response.put("message", "itemCode is required");
+	        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+	    }
+	    criteria.setStartIndex(0);
+	    criteria.setMaxRecords(1);
+	    Inventory inventory = inventoryService.searchInventory(criteria).stream().findFirst().orElse(null);
+	    garbageValidator.validate(criteria,inventory);
+	    GarbageItemsInfo garbageItemsInfo=objMapper.convertValue(inventory, GarbageItemsInfo.class);
+	    garbageItemsInfo.setId(null);
+	    garbageItemsInfo.setGarbageStatus(Constaints.GARBAGE_COLLECTED);
+	    garbageItemsInfo.setCreatedAt(LocalDateTime.now());
+	    garbageService.saveGarbage(garbageItemsInfo);
+	    
+	    response.put("status", "OK");
+	    response.put("code", "200");
 	    response.put("message", "Your records have been updated successfully.");
 	    return new ResponseEntity<>(response, HttpStatus.OK);
 	}
