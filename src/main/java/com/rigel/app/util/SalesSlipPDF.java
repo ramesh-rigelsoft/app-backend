@@ -47,9 +47,9 @@ import org.springframework.stereotype.Service;
 public class SalesSlipPDF {
 
 	
-	public static void createSlip(boolean isisGstApplicable,String fileName, User user, BuyerInfo buyer, List<SalesInfo> sales) {
+	public static void createSlip(boolean isGstApplicable,String fileName, User user, BuyerInfo buyer, List<SalesInfo> sales) {
 		try {
-			System.out.println("gst---" + user.getGstNumber());
+			System.out.println("paidAmount---" + buyer.getPaidAmount());
 //        	NumberFormat nf = NumberFormat.getNumberInstance(new Locale("en", "IN"));
 //        	 nf.setMinimumFractionDigits(2);
 //             nf.setMaximumFractionDigits(2);
@@ -288,9 +288,9 @@ public class SalesSlipPDF {
 						: BigDecimal.valueOf(s.getSoldPrice());	
 				
 				BigDecimal qty = BigDecimal.valueOf(s.getQuantity());
-			    BigDecimal discountedAmt =BigDecimal.valueOf(s.getSellingPrice()).subtract(BigDecimal.valueOf(s.getSoldPrice()));
+				BigDecimal discountedAmt =s.getCategory().equalsIgnoreCase(Constaints.SHOP_OWNER_CATEGORY)?BigDecimal.ZERO:BigDecimal.valueOf(s.getSellingPrice()).subtract(BigDecimal.valueOf(s.getSoldPrice()));
 				
-			    BigDecimal discountPercentage=discountedAmt.multiply(BigDecimal.valueOf(100).divide(basePrice.add(discountedAmt), 8, java.math.RoundingMode.HALF_UP));
+			    BigDecimal discountPercentage=s.getCategory().equalsIgnoreCase(Constaints.SHOP_OWNER_CATEGORY)?BigDecimal.ZERO:discountedAmt.multiply(BigDecimal.valueOf(100).divide(basePrice.add(discountedAmt), 8, java.math.RoundingMode.HALF_UP));
 
 			    
 			    BigDecimal amt = basePrice.add(discountedAmt).multiply(qty);
@@ -411,7 +411,7 @@ public class SalesSlipPDF {
 //				return rate * s.getQuantity();
 //			}).sum();
 
-			double discount = sales.stream().map(s -> BigDecimal.valueOf(s.getSellingPrice()).subtract(BigDecimal.valueOf(s.getSoldPrice())).multiply(BigDecimal.valueOf(s.getQuantity()))).reduce(BigDecimal.ZERO, BigDecimal::add).doubleValue();
+			double discount = sales.stream().map(s ->(s.getCategory().equalsIgnoreCase(Constaints.SHOP_OWNER_CATEGORY)?BigDecimal.ZERO:(BigDecimal.valueOf(s.getSellingPrice()).subtract(BigDecimal.valueOf(s.getSoldPrice())))).multiply(BigDecimal.valueOf(s.getQuantity()))).reduce(BigDecimal.ZERO, BigDecimal::add).doubleValue();
 			//			double discount = sales.stream().mapToDouble(s -> {return s.getSellingPrice()-s.getSoldPrice();}).sum();
 //			double grandTotal = subTotal -discount+ (isGstApplicable ? gst : 0.0);// - discount;
 			double grandTotal = BigDecimal.valueOf(subTotal).subtract(BigDecimal.valueOf(discount)).add(BigDecimal.valueOf(isGstApplicable ? gst : 0.0)).doubleValue();
@@ -444,10 +444,11 @@ public class SalesSlipPDF {
 
 			payment.addCell(cell("Paid Amount", normal));
 			payment.addCell(cell(
-					String.valueOf("Rs " + nf.format(new BigDecimal(String.valueOf(grandTotal))).toString()), normal));
+					String.valueOf("Rs " + nf.format(buyer.getPaidAmount()).toString()), normal));
 
 			payment.addCell(cell("Balance", normal));
-			payment.addCell(cell(String.valueOf("0.0"), normal));
+			BigDecimal balanceAmount=new BigDecimal(String.valueOf(grandTotal)).subtract(buyer.getPaidAmount());
+					payment.addCell(cell(String.valueOf(balanceAmount), normal));
 
 			document.add(payment);
 

@@ -44,7 +44,7 @@ public class PrintService implements IPrintService {
 		try {
 			User user = mapper.readValue(userObject, User.class);
 			
-			SalesSlipPDF.createSlip("bill_"+buyer.getInvoiceNumber(),user,buyer,item);
+			SalesSlipPDF.createSlip(isGstApplicable,"bill_"+buyer.getInvoiceNumber(),user,buyer,item);
 			return true;
 		} catch (JsonMappingException e) {
 			// TODO Auto-generated catch block
