@@ -37,7 +37,8 @@ public class PrintController {
 		} else if (result.hasFieldErrors()) {
 			throw new BadGatewayRequest(result.getFieldError().getDefaultMessage());
 		} else {
-			printService.billPrint(billRequest.getInvoiceNumber(), billRequest.getOwnerId(), billRequest.getUsername());
+			boolean isGstApplicable =billRequest.getBillType().equalsIgnoreCase("GST")?true:false;
+			printService.billPrint(isGstApplicable,billRequest.getInvoiceNumber(), billRequest.getOwnerId(), billRequest.getUsername());
 			response.put("data", data);
 			response.put("status", "CREATED");
 			response.put("code", "201");

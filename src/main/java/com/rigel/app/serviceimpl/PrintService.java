@@ -32,11 +32,11 @@ public class PrintService implements IPrintService {
 	private ObjectMapper mapper;
 
 	@Override
-	public boolean billPrint(String invoiceNumber,int ownerId,String username) {
+	public boolean billPrint(boolean isGstApplicable,String invoiceNumber,int ownerId,String username) {
 		SearchCriteria searchCriteria = SearchCriteria.builder().startIndex(0).maxRecords(100).isdownload(false).invoiceNumber(invoiceNumber).userId(ownerId).build();
 		System.out.println("searchCriteria---"+searchCriteria.toString());
 		List<SalesInfo> item=salesService.searchSalesInfo(searchCriteria);
-		System.out.println("item-------------"+item.toString());
+		System.out.println(item.size()+"item-------------"+item.toString());
 		BuyerInfo buyer=item.get(0).getBuyerInfo();
 		String userObject=loginInfoService.findLoginActivityByUsername(username).getUserObject();
 		System.out.println("userObject-------------"+userObject);

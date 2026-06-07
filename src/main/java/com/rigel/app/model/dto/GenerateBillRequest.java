@@ -19,6 +19,7 @@ public class GenerateBillRequest {
 	private int ownerId;
 	private String username;
 	private String invoiceNumber;
+	private String billType;
 	
 		
 }
