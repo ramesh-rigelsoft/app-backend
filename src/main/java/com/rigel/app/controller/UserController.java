@@ -195,9 +195,12 @@ public class UserController {
 				secret = RAUtility.generateMD5(thirdPartyResponse.getData().toString());
 				System.out.println("secret----" + secret);
 				User user = thirdPartyResponse.getData().getUser();
+				List<MenuDto> pageAccess=thirdPartyResponse.getData().getPage_access();
 				String json = null;
+				String pageAccessStr=null;
 				try {
 					json = mapper.writeValueAsString(user);
+					pageAccessStr = mapper.writeValueAsString(pageAccess);
 				} catch (JsonProcessingException e) {
 					saveLoginNotification(user.getId(),login.getUsername(),Constaints.NOTIFICATION_TYPE_F);
 					e.printStackTrace();
@@ -206,13 +209,15 @@ public class UserController {
 //				UserDto userDto = modelMapper.map(user, UserDto.class);
 				if (loginActivity != null) {
 					loginActivity.setToken(thirdPartyResponse.getData().getAccess_token());
+					loginActivity.setPageAccess(pageAccessStr);
 					loginInfoService.updateLoginActivity(loginActivity);
 				} else {
 					UploadFileUtlity.downloadImageFromApi("logo", user.getLogo(), Constaints.LOGO_PATH);
 //					JsonNode userNode = mapper.valueToTree(user);
 					LoginActivity loginActivity1 = LoginActivity.builder().userId(user.getId()).loginAt(LocalDateTime.now())
 							.token(thirdPartyResponse.getData().getAccess_token()).emailId(user.getEmail_id())
-							.mobileNumber(user.getMobile_no()).userObject(json).secret(secret).build();
+							.mobileNumber(user.getMobile_no()).pageAccess(pageAccessStr).userObject(json).secret(secret).build();
+					
 					loginInfoService.saveLoginActivity(Arrays.asList(loginActivity1));
 					addvendor(user);
 				}
@@ -220,6 +225,7 @@ public class UserController {
 				data.put("secret", secret);
 				data.put("user", thirdPartyResponse.getData().getUser());
 				data.put("token", thirdPartyResponse.getData().getAccess_token());
+				data.put("pages_access", thirdPartyResponse.getData().getPage_access());
 				response.put("data", data);
 				response.put("status", "OK");
 				response.put("code", "200");
@@ -266,6 +272,7 @@ public class UserController {
 			data2.put("access_token", loginActivity.getToken());
 			data2.put("user", user);
 			secret = RAUtility.generateMD5(data2.toString());
+			data.put("pages_access", loginActivity.getPageAccess());
 			
 			data.put("token", loginActivity.getToken());
 			data.put("secret", secret);

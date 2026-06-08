@@ -42,6 +42,11 @@ public class LoginActivity implements Serializable {
     
 	@Column(name = "lvstatus")
 	private boolean lvstatus;
+	
+	private String officeBranch;
+	
+	@Column(columnDefinition = "CLOB")
+	private String pageAccess;
 
 
 //    @Column(name = "user_object", columnDefinition = "text")

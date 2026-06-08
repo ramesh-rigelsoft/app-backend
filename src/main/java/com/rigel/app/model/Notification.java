@@ -45,6 +45,7 @@ public class Notification implements Serializable{
 	private boolean status;	
 	private boolean seenStatus;	
 	private LocalDateTime seenAt;
+	private String officeBranch;
 	private int ownerId;	
 	private LocalDateTime createdAt;
 }

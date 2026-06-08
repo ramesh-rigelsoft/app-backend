@@ -56,6 +56,7 @@ public class VendorPayments{
 	private LocalDateTime createdAt;
 	private LocalDateTime updateAt;
 	private int ownerId;
+	private String officeBranch;
 	
 	private String paymentModes;
 	private String comments;

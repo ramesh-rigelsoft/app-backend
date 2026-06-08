@@ -93,6 +93,8 @@ public class Items implements Serializable {
     private int ownerId;
     private String additionalDetails;
     
+	private String officeBranch;
+    
 	@ManyToOne(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
 	@JoinColumn(name="vendors")
 //	@JsonBackReference

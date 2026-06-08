@@ -1,5 +1,9 @@
 package com.rigel.app.model;
 
+import java.util.List;
+
+import com.rigel.app.model.dto.MenuDto;
+
 //import com.app.todoapp.model.User;
 
 //LoginResponse.java
@@ -26,9 +30,11 @@ public class ThirdPartyResponse {
  public static class Data {
      private String access_token;
      private User user;
+     private List<MenuDto> page_access;
 
      // Getters and Setters
      public String getAccess_token() { return access_token; }
+     public List<MenuDto> getPage_access() { return page_access; }
      public void setAccess_token(String access_token) { this.access_token = access_token; }
 
      public User getUser() { return user; }

@@ -81,6 +81,8 @@ public class Inventory implements Serializable {
     private Integer warrantyInMonth;
 	private String serialNumber;
 	
+	private String officeBranch;
+	
     private boolean status; 
     private String additionalDetails;
 

@@ -174,6 +174,8 @@ public class SalesInfo implements Serializable{
 
     @Column(name = "serial_number")
     private String serialNumber;
+    
+	private String officeBranch;
 	
 	@Column(name = "additional_details")
 	private String additionalDetails;

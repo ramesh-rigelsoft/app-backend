@@ -83,6 +83,8 @@ public class RepaireDevice implements Serializable {
 	private LocalDateTime deliveryDate;
 	private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    
+	private String officeBranch;
 	
     private int ownerId;
 

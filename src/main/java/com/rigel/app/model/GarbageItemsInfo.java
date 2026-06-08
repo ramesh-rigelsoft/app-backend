@@ -176,6 +176,8 @@ public class GarbageItemsInfo implements Serializable{
 	@Column(name = "garbageStatus")
 	private String garbageStatus;
 	
+	private String officeBranch;
+	
 	@Column(name = "updated_at")
 	private LocalDateTime updatedAt;
 

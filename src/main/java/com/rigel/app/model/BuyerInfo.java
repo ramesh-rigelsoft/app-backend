@@ -92,6 +92,8 @@ public class BuyerInfo implements Serializable{
 		
 	private int ownerId;
 	
+	private String officeBranch;
+	
 	@OneToMany(mappedBy="buyerInfo", cascade=CascadeType.ALL, fetch=FetchType.LAZY)
 	@JsonIgnore
 	private Set<SalesInfo> salesInfo = new HashSet<>();
